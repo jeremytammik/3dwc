@@ -1,0 +1,302 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</head>
+
+<!--
+
+-->
+
+<h3>Preparing for Processing Query String Server Arguments</h3>
+
+<p>Working our way towards our first full-fledged web application, we looked at the following steps so far:</p>
+
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/the-brackets-editor.html">The web enabled Brackets editor</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/the-nodejs-server-platform-icons-3d-and-the-future.html">The Node.js server platform</a></li>
+</ul>
+
+<p>For the <a name="1">next couple of steps</a>, I am thinking of things like this:</p>
+
+<ul>
+<li>Extract URL query string arguments.</li>
+<li>Implement a JavaScript function to do something interesting with them, e.g.:</li>
+<ul>
+<li>String sample.</li>
+<li>2D graphics sample using SVG.</li>
+<li>3D graphics sample using WebGL.</li>
+</ul>
+<li>Implement a REST API.</li>
+<li>Run our server live on the web.</li>
+<li>Implement a desktop application interacting with it.</li>
+</ul>
+
+<p>Before getting to that, I'll mention what my colleagues pointed out in reaction to yesterday's post on the
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/03/the-nodejs-server-platform-icons-3d-and-the-future.html">
+node.js web server</a>:</p>
+
+
+<a name="2"></a>
+
+<h4>Http-server</h4>
+
+<p>One of the very easiest ways to create a web server with no code whatsoever is to make use of
+
+<a href="https://github.com/indexzero/http-server">http-server</a>, a simple zero-configuration command-line HTTP server.</p>
+
+<p>It is powerful enough for production usage, but it's simple and hackable enough to be used for testing, local development, and learning, e.g. to
+
+<a href="http://stackoverflow.com/questions/16333790/node-js-quick-file-server-static-files-over-http">
+serve static files</a>.</p>
+
+<p>Here is a minimal description by <a href="http://adndevblog.typepad.com/cloud_and_mobile/cyrille-fauvel.html">Cyrille Fauvel</a>:</p>
+
+<ol>
+<li>This step needs to be done only once per machine (e.g. <code>–g</code> flag).
+Set up Node.js http-server server:
+<pre>
+npm install http-server -g
+</pre>
+</li>
+<li>Put your files in your folder.</li>
+<li>Start your local node http-server server:
+<pre>
+[sudo] http-server &lt;myfolder&gt;
+</pre>
+</li>
+</ol>
+
+
+<a name="3"></a>
+
+<h4>A JavaScript Function for Word Jumbling</h4>
+
+<p>As said, I would like to extract and process some
+
+<a href="https://en.wikipedia.org/wiki/Query_string">query string</a> arguments
+
+from the URL used to invoke the server.</p>
+
+<p>An easy kind of data type to start playing with is strings, so let's start by implementing a JavaScript function to do something interesting with them.</p>
+
+<p>A nice little example is the
+
+<a href="http://james.padolsey.com/javascript/word-jumbling-experiment">
+word jumbling experiment</a> presented
+
+by James Padolsey, based on the
+
+<a href="http://www.mrc-cbu.cam.ac.uk/people/matt.davis/Cmabrigde">Cmabrigde</a> paper
+
+by Matt Davis at Cambridge University.</p>
+
+<p>This function takes a word and jumbles all its 'interior' letters, leaving the first and last one intact:</p>
+
+<pre class="prettyprint">
+function jumble(word) {
+
+  // Rand function will return 2-part array
+  // [0] -> Index of rand,
+  // [1] -> random found value (from args)
+  var rand = function(){
+    var myRand = Math.floor(
+      Math.random() * arguments.length);
+    return [myRand, arguments[myRand]];
+  };
+
+  // Split passed word into array
+  word = word.split('');
+
+  // Cache word length for easy looping
+  length = word.length;
+
+  // Prepate empty string for jumbled word
+  jumbled = '';
+
+  // Get array full of all available indexes:
+  // (Reverse while loops are quickest:
+  // http://reque.st/1382)
+  arrIndexes = [];
+  while (length--) {
+    arrIndexes.push(length);
+  }
+
+  // Cache word length again:
+  length = word.length;
+
+  // Another loop
+  while (length--) {
+    // Get a random number, must be one of
+    // those found in arrIndexes
+    var rnd = rand.apply(null,arrIndexes);
+    // Append random character to jumbled
+    jumbled += word[rnd[1]];
+    // Remove character from arrIndexes
+    // so that it is not selected again:
+    arrIndexes.splice(rnd[0],1);
+  }
+
+  // Return the jumbled word
+  return jumbled;
+}
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Implementing a Word Jumbling JavaScript Driven HTML Form</h4>
+
+<p>I made use of the <code>jumble</code> function to implement a simple word jumbling form right here on this page:</p>
+
+<script>
+function jumble(word) {
+
+  // Cache word length for easy looping
+  var n = word.length;
+
+  // Rand function will return 2-part array
+  // [0] -> Index of rand, [1] -> random found value (from args)
+  var rand = function(){
+    var myRand = Math.floor(Math.random() * arguments.length);
+    return [myRand, arguments[myRand]];
+  };
+
+  // Split passed word into array
+  word = word.split('');
+
+  // Prepate empty string for jumbled word
+  jumbled = '';
+
+  // Get array full of all available indexes:
+  // (Reverse while loops are quickest: http://reque.st/1382)
+  arrIndexes = [];
+  var i = n;
+  while (i--) {
+    arrIndexes.push(i);
+  }
+
+  i = n;
+  while (i--) {
+    // Get a random number, must be one of
+    // those found in arrIndexes
+    var rnd = rand.apply(null,arrIndexes);
+    // Append random character to jumbled
+    jumbled += word[rnd[1]];
+    // Remove character from arrIndexes
+    // so that it is not selected again:
+    arrIndexes.splice(rnd[0],1);
+  }
+
+  // Return the jumbled word
+  return jumbled;
+}
+
+function jumble_one(word) {
+  var n = word.length;
+  if( 2 < n )
+  {
+    word = word[0] + jumble(word.slice(1,n-1)) + word[n-1];
+  }
+  return word;
+}
+
+function jumble_many(words) {
+  words = words.split(' ');
+  var jumbled = [];
+  for( var i=0; i < words.length; ++i)
+  {
+    jumbled.push( jumble_one(words[i]) );
+  }
+  return jumbled.join(' ');
+}
+
+function jumble_many_map(words) {
+  jumbled = words.split(' ').map(jumble_one);
+  return jumbled.join(' ');
+}
+
+function jumble_form(f)
+{
+  f.output.value = jumble_many_map(f.input.value);
+}
+</script>
+<center>
+<form onSubmit="submit()">
+  <p>Input words to jumble (no punctuation, please):</p>
+  <textarea name="input" rows="5" cols="50">Type text here</textarea>
+  <br/>
+  <input value="Jumble words" type="button" onClick="jumble_form(this.form)" />
+  <p>Output jumbled words:</p>
+  <textarea name="output" rows="5" cols="50" readonly="readonly">Result text here</textarea>
+</form>
+</center>
+
+<p>Here is the JavaScript code I added to grab the input text, split it into words, process them one by one, concatenate the result and populate the output text box:</p>
+
+<pre class="prettyprint">
+function jumble_one(word) {
+  var n = word.length;
+  if( 2 &lt; n )
+  {
+    word = word[0]
+      + jumble(word.slice(1,n-1))
+      + word[n-1];
+  }
+  return word;
+}
+
+function jumble_many(words) {
+  words = words.split(' ');
+  var jumbled = [];
+  for( var i=0; i &lt; words.length; ++i)
+  {
+    jumbled.push( jumble_one(words[i]) );
+  }
+  return jumbled.join(' ');
+}
+
+function jumble_many_map(words) {
+  jumbled = words.split(' ').map(jumble_one);
+  return jumbled.join(' ');
+}
+
+function jumble_form(f)
+{
+  f.output.value = jumble_many_map(f.input.value);
+}
+</pre>
+
+<p>As you can see, I implemented the <code>jumble_many</code> function twice over, once manually iterating over the array and a second more succinct version using <code>map</code> instead.</p>
+
+<p>Here is the form HTML definition:</p>
+
+<pre class="prettyprint">
+&lt;form onSubmit="submit()"&gt;
+  &lt;p&gt;Input words to jumble (no punctuation, please):&lt;/p&gt;
+  &lt;textarea name="input" rows="5" cols="30"&gt;Type text here&lt;/textarea&gt;
+  &lt;br/&gt;
+  &lt;input value="Jumble words" type="button"
+    onClick="jumble_form(this.form)" /&gt;
+
+  &lt;p&gt;Output jumbled words:&lt;/p&gt;
+  &lt;textarea name="output" rows="5" cols="30"
+    readonly="readonly"&gt;Result text here&lt;/textarea&gt;
+&lt;/form&gt;
+</pre>
+
+<p>For the sake of completeness, easier debugging and playing around, here is a complete little stand-alone HTML file <a href="files/word_jumbling.html">word_jumbling.html</a> implementing the form and JavaScript code discussed above.</p>
+
+<p>We'll continue with the <a href="#1">rest of the steps</a> anon</p>
+
+
+
+<a name="5"></a>
+
+<h4>Solar Eclipse on March 20, 2015</h4>
+
+<p>Oh yes, before I leave, most important: don't miss the
+
+<a href="https://en.wikipedia.org/wiki/Solar_eclipse_of_March_20,_2015">solar eclipse tomorrow, on Friday, March 20, 2015</a>!</p>

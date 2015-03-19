@@ -1,0 +1,119 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</head>
+
+<!--
+
+-->
+
+<h3>The Node.js Server Platform, Icons, 3D and the Future</h3>
+
+<p>So, still wanting to write some web application code, are we?</p>
+
+<p>Since yesterday, we have a suitable
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/03/the-brackets-editor.html">editor</a> in place.</p>
+
+<p>Another helpful component is a web server.</p>
+
+<p><a href="https://en.wikipedia.org/wiki/Node.js">Node.js</a> is an open source, cross-platform JavaScript runtime environment for server-side and networking applications, providing an event-driven architecture and a non-blocking I/O API that optimizes throughput and scalability for real-time web applications.</p>
+
+<p>We can use that to build a web server.</p>
+
+<p>This simple web server written in Node and highlighted on the <a href="https://nodejs.org">node.js home page</a> responds with "Hello World" for every request:</p>
+
+<pre class="prettyprint">
+  var http = require('http');
+
+  http.createServer(function (req, res) {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end('Hello World\n');
+  }).listen(1337, '127.0.0.1');
+
+  console.log('Server running at http://127.0.0.1:1337/');
+</pre>
+
+<p>To run the server, put the code into a file example.js and execute it with the node program from the command line:</p>
+
+<pre class="prettyprint">
+  % node example.js
+  Server running at http://127.0.0.1:1337/
+</pre>
+
+<p>Furthermore, happily, our Brackets editor provides built-in support for running node.js.</p>
+
+<p>To learn Node, tutorials and workshops are provided by the worldwide decentralized, open source and volunteer run <a href="http://nodeschool.io">NodeSchool</a> organisation.</p>
+
+<p>I installed the NodeSchool <a href="http://nodeschool.io/index.html#workshoppers">learnyounode 'workshopper' tutorial</a> like this:</p>
+
+<pre class="prettyprint">
+  $ npm install -g learnyounode
+</pre>
+
+<p>Actually, I had to run it in <code>sudo</code> to obtain write access to <code>/usr/local/lib/</code>.</p>
+
+<p>Note that the NodeSchool workshoppers also include an intro to WebGL to get started with three.js and WebGL:</p>
+
+<pre class="prettyprint">
+  $ npm install -g introtowebgl
+</pre>
+
+<p>Talking about WebGL, here is an important related event you don't want to miss:</p>
+
+
+
+<a name="3"></a>
+
+<h4>The 3D Web Fest</h4>
+
+<p>I already
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/02/view-and-data-api-sample-in-swift-and-mac-os-upgrade.html#2">
+pointed out</a> the upcoming <a href="http://www.3dwebfest.com">3D Web Festival</a> celebrating the web transition from mostly text to 2D image rich and now shifting to 3D:</p>
+
+<p>Open to any and all creative human beings, it will showcase 3D web sites presenting mixtures of music, art and technology, bringing together the best of the 3D Web &ndash; presented as Live Performance Art &ndash; amazing, delightful, surprising and at times disturbing, including creations by artists and developers of all kinds live with musical accompaniment.</p>
+
+<p>Time and place is Wednesday May 13th from 7 to 10 pm at the Folsom Street Foundry in San Francisco, with ticket proceeds going to the
+
+<a href="http://www.roxie.com">Roxie</a>, a community-based, non-profit theatre.</p>
+
+<p>You can <a href="http://www.3dwebfest.com/submit.html">submit your application here</a>.</p>
+
+
+
+<a name="4"></a>
+
+<h4>A History of the Future in 100 Objects</h4>
+
+<p>Here is another nice example of modern art, this time literary in nature, addressing technological trends, science fiction, humanity and philosophy:</p>
+
+<p><a href="http://www.ahistoryofthefuture.org">A History of the Future in 100 Objects</a> by Adrian Hon:</p>
+
+<p>"Why write a history of the 21st century?
+&nbsp; There are still 18 years until the end of the century, and it may seem foolhardy for a mere human to attempt to analyse the data at our disposal...
+&nbsp; The 21st century is different: it represents the first time in our history that we have truly had to question what it means to be human. It is the stories of our collective humanity that I hope to tell through the hundred objects in this book."</p>
+
+
+
+<a name="5"></a>
+
+<h4>The 3D Web Coder Favicon</h4>
+
+<p>As you may have noticed, I set up a <a href="https://en.wikipedia.org/wiki/Favicon">Favicon</a> for this site.</p>
+
+<p>To do so, I created thumbnail images of the author image in various sizes, copied them all into one single ICO file using Visual Studio, and placed that in the root folder of the blog.</p>
+
+<p>Here are the five thumbnails and the favicon.ico file with their sizes in bytes:</p>
+
+<pre>
+    1406 favicon16.ico
+    3262 favicon32.ico
+    7358 favicon48.ico
+   12862 favicon64.ico
+   24350 favicon88.ico
+   49214 favicon.ico
+</pre>
+
