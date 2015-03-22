@@ -1,12 +1,11 @@
 /*
-// bc.css - The Building Coder style sheet
+// 3dwc.css - The 3D Web Coder style sheet
 //
-// Copyright (C) 2009 by jeremy tammik, autodesk inc, 2009-07-30
+// Copyright (C) 2015 by Jeremy Tammik, Autodesk Inc.
 // All rights reseved.
 */
 
 pre {
-  font-size : 95%;
   line-height : 120%;
   background-color : lightgrey;
   white-space : wrap;
