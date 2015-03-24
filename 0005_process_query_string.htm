@@ -1,0 +1,248 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
+<link rel="stylesheet" type="text/css" href="3dwc.css">
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</head>
+
+<!--
+
+-->
+
+<h3>Processing Query Strings in JavaScript and Node</h3>
+
+<p>Working our way towards our first full-fledged web application, we looked at the following steps so far:</p>
+
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/the-brackets-editor.html">The web enabled Brackets editor</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/the-nodejs-server-platform-icons-3d-and-the-future.html">The Node.js server platform</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/preparing-for-processing-query-string-server-arguments.html">Sample JavaScript function to process query strings</a></li>
+</ul>
+
+<p>Now let's move on to grab and process real query strings, first in a naked stand-alone JavaScript sample, then in a node.js server.</p>
+
+<p>Once we have that in place, we can move on to further interesting aspects such as using them to drive 2D and 3D graphics and hosting the server somewhere globally accessible.</p>
+
+<p>Before getting to the coding side of things, here is an interesting scholarship possibility to be aware of:</p>
+
+
+<a name="2"></a>
+
+<h4>Autodesk Cloud Scholarship for Impact Design</h4>
+
+<p>The
+
+<a href="http://masschallenge.org/blog/masschallenge-scholarship-program-empowers-entrepreneurs-participate-2015-accelerator-program?pressrelease=yes">
+MassChallenge Scholarship Program</a> and
+
+<a href="http://masschallenge.org/blog/masschallenge-scholarship-program-empowers-entrepreneurs-participate-2015-accelerator-program?pressrelease=yes">
+Autodesk Cloud Scholarship for Impact Design</a> support
+
+startups that are combining the power of
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/03/opening-and-activating-document-in-an-event-handler.html#2">
+impact design</a> with
+
+cloud-based tools to create positive social, environmental and economic impact.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Retrieving Query String Arguments in JavaScript</h4>
+
+<p>The <a href="https://en.wikipedia.org/wiki/Query_string">query string</a> argument list
+
+is an ampersand-separated list of key-value pairs appended to the base URL invoking a page following a question mark '?'.</p>
+
+<p>It can therefore be retrieved like this in pure JavaScript:</p>
+
+<script>
+function pluralSuffix( n ) {
+  return 1 == n ? '' : 's';
+}
+
+function dotOrColon( n ) {
+  return 0 == n ? '.' : ':';
+}
+
+// format dictionary values to a string
+
+function dict_to_string(dict) {
+  var keys = Object.keys(dict);
+  var n = keys.length;
+  var s = [];
+
+  s.push( n.toString() + ' key-value pair'
+         + pluralSuffix( n ) + dotOrColon( n ) );
+
+  keys.sort();
+  for( var i = 0; i < n; ++i ) {
+    s.push( '  ' + keys[i] + ' = ' + dict[keys[i]] );
+  }
+  return s.join('\n');
+}
+
+// split url parameters into a dictionary
+
+function get_url_paramdict( params ) {
+  paramdict = {};
+  var a = params.split('&');
+  for(var i = 0; i < a.length; ++i)
+  {
+    var kv = a[i].split('=');
+    paramdict[kv[0]] = kv[1];
+  }
+  return paramdict;
+}
+
+// retrieve query string arguments and
+// use them to populate text area
+
+function get_query_string_argument_list(f)
+{
+  var url = this.location;
+
+  var params = url.href.split('?');
+
+  if( 1 < params.length ) {
+    url = params[0];
+
+    var paramdict = get_url_paramdict(
+      unescape( params[1] ) );
+
+    f.input.value = dict_to_string(paramdict);
+  }
+}
+
+//window.onload = get_query_string_argument_list;
+</script>
+
+<pre class="prettyprint">
+function pluralSuffix( n ) {
+  return 1 == n ? '' : 's';
+}
+
+function dotOrColon( n ) {
+  return 0 == n ? '.' : ':';
+}
+
+// format dictionary values to a string
+
+function dict_to_string(dict) {
+  var keys = Object.keys(dict);
+  var n = keys.length;
+  var s = [];
+
+  s.push( n.toString() + ' key-value pair'
+         + pluralSuffix( n ) + dotOrColon( n ) );
+
+  keys.sort();
+  for( var i = 0; i &lt; n; ++i ) {
+    s.push( '  ' + keys[i] + ' = ' + dict[keys[i]] );
+  }
+  return s.join('\n');
+}
+
+// split url parameters into a dictionary
+
+function get_url_paramdict( params ) {
+  paramdict = {};
+  var a = params.split('&');
+  for(var i = 0; i &lt; a.length; ++i)
+  {
+    var kv = a[i].split('=');
+    paramdict[kv[0]] = kv[1];
+  }
+  return paramdict;
+}
+
+// retrieve query string arguments and
+// use them to populate text area
+
+function get_query_string_argument_list(f)
+{
+  var url = this.location;
+
+  var params = url.href.split('?');
+
+  if( 1 &lt; params.length ) {
+    url = params[0];
+
+    var paramdict = get_url_paramdict(
+      unescape( params[1] ) );
+
+    f.input.value = dict_to_string(paramdict);
+  }
+}
+</pre>
+
+<p>It populates this text area from the query string arguments appended to the base URL invoking this page when you click the button:</p>
+
+<center>
+<form onSubmit="submit()">
+  <input value="Retrieve query string" type="button"
+         onClick="get_query_string_argument_list(this.form)" />
+  <p>Query string argument key-value pairs:</p>
+  <textarea name="input" rows="5" cols="50">No query string arguments given</textarea>
+</form>
+</center>
+
+<p>Try it out by appending some query string arguments to the URL invoking this page &ndash; e.g., adding something like <code>?a=1&amp;b=2</code> to the end of the location displayed in the browser address bar &ndash; and then clicking the button again.</p>
+
+<p>As you can see, accessing these arguments is rather trivial, and most of the code is just plumbing to format and display them nicely in the text area element.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Retrieving Query String Arguments in Node.js</h4>
+
+<p>Now let's look at how to proccess this data in a node server.</p>
+
+<!--
+<p>While looking at that, a debugger is definitely of use.
+Here are <a href="http://www.100percentjs.com/best-way-debug-node-js">a couple of ways to debug node.je</a>.</p>
+
+<p>After pondering my options for a moment, I opted for the
+
+<a href="https://github.com/node-inspector/node-inspector">StrongLoop Node Inspector</a>:</p>
+
+<pre>
+  $ npm install -g node-inspector
+</pre>
+-->
+
+<p>The <code>url</code> module parses the URL and provides direct access to the query string already converted to a dictionary, so the following little server does a similar job as above, still making use of our <code>dict_to_string</code> formatting helper:</p>
+
+<pre class="prettyprint">
+http = require('http'),
+url = require('url'),
+server = http.createServer(
+  function(request,response){
+    var paramdict = url.parse(request.url,true).query;
+    response.writeHead(200, {'Content-Type': 'text/plain'});
+    response.end(dict_to_string(paramdict));
+  });
+server.listen(1337, '127.0.0.1');
+console.log('Server running at http://127.0.0.1:1337/');
+</pre>
+
+<p>I saved that in a script named <a href="files/node_process_query_string.js">node_process_query_string.js</a> that I can run like this from the command line:</p>
+
+<pre>
+  $ node node_process_query_string.js
+  Server running at http://127.0.0.1:1337/
+</pre>
+
+<p>The result looks like this browsing my local server:</p>
+
+<center>
+<img src="img/node_process_query_string.png" alt="Node.js server processing query string" width="418"/>
+</center>
+
+<p>All is well.</p>
+
+<p>The next step will be to run our server live and accessible on the big wild worldwide web, e.g., using a service such as
+
+<a href="http://www.herokuapp.com">Heroku</a>.</p>
