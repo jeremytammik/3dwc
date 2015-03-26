@@ -1,0 +1,156 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
+<link rel="stylesheet" type="text/css" href="3dwc.css">
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</head>
+
+<!--
+
+-->
+
+<h3>Hosting a Simple Node Web Server on Heroku</h3>
+
+<p>Working our way towards our first full-fledged web application, we looked at the following steps so far:</p>
+
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/the-brackets-editor.html">The web enabled Brackets editor</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/the-nodejs-server-platform-icons-3d-and-the-future.html">The Node.js server platform</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/preparing-for-processing-query-string-server-arguments.html">Sample JavaScript function to process query strings</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/processing-query-strings-in-javascript-and-node.html">Processing query strings in JavaScript and Node</a></li>
+</ul>
+
+<p>Now I want to host and run my server live and accessible on the big wild worldwide web using
+
+<a href="http://www.herokuapp.com">Heroku</a>.</p>
+
+<p>Once I have that in place, I can start implementing interesting things like 2D and 3D graphics display that can be driven from a desktop application or anywhere else I choose.</p>
+
+
+<a name="2"></a>
+
+<h4>The 3D Web Coder Source HTML GitHub Repository</h4>
+
+<p>Before getting to the coding side of things, let me mention some handy file management, documentation and search advantages that I gain by making use of the
+
+<a href="https://pages.github.com/">GitHub Pages</a> functionality.</p>
+
+<p>All of the HTML sources for The 3D Web Coder live in the
+
+<a href="https://github.com/jeremytammik/3dwc">3dwc GitHub repository</a>,
+
+so you can clone that to copy all the HTML source to your own local system for simple and efficient global searches, etc.</p>
+
+<p>The project also includes a global
+
+<a href="https://github.com/jeremytammik/3dwc/blob/gh-pages/0000_index.htm">blog post index 0000_index.htm</a> that
+
+is updated for every new post.</p>
+
+<p>The posts are consecutively numbered for easier reference, just like I have been doing since 2008 for the older sibling blog
+
+<a href="http://thebuildingcoder.typepad.com">The Building Coder</a>.
+
+<p>This post is number 0006.
+The current post number for The Building Coder is 1300 &ndash; :-)</p>
+
+<p>For The Building Coder, though, I so far only used the index and internal numbering for my own personal use, since the HTML sources there include some occasional snippets of confidentiol information.</p>
+
+<p>For The 3D Web Coder, you can use the global index to navigate your local copy of the repository.</p>
+
+<p>Much more exciting, though, is the fact that the 3dwc GitHub repository uses the <code>gh-pages</code> branch and thus is automatically published to the web every time a new commit is pushed.</p>
+
+<p>Therefore, you can look at the global index file &ndash; and all the other HTML source files too, of course &ndash; live on the web, directly in GitHub, e.g. from</p>
+
+<p style="text-align:center">
+<a href="http://jeremytammik.github.io/3dwc">jeremytammik.github.io/3dwc</a>
+</p>
+
+<p>The index lists the following data for each post:</p>
+
+<ul>
+<li>Number</li>
+<li>Date</li>
+<li>Title linked to the live blog page</li>
+<li>Link to the HTML source file on GitHub or your local copy</li>
+<li>Categories</li>
+</ul>
+
+<p>I hope you find this useful.</p>
+
+<p>Dear Reader of The Building Coder, please yell hard enough and I promise to do my best to publish the HTML sources and global index for that as well in a similar fashion.</p>
+
+
+
+<a name="3"></a>
+
+<h4>A Simple Node Server</h4>
+
+
+<a name="4"></a>
+
+<h4>Steps to Host a Node Server on Heroku</h4>
+
+
+
+
+<a href="">
+</a>
+
+
+<script>
+</script>
+
+<pre class="prettyprint">
+</pre>
+
+
+
+<a name="3"></a>
+
+<h4>Retrieving Query String Arguments in Node.js</h4>
+
+<p>Now let's look at how to proccess this data in a node server.</p>
+
+<!--
+<p>While looking at that, a debugger is definitely of use.
+Here are <a href="http://www.100percentjs.com/best-way-debug-node-js">a couple of ways to debug node.je</a>.</p>
+
+<p>After pondering my options for a moment, I opted for the
+
+<a href="https://github.com/node-inspector/node-inspector">StrongLoop Node Inspector</a>:</p>
+
+<pre>
+  $ npm install -g node-inspector
+</pre>
+-->
+
+<p>The <code>url</code> module parses the URL and provides direct access to the query string already converted to a dictionary, so the following little server does a similar job as above, still making use of our <code>dict_to_string</code> formatting helper:</p>
+
+<pre class="prettyprint">
+http = require('http'),
+url = require('url'),
+server = http.createServer(
+  function(request,response){
+    var paramdict = url.parse(request.url,true).query;
+    response.writeHead(200, {'Content-Type': 'text/plain'});
+    response.end(dict_to_string(paramdict));
+  });
+server.listen(1337, '127.0.0.1');
+console.log('Server running at http://127.0.0.1:1337/');
+</pre>
+
+<p>I saved that in a script named <a href="files/node_process_query_string.js">node_process_query_string.js</a> that I can run like this from the command line:</p>
+
+<pre>
+  $ node node_process_query_string.js
+  Server running at http://127.0.0.1:1337/
+</pre>
+
+<p>The result looks like this browsing my local server:</p>
+
+<center>
+<img src="img/node_process_query_string.png" alt="Node.js server processing query string" width="418"/>
+</center>
+
+<p>All is well.</p>
