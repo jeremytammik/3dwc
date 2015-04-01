@@ -1,0 +1,207 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
+<link rel="stylesheet" type="text/css" href="3dwc.css">
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+<!-- <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script> -->
+</head>
+
+<!--
+
+april fool
+
+stephen:
+VVR: VR means reality: people become immersed, parents never see their children, nobody ever leaves their house, there is a problem: the closer the simlation is to reality the more the brain picks out differences; VR oculus you strangle yourself with the wire; enter VVR;
+MDS: mattress data storage: scared of storing data online; banls: eople used to store money in mattress; banks; online banking; online identity theft, crisis; the only safe place is the mattress again; imagine any data online, same risk. obvious conclusion: store your data in your mattress; we invented a new technology to physically store it in your mattress discussions with namhafte mattress vendors have been initiated
+3D: vr headset gives many people motion sickness; putting your nose into the image helps; many people are still into 2D; now enter the device that you convert 3D experience into 2D experience; enter the picture at the end: it's an eye patch
+adam:
+google acquires autodesk because of translation services
+jeremy:
+google stopped production of google glass
+autodesk entered the open source hardware market, publishing the entire plans for the spark 3D printer for universities and anyone else to reproduce or buy, incl. hardware, software, materials and everything
+enter autodesk glass
+scan and remote reproduction: scan and reprint somewhere else with all the right materials
+cyrille:
+autodesk cloud service to create code for you: sesame, write me this code, please; type in a free text description; you only get three pieces free per day, after that you pay; genetics to evolve the variants darwinism;
+
+the ultimate revit family
+sim generated
+automated house
+bathroom door locks and the room is all steamed up, not to mention the state of the toilet seat after the 15-year old son mad euse of it
+superimpose
+
+http://www.microsoft.com/microsoft-hololens Microsoft HoloLens
+
+automated code translation taken off github google translation services evolved
+
+http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
+
+if (!String.format) {
+  String.format = function(format) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    return format.replace(/{(\d+)}/g, function(match, number) {
+      return typeof args[number] != 'undefined'
+        ? args[number]
+        : match
+      ;
+    });
+  };
+}
+
+Gives you the much more familiar:
+
+String.format('{0} is dead, but {1} is alive! {0} {2}', 'ASP', 'ASP.NET');
+
+http://stackoverflow.com/questions/2534803/string-format-in-javascript
+
+IL
+C#
+Visual Basic
+Delphi
+MC++
+Oxygene
+F#
+
+-->
+
+<h3>A ProgGen Web Service Program Generator Node Server</h3>
+
+<p>Now that our node.js web server is
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/03/hosting-a-node-server-on-heroku-pages-and-3d-web.html#6">
+hosted by Heroku</a> and up and
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/03/hosting-a-node-server-on-heroku-pages-and-3d-web.html#7">
+running live on the web</a>,
+
+let's start talking with it.</p>
+
+<p>As I already hinted, I would like to move into graphical topics as quickly as possible, e.g., by sending a string of polygon coordinate values and asking it to render them as a 2D polygon.</p>
+
+<p>Before getting to that, though, a very exciting non-graphical usage is offered by the new Autodesk <b>ProgGen Web Service</b>.</p>
+
+<p>ProgGen is a cloud-based web service for automatically generating program code to solve simple tasks described in spoken English language.
+The functionality is still evolving and the service is currently in beta.</p>
+
+<p>It is based on crowd-driven machine learning algorithms similar to those fuelling the huge success of <a href="https://translate.google.com">Google Translate</a>, which has amply proved far superior to the decades of academic research fruitlessly poured into previous automated translation efforts.</p>
+
+<p>These powerful algorithms have been unleashed on the huge volume of open source implementations freely available on <a href="https://github.com">GitHub</a>, and Autodesk now launched this experimental web service to automatically generate source code for arbitrary simple tasks in various programming languages directly from a spoken language input description.</p>
+
+<p>Currently, the languages supported are all .NET oriented and include:</p>
+
+<ul>
+<li>C#</li>
+<li>Visual Basic</li>
+<li>Delphi</li>
+<li>MC++</li>
+<li>Oxygene</li>
+<li>F#</li>
+</ul>
+
+<p>You can try it out live yourself right here!</p>
+
+<p>Type a short description of the task you would like to achieve, select the desired target programming language and submit:</p>
+
+<script>
+if (!Object.keys) {
+  Object.keys = function (object) {
+    var keys = [];
+    for (var key in object) {
+      if (object.hasOwnProperty(key)) {
+        keys.push(key);
+      }
+    }
+  }
+}
+
+// common short English words to ignore
+// https://en.wikipedia.org/wiki/Most_common_words_in_English
+var common_english_words = ['the','be','to','of','and','a','in','I','it','for','not','on','he','as','you','do','at','but','his','by','we','say','her','she','or','an','my','one','all','so','up','out','if','who','get','go','me','can','no','him','its','new','any','us'];
+
+function cleanup_word(s) {
+  return s
+    .replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"")
+    .replace(/^\s+|\s+$/g,"");
+}
+
+function remove_common_word(words, w)
+{
+  var i = words.indexOf(w);
+  if(i !== -1) { words.splice(i, 1); }
+}
+
+function make_word_list(s) {
+  var words = s.split(' ').map(cleanup_word);
+  var d = {};
+  for(var i=0; i < words.length; ++i)
+  {
+    if( !d.hasOwnProperty(words[i])){d[words[i]]=0;}
+    ++d[words[i]];
+  }
+  words = Object.keys(d);
+  for(var i=0; i < common_english_words.length; ++i) {
+    remove_common_word(words, common_english_words[i]);
+  }
+  return words;
+}
+
+function submit_form_proggen(txt,lang)
+{
+  //base_url = 'http://127.0.0.1:1337';
+  base_url = 'https://limitless-plains-4132.herokuapp.com';
+  var words = make_word_list( txt );
+  var query_string = 'lang='+lang+'&text='+words.toString();
+  window.open(base_url + '?' + query_string,
+    'node_server', 'scrollbars=1,width=600,height=600');
+}
+</script>
+
+<center>
+<form>
+  <p>Input free form text description of the desired programming task, e.g.:</p>
+  <textarea name="input" rows="5" cols="50">sort a given list of numbers in ascending order (minimum twenty words, please, and obviously, the more precise, the better)</textarea>
+  <p>Select the desired target programming language:</p>
+  <select name="lang">
+  <option value="cs">C#</option>
+  <option value="vb">Visual Basic</option>
+  <option value="de">Delphi</option>
+  <option value="mc">Managed C++</option>
+  <option value="ox">Oxygene</option>
+  <option value="fs">F#</option>
+  </select> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+  <input value="Submit to ProgGen" type="button"
+         onClick="submit_form_proggen(this.form.input.value,this.form.lang.value)" />
+</form>
+</center>
+
+<p>Your input is processed by my new node.js server hosted on Heroku that analyses the input task description, queries the Autodesk ProgGen Web Service for a suitable implementation, and returns the result in a separate browser window right here and now.</p>
+
+<p>Impressed?</p>
+
+<p>Well, I should hope so.
+So am I!</p>
+
+<p>For the sake of completeness, here is the source code of the Heroku server
+
+<a href="files/node_april_fool_heroku.js">index.js</a> file
+
+implementing this functionality.
+Just like in the previous example showing how to
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/03/hosting-a-node-server-on-heroku-pages-and-3d-web.html#6">
+host a node server on Heroku</a>,
+
+the entire rest of the code is completely unchanged from the
+
+<a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs">Heroku Node.js getting started</a> script.</p>
+
+<p>Read all about the
+
+<a href="https://en.wikipedia.org/wiki/April_Fools%27_Day">
+Autodesk ProgGen Web Service</a> and
+
+get started today with this exciting new technology!</p>
+
+<p><strong>Addendum:</strong> Don't miss the related article by Kean Walmsley on software reverse engineering and the new
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/2015/03/autodesk-socap.html">Autodesk SoCap</a>
+</p>
