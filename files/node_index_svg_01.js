@@ -20,25 +20,13 @@ app.set('port', (process.env.PORT || 5000));
 
 app.get('/', function(request, response) {
   var paramdict = url.parse(request.url,true).query;
-  if( !paramdict.hasOwnProperty('w') )
-  {
-    response.writeHead(400, {'Content-Type': 'text/plain'});
-    response.end('No width specified');
-  }
-  if( !paramdict.hasOwnProperty('h') )
-  {
-    response.writeHead(400, {'Content-Type': 'text/plain'});
-    response.end('No height specified');
-  }
-  else if( !paramdict.hasOwnProperty('d') )
+  if( !paramdict.hasOwnProperty('d') )
   {
     response.writeHead(400, {'Content-Type': 'text/plain'});
     response.end('No SVG path description given');
   }
   else
   {
-    var w = paramdict['w'];
-    var h = paramdict['h'];
     var d = paramdict['d'];
     var svg = svg_template.replace('{path_data}', d);
     response.writeHead(200, {'Content-Type': 'text/html'});
