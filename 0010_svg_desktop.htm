@@ -1,0 +1,97 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="3dwc.css">
+<!-- <script src="http://thebuildingcoder.typepad.com/google-code-prettify/run_prettify.js"></script> -->
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</head>
+
+<!--
+
+#3dwebcoder @jeremytammik #svg #nodejs
+
+-->
+
+<h3>Driving the SVG Node Server from a Desktop Application</h3>
+
+<p>Yesterday, I implemented a pretty minimal Heroku-hosted node.js web server and used it to
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html">
+display some SVG graphics</a>.</p>
+
+<p>I implemented a little interactive form and used the following JavaScript snippet to invoke the server and submit the data entered to it:</p>
+
+<pre class="prettyprint">
+function submit_form_svg_01(path_data)
+{
+  var local = false;
+  var base_url = local
+    ? 'http://127.0.0.1:5000'
+    : 'https://shielded-hamlet-1585.herokuapp.com';
+  var w = 400;
+  var h = 400;
+  var d = path_data.replace(' ','+');
+  var query_string = 'w='+w+'&h='+h+'&d='+d;
+  window.open(base_url + '?' + query_string,
+    'node_server', 'width=' + w + ',height = ' + h);
+}
+</pre>
+
+<p>Today, in
+
+<a href="http://thebuildingcoder.typepad.com">The Building Coder</a> discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/sending-a-room-boundary-to-an-svg-node-web-server.html">
+sending a room boundary to an SVG node web server</a>,
+
+I describe a Revit add-in to drive the exact same web server with polygon data retrieved from the boundary of a room element in a BIM, or building information model, i.e., a 3D architectural design document.</p>
+
+<p>The interesting part is really the C# .NET method analogue to the JavaScript snippet above:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Invoke the SVG node.js web server.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Use a local or global base URL and append</span>
+&nbsp; <span class="gray">///</span><span class="green"> the SVG path definition as a query string.</span>
+&nbsp; <span class="gray">///</span><span class="green"> Compare this with the JavaScript version used in</span>
+&nbsp; <span class="gray">///</span><span class="green"> http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> DisplaySvg( <span class="blue">string</span> path_data )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> local = <span class="blue">false</span>;
+
+&nbsp; &nbsp; <span class="blue">var</span> base_url = local
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">&quot;http://127.0.0.1:5000&quot;</span>
+&nbsp; &nbsp; &nbsp; : <span class="maroon">&quot;https://shielded-hamlet-1585.herokuapp.com&quot;</span>;
+
+&nbsp; &nbsp; <span class="blue">var</span> d = path_data.Replace( <span class="maroon">' '</span>, <span class="maroon">'+'</span> );
+
+&nbsp; &nbsp; <span class="blue">var</span> query_string = <span class="maroon">&quot;d=&quot;</span> + d;
+
+&nbsp; &nbsp; <span class="blue">string</span> url = base_url + <span class="maroon">'?'</span> + query_string;
+
+&nbsp; &nbsp; System.Diagnostics.<span class="teal">Process</span>.Start( url );
+&nbsp; }
+</pre>
+
+<p>Pretty neat, the similarities, aren't they?</p>
+
+<p>Here is what a weird-shaped sample room can look like in Revit:</p>
+
+<center>
+<img src="img/room_svg_01_model.png" alt="Weird room in Revit" width="590"/>
+</center>
+
+<p>Extracting its boundary loop and using that to define the SVG path data produces this result:</p>
+
+<center>
+<img src="img/room_svg_01_result.png" alt="Weird room boundary in SVG" width="500"/>
+</center>
+
+<p>Please refer to
+
+<a href="http://thebuildingcoder.typepad.com">The Building Coder</a> discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2015/04/sending-a-room-boundary-to-an-svg-node-web-server.html">
+sending a room boundary to an SVG node web server</a> for
+
+all further details.</p>
