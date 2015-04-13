@@ -1,0 +1,121 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="3dwc.css">
+</head>
+
+<!--
+
+#3dwebcoder @jeremytammik #svg #nodejs
+
+-->
+
+<h3>WebGL 101 &ndash; Getting Started</h3>
+
+<p>In our progression towards a full-fledged model design app, we completed the following steps so far:</p>
+
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/processing-query-strings-in-javascript-and-node.html">Retrieving and Processing Query Strings in JavaScript and a Node.js Server</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/hosting-a-node-server-on-heroku-pages-and-3d-web.html">Hosting a Node Server on Heroku</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/a-proggen-web-service-program-generator-node-server.html">A Program Generator Node.js Web Server</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html#7">Displaying 2D Graphics via a Node Server</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/driving-the-2d-graphics-svg-node-server-from-a-desktop-app.html">Driving the SVG Node Server from a Desktop Application</a></li>
+</ul>
+
+<p>After the quick and efficient little excursion into 2D graphics using SVG, let's head straight on towards 3D...</p>
+
+<a name="2"></a>
+
+<h4>WebGL</h4>
+
+<p>Nowadays, the simplest and most ubiquitous support for 3D on the web is probably provided by <a href="https://www.khronos.org/webgl">WebGL</a>.</p>
+
+<p>WebGL is a JavaScript library that supports generation and interaction with 3D graphics within compatible web browsers.</p>
+
+<p>It uses the <a href="HTML5">HTML5</a> canvas element and the DOM or <a href="https://en.wikipedia.org/wiki/Document_Object_Model">Document Object Model</a> interface to access it.</p>
+
+<p>WebGL is more-or-less a subset of <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>, a well established, cross-language, cross-platform specification typically used in desktop applications.</p>
+
+<p>Here are some great WebGL resources for getting started:</p>
+
+<ul>
+  <li><a href="http://webglsamples.org">WebGL samples</a></li>
+  <li><a href="http://webglfundamentals.org">WebGL fundamentals &ndash; start here to learn WebGL</a></li>
+  <li><a href="http://threejs.org">Three.js &ndash; start here to get stuff done</a></li>
+  <li><a href="https://www.khronos.org/registry/webgl/specs/latest/1.0/">The WebGL specification</a></li>
+  <li><a href="https://www.khronos.org/webgl/wiki/Main_Page">The official WebGL Wiki</a></li>
+</ul>
+
+
+<a name="3"></a>
+
+<h4>WebGL Fundamentals Tutorial</h4>
+
+<p>The <a href="http://webglfundamentals.org">WebGL fundamentals</a> by
+
+<a href="http://games.greggman.com/game">Gregg 'Greggman' Tavares</a> provide an exquisite and thorough tutorial.</p>
+
+<p>The entire web site is GitHub hosted and automatically generated from markdown source files.</p>
+
+<p>To quote the readme in the
+
+<a href="https://github.com/greggman/webgl-fundamentals">WebGL Fundamentals GitHub repo</a>:</p>
+
+<blockquote>
+<p>Unlike most WebGL lessons these are not based off of OpenGL. OpenGL is 20 years old.
+The lessons of OpenGL don't match well with WebGL.
+The APIs have changed too much.
+The ideas of OpenGL and OpenGL tutorials are out of date with WebGL, OpenGL ES 2.0 and the land of shaders.</p>
+
+<p>I would argue that WebGL is actually a very simple API. What makes it appear complicated is the way in which it's used. The complications are added by the programmer. WebGL itself is simple.</p>
+
+<p>These lessons try to show that simplicity and well as teach the fundamentals of 2D math and 3D math so readers can hopefully have an easier time writing their own WebGL programs and understanding the complexity that other programmers pile on top of simple WebGL.</p>
+</blockquote>
+
+<p>One nice starting point to jump into the third dimension is his
+
+<a href="http://webglfundamentals.org/webgl/lessons/webgl-3d-orthographic.html">orthographic 3D</a> post,
+
+working up meticulously step by step to the following final result:</p>
+
+<center>
+<iframe src="http://webglfundamentals.org/webgl/webgl-3d-step6.html" style="width: 400px; height: 300px;"></iframe>
+<br/>
+<a href="http://webglfundamentals.org/webgl/webgl-3d-step6.html" style="font-size: smaller;font-style: italic; text-align: center">Click here to open in a separate window</a>
+</center>
+
+<p>One of Gregg's subsequent posts, on the
+
+<a href="http://webglfundamentals.org/webgl/lessons/webgl-3d-perspective.html">WebGL 3D perspective</a>,
+
+provides the nicest interactive explanation of the perspective view matrix I have ever laid eyes on:</p>
+
+<center>
+<iframe src="http://webglfundamentals.org/webgl/frustum-diagram.html" style="width: 400px; height: 600px;"></iframe>
+<br/>
+<a href="http://webglfundamentals.org/webgl/frustum-diagram.html" style="font-size: smaller;font-style: italic; text-align: center">Click here to open in a separate window</a>
+</center>
+
+<a name="4"></a>
+
+<h4>The Tiny WebGL Helper Library TWGL</h4>
+
+<p>The WebGL Fundamentals Tutorial also presents Gregg's
+
+Tiny WebGL helper Library <a href="http://twgljs.org">TWGL</a> (rhymes
+
+with wiggle).</p>
+
+<p>TWGL makes the use of WebGL a little simpler by providing a few tiny helper functions that make it much less verbose.
+It is a <b>thin</b> wrapper.
+It does not help with the complexity of managing shaders, nor is it a full-fledged 3D library like three.js.</p>
+
+<p>One simple demos of it displays this rotating cube:</p>
+
+<center>
+<iframe src="http://twgljs.org/examples/twgl-cube.html" style="width: 400px; height: 600px;"></iframe>
+<br/><a href="http://twgljs.org/examples/twgl-cube.html" style="font-size: smaller;font-style: italic; text-align: center">Click here to open in a separate window</a>
+</center>
+
+<p>I already started implementing a Revit add-in to populate that sample with real-world CAD geometry grabbed from a simple building model, so I'll go on and take a closer look at it tomorrow.</p>
+
+<p>For more complex interaction and greater comfort, we will later move on to three.js and other higher-level frameworks, just as suggested <a href="#2">above</a> in the overview of WebGL resources.</p>
