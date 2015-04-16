@@ -1,0 +1,235 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="3dwc.css">
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</head>
+
+<!--
+
+#3dwebcoder @jeremytammik #3dweb #3dviewapi #html5 #threejs #webgl #vr
+
+-->
+
+<h3>A WebGL Node Server with Synchronised GitHub and Heroku Repos</h3>
+
+<p>Yesterday, I discussed a proof of concept for a simple
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/webgl-viewer-cloud-accelerator-verold-and-rtc.html#5">
+desktop driven 3D geometry WebGL viewer</a>.</p>
+
+<p>I want to enhance it in a number of ways:</p>
+
+<ul>
+<li>Reimplement it as a Heroku-hosted node.js web server</li>
+<li>Provide the geometrical data to display through query string input arguments</li>
+<li>Remove the scaling to the -1 to 1 2-unit box</li>
+<li>Support integer arguments for the geometry definition</li>
+<li>Add support to define rendering colours</li>
+</ul>
+
+<p>Let's start at the top of the list and host the 3D WebGL viewer as a web server on Heroku, just like the recently discussed
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html#7">
+Heroku hosted 2D SVG server</a>,
+
+later also
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/driving-the-2d-graphics-svg-node-server-from-a-desktop-app.html">
+desktop driven</a>.</p>
+
+<p>While doing so, I unexpectedly encountered a completely different important issue to tackle as well, the synchronisation of a GitHub repository with Heroku:</p>
+
+<ul>
+<li><a href="#2">Creating a Heroku hosted Node.js WebGL server</a></li>
+<li><a href="#3">Synchronising a Heroku Repository with GitHub</a></li>
+<li><a href="#4">Up and running now</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Creating a Heroku Hosted Node.js WebGL Server</h4>
+
+<p>For the sake of completeness and my own future reference, seeing that I am repeating them on a pretty regular basis now, here are the commands I step through to generate a new skeleton node server:</p>
+
+<pre>
+heroku login
+git clone https://github.com/heroku/node-js-getting-started.git
+cd node-js-getting-started
+heroku create
+git push heroku master
+heroku ps:scale web=1
+heroku open
+heroku logs --tail
+</pre>
+
+<p>The auto-generated node.js app name is <code>nameless-harbor-7576</code>.</p>
+
+<p>In the new skeleton node.js server, I performed the following steps to integrate the previous incarnation of the
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/webgl-viewer-cloud-accelerator-verold-and-rtc.html#5">
+3D geometry WebGL viewer code</a> into
+
+its new environment:</p>
+
+<ul>
+<li>Added index.html and twgl-full.min.js to the public subfolder</li>
+<li>Renamed index.js to server.js</li>
+<li>Updated Procfile and package.json</li>
+</ul>
+
+<p>At this point, the WebGL viewer is already up and running, working just as it did before, when it was just a simple HTML page with some JavaScript in it.</p>
+
+<p>It can be tested at <a href="https://nameless-harbor-7576.herokuapp.com">nameless-harbor-7576.herokuapp.com</a>.</p>
+
+<p>I can clone it from the inaccessible Heroku repository to one of my own using</p>
+
+<pre>
+heroku git:clone -a nameless-harbor-7576
+</pre>
+
+<p>In other words, the first step listed above is complete.</p>
+
+<p>That was easy.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Synchronising a Heroku Repository with GitHub</h4>
+
+<p>I would like to use Heroku to deploy my app and manage its code in GitHub as usual.</p>
+
+<p>In other words, use GitHub for source code management, releases, change tracking, etc., as usual, and additionally push to the Heroku git repository to deploy it.</p>
+
+<p>The Stack Overflow discussion on <a href="http://stackoverflow.com/questions/15231937/heroku-and-github-at-the-same-time">heroku and github at the same time</a> explains the issue and suggests various illuminating approaches towards solving it.</p>
+
+<p>After struggling for a while and repeatedly receiving the git error message saying <code>fatal: remote origin already exists</code>, I discovered the useful <code>git remote</code> command:</p>
+
+<pre>
+$ git remote -v
+heroku	https://git.heroku.com/nameless-harbor-7576.git (fetch)
+heroku	https://git.heroku.com/nameless-harbor-7576.git (push)
+origin	https://github.com/heroku/node-js-getting-started.git (fetch)
+origin	https://github.com/heroku/node-js-getting-started.git (push)
+</pre>
+
+<p>Aha, the origin is already defined.
+Of course!
+That is the Heroku sample folder that I got the code from to start with.</p>
+
+<p>I set up an own new GitHub repo <a href="https://github.com/jeremytammik/nodewebgl01">nodewebgl01</a> and tried to add it:</p>
+
+<pre>
+git remote set-url origin --push --add git@github.com:jeremytammik/nodewebgl01.git
+</pre>
+
+<p>Now git push causes an error:</p>
+
+<pre>
+Permission denied (publickey).
+fatal: Could not read from remote repository.
+Please make sure you have the correct access rights
+and the repository exists.
+</pre>
+
+<p>The setup is interestingly mixed:</p>
+
+<pre>
+$ git remote -v
+heroku	https://git.heroku.com/nameless-harbor-7576.git (fetch)
+heroku	https://git.heroku.com/nameless-harbor-7576.git (push)
+origin	https://github.com/heroku/node-js-getting-started.git (fetch)
+origin	git@github.com:jeremytammik/nodewebgl01.git (push)
+</pre>
+
+<p>This works better, defining a new remote location named <code>git</code> &ndash; or any other name of my choosing &ndash; for my own GitHub repo:</p>
+
+<pre>
+git remote add git git@github.com:jeremytammik/nodewebgl01.git
+</pre>
+
+<p>The result is the following list of remotes:</p>
+
+<pre>
+$ git remote -v
+git	git@github.com:jeremytammik/nodewebgl01.git (fetch)
+git	git@github.com:jeremytammik/nodewebgl01.git (push)
+heroku	https://git.heroku.com/nameless-harbor-7576.git (fetch)
+heroku	https://git.heroku.com/nameless-harbor-7576.git (push)
+origin	https://github.com/heroku/node-js-getting-started.git (fetch)
+origin	git@github.com:jeremytammik/nodewebgl01.git (push)
+</pre>
+
+<p>I can now push to my GitHub repository using this:</p>
+
+<pre>
+git push git master
+</pre>
+
+<p>Now that I understand what is going on and how to fix it, I cleaned it up all the settings like this and restarted from scratch with another new personal GitHub repo named <a href="https://github.com/jeremytammik/NodeWebGL">NodeWebGL</a>:</p>
+
+<pre>
+$ git remote -v
+git	https://github.com/jeremytammik/nodewebgl01.git (fetch)
+git	https://github.com/jeremytammik/nodewebgl01.git (push)
+heroku	https://git.heroku.com/nameless-harbor-7576.git (fetch)
+heroku	https://git.heroku.com/nameless-harbor-7576.git (push)
+origin	https://github.com/heroku/node-js-getting-started.git (fetch)
+origin	git@github.com:jeremytammik/nodewebgl01.git (push)
+$ git remote remove git
+$ git remote remove origin
+$ git remote -v
+heroku	https://git.heroku.com/nameless-harbor-7576.git (fetch)
+heroku	https://git.heroku.com/nameless-harbor-7576.git (push)
+$  git remote add git https://github.com/jeremytammik/NodeWebGL.git
+$ git remote -v
+git	https://github.com/jeremytammik/NodeWebGL.git (fetch)
+git	https://github.com/jeremytammik/NodeWebGL.git (push)
+heroku	https://git.heroku.com/nameless-harbor-7576.git (fetch)
+heroku	https://git.heroku.com/nameless-harbor-7576.git (push)
+$ git push git master
+Counting objects: 394, done.
+Delta compression using up to 8 threads.
+Compressing objects: 100% (311/311), done.
+Writing objects: 100% (394/394), 252.43 KiB | 0 bytes/s, done.
+Total 394 (delta 56), reused 381 (delta 52)
+To https://github.com/jeremytammik/NodeWebGL.git
+ * [new branch]      master -> master
+</pre>
+
+<p>Et voila, I have the complete copy of the Heroku server code in my NodeWebGL repository.</p>
+
+<p>Whenever I update anything, I can push it to the two repositories like this:</p>
+
+<pre>
+git add app.json
+git commit -m "updated name and description"
+git push git master
+git push heroku master
+</pre>
+
+<p>Come to think of it, I could just have left <code>origin</code> as it was, since it does no harm.
+I could also have chosen a more illuminating name for my own remote...</p>
+
+<p>This actually takes me back to the beginning of this discussion:
+now that the code is properly tracked in GitHub, I can start creating releases and stuff, so updates will not interfere with previous versions, and there much less need to create new samples from scratch on a regular basis. Ha!</p>
+
+
+<a name="4"></a>
+
+<h4>Up and Running Now</h4>
+
+<p>As mentioned, you can see the Heroku app running live
+at <a href="https://nameless-harbor-7576.herokuapp.com">nameless-harbor-7576.herokuapp.com</a>, and the complete updated source code is now available from
+the <a href="https://github.com/jeremytammik/NodeWebGL">NodeWebGL GitHub repository</a>.</p>
+
+<p>The version discussed here is
+<a href="https://github.com/jeremytammik/NodeWebGL/releases/tag/1.0.0.1">release 1.0.0.1</a>.</p>
+
+<p>Actually, come to think of it, I can also embed the Heroku app right here:</p>
+
+<center>
+<iframe src="https://nameless-harbor-7576.herokuapp.com" style="width: 300px; height: 400px;"></iframe>
+</center>
+
+<p>The <a href="http://the3dwebcoder.typepad.com/blog/2015/04/webgl-viewer-cloud-accelerator-verold-and-rtc.html#5">same instructions and explanations as before</a> apply here as well.</p>
