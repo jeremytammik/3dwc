@@ -1,0 +1,238 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="3dwc.css">
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</head>
+
+<!--
+
+-->
+
+<h3>Implementing a REST API Node Server</h3>
+
+<p>Now that our node.js web server is
+<a href="http://the3dwebcoder.typepad.com/blog/2015/03/hosting-a-node-server-on-heroku-pages-and-3d-web.html#6">Heroku-hosted live on the web</a>, we can
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/a-proggen-web-service-program-generator-node-server.html">talk with it through text</a>,
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html#7">view 2D SVG graphics</a>
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/driving-the-2d-graphics-svg-node-server-from-a-desktop-app.html">drive that from a desktop app</a>
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/webgl-node-server-with-github-and-heroku-repo-sync.html#2">implement a 3D WebGL viewer</a> and
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/webgl-viewer-cloud-accelerator-verold-and-rtc.html#5">feed that geometry data from the desktop</a> as well,
+let's start interacting with it on a more professional basis.</p>
+
+<p>Time to implement an API, aka <a href="https://en.wikipedia.org/wiki/Application_programming_interface">
+Application Programming Interface</a>.
+Together with other interesting little titbits, this  leads to the following topics:</p>
+
+<ul>
+<li><a href="#2">JavaScript style guide</a></li>
+<li><a href="#3">REST API 101</a></li>
+<li><a href="#4">REST API skeleton implementation</a></li>
+<li><a href="#5">Still up and running</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>JavaScript Style Guide</h4>
+
+<p>One colleague asked my other colleague Philippe:</p>
+
+<p><strong>Question:</strong> In some of your code, you declare a var <code>_self</code> and assign <code>this</code> to it, e.g.:</p>
+
+<pre class="prettyprint">
+  var _self = this;
+
+  _self.load = function () {
+</pre>
+
+<p>Is there any particular reason for that?</p>
+
+<p><strong>Answer:</strong> Using _self instead of this is a recommended practice and may help avoid using <code>this</code> in the wrong context, for example when writing code inside a callback.
+In that case, <code>this</code> will be pointing to something different than outside.</p>
+
+<p>Check out the <a href="https://github.com/airbnb/javascript">Airbnb JavaScript Style Guide</a>, "a mostly reasonable approach to JavaScript".</p>
+
+
+
+<a name="3"></a>
+
+<h4>REST API 101</h4>
+
+<p>Back to my issue at hand, talking and interacting sensible and professionally with my web server.</p>
+
+<p>A suitable way to discuss things like that with a web server is by using a REST API, a form of
+
+<a href="https://en.wikipedia.org/wiki/Representational_state_transfer">representational state transfer</a>.</p>
+
+<p>To cite Wikipedia, "REST is a software architecture style consisting of guidelines and best practices for creating scalable web services ... that can lead to a more performant and maintainable architecture... RESTful systems typically ... communicate ... with the same HTTP verbs (GET, POST, PUT, DELETE, etc.) used by web browsers to retrieve web pages and send data to remote servers."</p>
+
+<p>One important aspect of the RESTful architecture is the fact that it is
+
+<a href="https://en.wikipedia.org/wiki/Representational_state_transfer#Stateless">stateless</a>.</p>
+
+<p>As an interesting consequence, the REST API PUT and DELETE methods are referred to as
+
+<a href="https://en.wikipedia.org/wiki/Idempotent#Computer_science_meaning">idempotent</a>,
+
+meaning that the operation will produce the same result no matter how many times it is repeated.
+The GET method is a
+
+<a href="https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Safe_methods">
+safe method</a> (or <a href="https://en.wiktionary.org/wiki/nullipotent">nullipotent</a>),
+
+meaning that calling it produces no
+
+<a href="https://en.wikipedia.org/wiki/Side_effect_(computer_science)">
+side effects</a>.</p>
+
+<p>OK, that's enough theory for today.</p>
+
+<p>Let's dive straight into how to do it instead.</p>
+
+
+
+<a name="4"></a>
+
+<h4>REST API Skeleton Implementation</h4>
+
+<p>How do we go about implementing a REST API for a node server?</p>
+
+<p>There are a bunch of <a href="http://nodeframework.com/index.html#rest-api">Node REST API frameworks</a> around to generate this for you automatically.</p>
+
+<p>Nothing goes over learning by doing, though, so let's attack this by hand to start with.</p>
+
+<p>It is simple!</p>
+
+<p>So simple.</p>
+
+<p>And simple is sweet!</p>
+
+<p>I want to add an API to my <a href="http://the3dwebcoder.typepad.com/blog/2015/04/webgl-node-server-with-github-and-heroku-repo-sync.html#4">existing WebGL node server</a>.</p>
+
+<p>The existing implementation code looks like this:</p>
+
+<pre class="prettyprint">
+var express = require('express');
+var app = express();
+
+app.set('port', (process.env.PORT || 5000));
+app.use(express.static(__dirname + '/public'));
+
+app.get('/', function(request, response) {
+  response.send('Hello World!');
+});
+
+app.listen(app.get('port'), function() {
+  console.log("Node WebGL app is running at localhost:"
+    + app.get('port'));
+});
+</pre>
+
+<p>I want to avoid disrupting existing clients, of course.</p>
+
+<p>The existing clients just access the base URL of the service, i.e. '/', and the node server returns a static <code>public/index.html</code>.</p>
+
+<p>The <code>response.send('Hello World!')</code> is actually ignored.</p>
+
+<p>I also want to avoid disrupting future clients if the API ever changes, so I define a version number <code>v1</code> for the API I implement now and add modify my node server implementation like this:</p>
+
+<pre class="prettyprint">
+var express = require('express');
+var app = express();
+var api = require('./routes/api');
+
+app.set('port', (process.env.PORT || 5000));
+app.use(express.static(__dirname + '/public'));
+
+app.get('/', function(req, res) {}); // leads to public/index.html
+app.get('/api/v1', api.v1);
+
+app.listen(app.get('port'), function() {
+  console.log("Node WebGL app is running at localhost:" + app.get('port'));
+});
+</pre>
+
+<p>Just like before, it will respond to a call to the base URL by serving up <code>public/index.html</code>.</p>
+
+<p>A call to the base URL with an appended path '/api/v1' will access the first version of my new API, which is implemented like this in a new module named <code>routes/api.js</code>:</p>
+
+<pre class="prettyprint">
+exports.v1 = function(req, res) {
+  res.send('v1: Hello World!');
+};
+</pre>
+
+
+<a name="5"></a>
+
+<h4>Still Up and Running</h4>
+
+<p>This implementation is up and running live already at the same Herouku URL as before,
+<a href="https://nameless-harbor-7576.herokuapp.com">nameless-harbor-7576.herokuapp.com</a>,
+and can be embedded right here:</p>
+
+<center>
+<iframe src="https://nameless-harbor-7576.herokuapp.com" style="width: 300px; height: 400px;"></iframe>
+</center>
+
+<p>The complete updated source code is stored in 
+the <a href="https://github.com/jeremytammik/NodeWebGL">NodeWebGL GitHub repository</a>,
+and the version discussed here is
+<a href="https://github.com/jeremytammik/NodeWebGL/releases/tag/1.0.0.2">release 1.0.0.2</a>.</p>
+
+<p>For now, the API does nothing useful whatsoever, but I'll get to that next  :-)</p>
+
+<p>I you are hungry for a more complete real-life sample right here and now, you can take a look at Cyrille Fauvel's
+<a href="https://github.com/cyrillef/workflow-node.js-server-view.and.data.api">Node.js View and Data API</a> sample, e.g.
+<a href="https://github.com/cyrillef/workflow-node.js-server-view.and.data.api/blob/master/start.js">start.js</a>.</p>
+
+
+<!--
+<p>Here is one nice and short tutorial that does more than we need to
+
+<a href="http://coenraets.org/blog/2012/10/creating-a-rest-api-using-node-js-express-and-mongodb">create a REST API using Node.js, Express, and MongoDB</a>.</p>
+
+<p>I already used Express in the initial server example consisting mainly of the Node.js sample code.
+It is a lightweight node.js web application framework and provides a basic HTTP infrastructure that makes it very easy indeed to create REST APIs.</p>
+
+/api/wh works
+
+how to access window?
+
+tried jsdom but that caused an error:
+
+<pre>
+/src/poly01/node_modules/jsdom/lib/jsdom/level2/html.js:405
+var nonInheritedTags = new Set([
+                           ^
+ReferenceError: Set is not defined
+</pre>
+
+tried cheerio instead:
+
+https://github.com/cheeriojs/cheerio
+
+described in
+
+http://encosia.com/cheerio-faster-windows-friendly-alternative-jsdom/
+
+Cheerio: A faster, Windows-friendly alternative to jsdom
+
+<ul>
+<li><a href="#2"></a></li>
+</ul>
+
+<hr/>
+
+Look at Cyrille's
+
+https://github.com/cyrillef/workflow-node.js-server-view.and.data.api/blob/master/start.js
+
+<hr/>
+<p>As I already hinted, I would like to move into graphical topics as quickly as possible, so here are two things I can imagine starting to chat with it about:</p>
+<ul>
+<li>Question: How big is your current HTML canvas that I can paint into?</li>
+<li>Request: Here is a bunch of polygon data; please display it for me.</li>
+</ul>
+
+-->
