@@ -1,0 +1,364 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="3dwc.css">
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</head>
+
+<!--
+
+#3dwebcoder #webgl #heroku #github #3dweb #3dviewapi #html5 #threejs #node
+akn_include
+
+-->
+
+<h3>HTTP GET versus POST</h3>
+
+<p>In my last step towards implementing a handy minimal WebGL viewer, I started equipping it with a
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/implementing-a-node-rest-api-server.html">REST API</a>.</p>
+
+<p>Now I'll expand that just a little bit by adding support for POST requests as well:</p>
+
+<ul>
+<li><a href="#2">HTTP GET and POST limitations</a></li>
+<li><a href="#3">HTTP GET implementation starting point</a></li>
+<li><a href="#4">Struggles implementing the POST handler</a></li>
+<li><a href="#5">Complete GET and POST implementation</a></li>
+<li><a href="#6">Interactive testing framework</a></li>
+<li><a href="#7">What next?</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>HTTP GET and POST Limitations</h4>
+
+<p>So far, my miniscule REST API just implements a placeholder skeleton returning <code>v1: Hello World!</code> to a HTTP GET request to the URL <code>api/v1</code>.</p>
+
+<p>Before starting with the REST API approach and the 3D WebGL stuff, I implemented a little
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html#7">
+2D SVG viewer as a Heroku-hosted Node.js server</a> using
+
+a query string appended to the URL to pass in data to the server.</p>
+
+<p>This method is limited by the maximum practical length of a URL.
+The limitation to 256 characters is a <a href="http://www.w3.org/2001/tag/doc/get7#myths">myth</a>,
+cf. the various discussions on
+<a href="http://stackoverflow.com/questions/266322/is-there-a-limit-to-the-length-of-a-get-request">limit to the length of a GET request</a>,
+<a href="http://classicasp.aspfaq.com/forms/what-is-the-limit-on-querystring/get/url-parameters.html">limits on query string, GET and URL parameters</a>.</p>
+
+<p>Still, even if a couple of thousand characters can be used, it will still be too limiting to allow passing around any serious amount of geometrical data.</p>
+
+<p>Passing geometry data with potentially hundreds of face definitions requiring thousands of vertex and normal coordinates will require more than a few thousand bytes.</p>
+
+<p>A POST request, however,
+<a href="http://stackoverflow.com/questions/2364840/what-is-the-size-limit-of-a-post-request">can handle several MB</a>.</p>
+
+<p>So I started digging into the implementation of a POST request handler for my node server.</p>
+
+
+
+<a name="3"></a>
+
+<h4>HTTP GET Implementation Starting Point</h4>
+
+<p>To be clear about where we are starting from, here is the HTTP GET implementation that I ended up with last time; it defines how to handle the <code>api/v1</code> route in <code>server.js</code> like this:</p>
+
+<pre class="prettyprint">
+var api = require('./routes/api');
+app.get('/api/v1', api.v1);
+</pre>
+
+<p>The implementation module <code>routes/api.js</code> defines the method <code>v1</code> as:</p>
+
+<pre class="prettyprint">
+exports.v1 = function(req, res) {
+  res.send('v1: Hello World!');
+};
+</pre>
+
+<p>For the entire starting point implementation code, look at
+<a href="https://github.com/jeremytammik/NodeWebGL/releases/tag/1.0.0.2">NodeWebGL release 1.0.0.2</a>.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Struggles Implementing the POST Handler</h4>
+
+<p>The exploration how to add a POST handler took longer than I would have expected due to the evolution of the packages being used.</p>
+
+<p>I started off from this thread on
+<a href="http://stackoverflow.com/questions/4295782/how-do-you-extract-post-data-in-node-js">how to extract POST data in node.js</a>,
+
+<!--
+
+http://stackoverflow.com/questions/5710358/how-to-get-post-query-in-express-node-js
+
+npm install --save body-parser
+
+
+http://stackoverflow.com/questions/7172784/how-to-post-json-data-with-curl-from-terminal-commandline-to-test-spring-rest
+
+curl -H "Content-Type: application/json" -X POST -d '{"username":"xyz","password":"xyz"}' http://localhost:3000/api/login
+
+
+http://stackoverflow.com/questions/7172784/how-to-post-json-data-with-curl-from-terminal-commandline-to-test-spring-rest
+
+
+nice tool to work with curl from the command line:
+https://github.com/micha/resty
+
+
+http://www.primaryobjects.com/CMS/Article144
+app.render(view, [locals], callback)
+
+
+http://runnable.com/U07z_Y_j9rZk1tTx/handlebars-template-examples-with-express-4-for-node-js
+
+http://runnable.com/UxzDw-slnvpEzYsl/restful-express-for-node-js-and-restpress
+-->
+
+plus the Hack Sparrow tutorials on
+
+<a href="http://www.hacksparrow.com/express-js-tutorial.html">Express.js</a>,
+
+Handling Forms &ndash; POST, GET Requests, saying "handling POST data is pretty easy &ndash; just look for it in the req.body object" and on
+
+<a href="http://www.hacksparrow.com/form-handling-processing-in-express-js.html">form handling and processing in Express.js</a>,
+
+followed by the more complete description on
+
+<a href="http://cwbuecheler.com/web/tutorials/2014/restful-web-app-node-express-mongodb">creating a simple RESTful web app with node.js, express, and mongodb</a>.</p>
+
+<p>Trying to use <code>bodyParser</code> as described there produces this error on my system, though:</p>
+
+<pre>
+$ node server.js
+Error: Most middleware (like bodyParser) is no longer
+bundled with Express and must be installed separately.
+Please see https://github.com/senchalabs/connect#middleware.
+</pre>
+
+<p>So I took a look at the <a href="https://github.com/senchalabs/connect#middleware">Connect project middleware</a>, struggled a bit more and finally hit upon
+
+<!--
+https://www.npmjs.com/package/raw-body
+
+http://stackoverflow.com/questions/23620319/how-to-access-express-4-req-body-object-using-busboy
+How to access Express 4 req.body object using Busboy
+
+<p>So let's set about implementing something like that in our new REST API.</p>
+
+We need to convert that to POST to enable passing in more data.
+
+We need to access the form data.
+
+After searching all over, I finally found -->
+
+this workable and very helpful
+<a href="http://runnable.com/U0sU598vXio2uD-1/example-reading-form-input-with-express-4-0-and-body-parser-for-node-js">
+example reading form input with Node.js, Express 4.0 and body-parser</a>,
+still making use of the
+<a href="https://www.npmjs.com/package/body-parser">body-parser</a> Node.js body parsing middleware:</p>
+
+<pre class="prettyprint">
+var bodyParser = require('body-parser');
+</pre>
+
+<p>However, the body-parser usage has evolved and needs to be modified.</p>
+
+<p>I cannot simply use it as presented in that example without being warned off from deprecated usage:</p>
+
+<pre class="prettyprint">
+// use the deprecated bodyParser middleware for all routes
+app.use( bodyParser() );
+</pre>
+
+<p>This generates the following warnings:</p>
+
+<ul>
+<li>body-parser deprecated bodyParser: use individual json/urlencoded middlewares server.js:33:10</li>
+<li>body-parser deprecated undefined extended: provide extended option node_modules/body-parser/index.js:85:29</li>
+</ul>
+
+<p>The individual middleware packages provided by body-parser are json, raw, text and urlencoded.</p>
+
+<p>I am testing my initial implementation with a form.
+By trial and error, I determined that I need the <code>urlencoded</code> version to handle the form input fields.</p>
+
+<p>So I solved the two warnings by switching to this:</p>
+
+<pre class="prettyprint">
+app.use( bodyParser.urlencoded() );
+</pre>
+
+<p>That generates a new warning, though, complaining about the lack of extended options:</p>
+
+<ul>
+<li>body-parser deprecated undefined extended: provide extended option server.js:34:21</li>
+</ul>
+
+<p>Adding the options finally enables me to handle my form POST request with no warnings at all:</p>
+
+<pre class="prettyprint">
+app.use( bodyParser.urlencoded({ extended: true }) );
+</pre>
+
+
+
+<a name="5"></a>
+
+<h4>Complete GET and POST Implementation</h4>
+
+<p>The entire node.js server basically still just consists of two modules, server.js and routes/app.js.</p>
+
+<p>Here is the mainline implementation in the former:</p>
+
+<pre class="prettyprint">
+var express = require('express');
+var app = express();
+
+app.set('port', (process.env.PORT || 5000));
+
+app.use(express.static(__dirname + '/public'));
+
+app.get('/', function(req, res) {}); // leads to public/index.html
+
+var bodyParser = require('body-parser');
+app.use( bodyParser.urlencoded({ extended: true }) );
+
+var api = require('./routes/api');
+app.get('/api/v1', api.v1);
+app.post('/api/v1', api.v1);
+
+app.listen(app.get('port'), function() {
+  console.log("Node WebGL app is running at localhost:"
+    + app.get('port'));
+});
+</pre>
+
+<p>As you can see, calling the server with no route appended is handled and leads to the static index.html provided in the public folder.</p>
+
+<p>The REST API is supported by the route <code>api/v1</code> and responds to both GET and POST requests.</p>
+
+<p>They are implemented by <code>routes/app.js</code> like this:</p>
+
+<pre class="prettyprint">
+exports.v1 = function(req, res) {
+  if (req.method == 'GET') {
+    res.send('API v1 GET: Hello World!');
+  }
+  else if (req.method == 'POST') {
+    res.send('API v1 POST: ' + JSON.stringify(req.body));
+  }
+};
+</pre>
+
+<p>GET is answered with a simple message &ndash; this could be used to provide API usage instructions, for instance &ndash; whereas POST replies by echoing the body data.</p>
+
+
+<a name="6"></a>
+
+<h4>Interactive Testing Framework</h4>
+
+<p>Here is a HTML form for testing the first POST request.</p>
+
+<p>It uses a JavaScript helper function to open a new window to host the server:</p>
+
+<pre class="prettyprint">
+function open_node_server_window()
+{
+  var local = false;
+  var base_url = local
+    ? 'http://localhost:5000'
+    : 'https://nameless-harbor-7576.herokuapp.com';
+  var api_url = '/api/v1';
+  var w = 400;
+  var h = 400;
+  var features = 'width=' + w.toString()
+    + ',height=' + h.toString();
+
+  window.open(base_url + api_url, 'node_server', features);
+}
+</pre>
+
+<p>The <code>open_node_server_window</code> function is called from the submit button onclick event before the form routes the node server response to it through the form <code>action</code> and <code>target</code> attributes:</p>
+
+<pre class="prettyprint">
+&lt;form method="post"
+  action="https://nameless-harbor-7576.herokuapp.com/api/v1"
+  target="node_server"&gt;
+
+  &lt;p&gt;Form submitting a HTTP POST request:&lt;/p&gt;
+  &lt;table&gt;
+    &lt;tr&gt;&lt;td&gt;position:&lt;/td&gt;&lt;td&gt;&lt;input type="text"
+      name="position" value="1, 1, -1,  1, 1, 1,  1, -1, 1,..."&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;normal:&lt;/td&gt;&lt;td&gt;&lt;input type="text"
+      name="normal" value="1, 0, 0,   1, 0, 0,   1, 0, 0,..."&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;indices:&lt;/td&gt;&lt;td&gt;&lt;input type="text"
+      name="indices" value="0, 1, 2,  0, 2, 3,..."&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;input type="submit"
+      onclick="open_node_server_window()"&gt;&lt;/td&gt;&lt;/tr&gt;
+  &lt;/table&gt;
+&lt;/form&gt;
+</pre>
+
+<p>Here it is for you to try out live:</p>
+
+<script>
+function open_node_server_window() {
+  var local = false;
+  var base_url = local
+    ? 'http://localhost:5000'
+    : 'https://nameless-harbor-7576.herokuapp.com';
+  var api_url = '/api/v1';
+  var w = 400;
+  var h = 400;
+  var features = 'width=' + w.toString()
+    + ',height=' + h.toString();
+
+  window.open(base_url + api_url, 'node_server', features);
+}
+</script>
+
+<center>
+<form method="post" action="https://nameless-harbor-7576.herokuapp.com/api/v1" target="node_server">
+  <p>Form submitting a HTTP POST request:</p>
+  <table>
+    <tr><td>position:</td><td><input type="text" name="position" value="1, 1, -1,  1, 1, 1,  1, -1, 1,..."></td></tr>
+    <tr><td>normal:</td><td><input type="text" name="normal" value="1, 0, 0,   1, 0, 0,   1, 0, 0,..."></td></tr>
+    <tr><td>indices:</td><td><input type="text" name="indices" value="0, 1, 2,  0, 2, 3,..."></td></tr>
+    <tr><td></td><td><input type="submit" onclick="open_node_server_window()"></td></tr>
+  </table>
+</form>
+</center>
+
+<p>As said, you can also call it with the HTTP GET verb, in which case the response is different:</p>
+
+<center>
+<form action="https://nameless-harbor-7576.herokuapp.com/api/v1" target="node_server">
+  <p>Form submitting a HTTP GET request:</p>
+  <p><input type="submit" onclick="open_node_server_window()"></p>
+</form>
+</center>
+
+<p>Finally, the original non-API-driven version still works just as before; I added the REST API while preserving upward compatibility and keeping the original server running continuously at the same time:</p>
+
+<center>
+<iframe src="https://nameless-harbor-7576.herokuapp.com" style="width: 300px; height: 400px;"></iframe>
+</center>
+
+
+<a name="7"></a>
+
+<h4>What Next?</h4>
+
+<p>Even with the placeholder GET and POST functionality in place, the REST API still does nothing useful whatsoever yet.</p>
+
+<p>Starting to pass in useful data and doing something interesting with it is next on the agenda, of course.</p>
+
+<p>Specifically, driving a WebGL viewer from the posted data, similar to the one currently defined in the static <code>public/index.html</code> file.</p>
+
+<p>Stay tuned.</p>
