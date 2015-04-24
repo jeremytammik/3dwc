@@ -213,7 +213,7 @@ app.use( bodyParser.urlencoded({ extended: true }) );
 
 <h4>Complete GET and POST Implementation</h4>
 
-<p>The entire node.js server basically still just consists of two modules, server.js and routes/app.js.</p>
+<p>The entire node.js server basically still just consists of two modules, server.js and routes/api.js.</p>
 
 <p>Here is the mainline implementation in the former:</p>
 
@@ -244,7 +244,7 @@ app.listen(app.get('port'), function() {
 
 <p>The REST API is supported by the route <code>api/v1</code> and responds to both GET and POST requests.</p>
 
-<p>They are implemented by <code>routes/app.js</code> like this:</p>
+<p>They are implemented by <code>routes/api.js</code> like this:</p>
 
 <pre class="prettyprint">
 exports.v1 = function(req, res) {
@@ -309,23 +309,41 @@ function open_node_server_window()
 <p>Here it is for you to try out live:</p>
 
 <script>
-function open_node_server_window() {
-  var local = false;
-  var base_url = local
+// to switch between heroku and localhost,
+// toggle the Boolean 'local' variable below
+
+function get_base_url_0015() {
+  var local = true;
+  return local
     ? 'http://localhost:5000'
     : 'https://nameless-harbor-7576.herokuapp.com';
-  var api_url = '/api/v1';
+}
+
+function get_api_url_0015() {
+  var api_route = '/api/v1';
+  return get_base_url_0015() + api_route;
+}
+
+function open_node_server_window() {
   var w = 400;
   var h = 400;
   var features = 'width=' + w.toString()
     + ',height=' + h.toString();
 
-  window.open(base_url + api_url, 'node_server', features);
+  window.open(get_api_url_0015(), 'node_server', features);
+}
+
+window.onload = function(e) {
+  var baseurl = get_base_url_0015();
+  var apiurl = get_api_url_0015();
+  document.getElementById('form_0015').action = apiurl;
+  document.getElementById('form2_0015').action = apiurl;
+  document.getElementById('iframe_0015').src = baseurl;
 }
 </script>
 
 <center>
-<form method="post" action="https://nameless-harbor-7576.herokuapp.com/api/v1" target="node_server">
+<form method="post" id="form_0015" target="node_server">
   <p style="text-align: center">Form submitting a HTTP POST request:</p>
   <table>
     <tr><td>position:</td><td><input type="text" name="position" value="1, 1, -1,  1, 1, 1,  1, -1, 1,..."></td></tr>
@@ -339,7 +357,7 @@ function open_node_server_window() {
 <p>As said, you can also call it with the HTTP GET verb, in which case the response is different:</p>
 
 <center>
-<form action="https://nameless-harbor-7576.herokuapp.com/api/v1" target="node_server">
+<form id="form2_0015" target="node_server">
   <p style="text-align: center">Form submitting a HTTP GET request:</p>
   <p style="text-align: center"><input type="submit" onclick="open_node_server_window()"></p>
 </form>
@@ -348,7 +366,7 @@ function open_node_server_window() {
 <p>Finally, the original non-API-driven version still works just as before; I added the REST API while preserving upward compatibility and keeping the original server running continuously at the same time:</p>
 
 <center>
-<iframe src="https://nameless-harbor-7576.herokuapp.com" style="width: 300px; height: 400px;"></iframe>
+<iframe id="iframe_0015" style="width: 300px; height: 400px;"></iframe>
 </center>
 
 
