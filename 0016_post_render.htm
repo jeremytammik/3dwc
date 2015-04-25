@@ -1,0 +1,516 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="3dwc.css">
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</head>
+
+<!--
+
+#3dwebcoder #webgl #heroku #swig #github #3dweb #3dviewapi #html5 #node
+akn_include
+
+-->
+
+<h3>POST Data and Swig Driven WebGL Viewer Node Server</h3>
+
+<p>In my previous step towards a node server implementing a handy minimal WebGL viewer, I started added support for
+
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/implementing-node-server-http-post-get-vs-post.html#5">
+handling a REST API POST request</a>.</p>
+
+<p>Now that we have transferred and received data, let's implement code to display it:</p>
+
+<ul>
+<li><a href="#2">Adding JSON support</a></li>
+<li><a href="#3">Picking a Node view engine</a></li>
+<li><a href="#4">How to reference JavaScript modules in the template file &ndash; or not?</a></li>
+<li><a href="#5">Transferring data to the view template</a></li>
+<li><a href="#6">Complete node.js server implementation</a></li>
+<li><a href="#7">Interactive testing framework</a></li>
+<li><a href="#8">Download</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Adding JSON Support</h4>
+
+<p>My initial tests were performed by invoking the API from an interactive HTML form posting the values of its input fields.</p>
+
+<p>For that, I just need the <code>bodyParser.urlencoded</code> middleware.</p>
+
+<p>We will certainly be wanting to handle JSON data as well, so I went ahead and added the middleware for that too, <code>bodyParser.json</code>.</p>
+
+<p>A couple of examples of adding both are discussed in the Stack Overflow thread about
+<a href="http://stackoverflow.com/questions/24330014/bodyparser-is-deprecated-express-4">bodyParser deprecated in express 4</a>.</p>
+
+
+
+<a name="3"></a>
+
+<h4>Picking a Node View Engine</h4>
+
+<p>The
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/webgl-viewer-cloud-accelerator-verold-and-rtc.html#5">
+very first incarnation of the Node WebGL viewer</a> already
+shows how to serve static content, e.g., an unmodified HTML file.</p>
+
+<p>Serving content that is updated dynamically is called 'rendering' in this context.</p>
+
+<p>A number of Express templating, viewing and rendering engines are available, e.g.:</p>
+<ul>
+<li><a href="https://github.com/tj/ejs">EJS</a> embedded JavaScript templates.</li>
+<li><a href="https://github.com/ericf/express-handlebars">Express Handlebars</a>, "a Handlebars view engine for Express which doesn't suck".</li>
+<li><a href="http://jade-lang.com">Jade</a>, "a terse language for writing HTML templates".</li>
+<li><a href="http://paularmstrong.github.io/swig">Swig</a>, "a simple, powerful, extendable, awesome, Django/Jinja-like JavaScript template engine for node.js".</li>
+</ul>
+
+<p>And there are
+<a href="http://expressjs-book.com/forums/topic/how-to-use-alternative-non-jade-template-engines-with-express">many more</a> to
+choose from...</p>
+
+<p>In my simple case, I could also just set up a HTML skeleton myself, populate the handful of variable bits and pieces in it using simple string replacement operations, and return that using <code>response.send</code> or <code>response.sendFile</code>.</p>
+
+<p>Just for the heck of it, I'll dig into one of these frameworks and give it a swing.</p>
+
+<p>Which one to choose?</p>
+
+<p>Here is a comparison of
+<a href="http://www.reddit.com/r/javascript/comments/1tefw3/jade_vs_ejs_with_express">Jade vs EJS</a>,
+and an explanation how to
+<a href="http://www.100percentjs.com/replacing-jade-with-hogan-in-an-express-js-app-the-mean-stack">replace Jade with Hogan</a>.</p>
+
+<p>To cut a long story short, I initially tried <a href="https://github.com/ericf/express-handlebars">Express Handlebars</a>:</p>
+
+<pre>
+  $ npm install express-handlebars
+</pre>
+
+<p>I added these lines to the node server mainline to install <code>express-handlebars</code> as a renderer for files with a <code>handlebars</code> filename extension:</p>
+
+<pre class="prettyprint">
+  var exphbs  = require('express-handlebars');
+  app.engine('handlebars', exphbs());
+  app.set('view engine', 'handlebars');
+</pre>
+
+
+
+<a name="4"></a>
+
+<h4>How to Reference JavaScript Modules in the Template File &ndash; or Not?</h4>
+
+<p>I ran into a number of issues due to my lack of understanding.</p>
+
+<p>The hardest stumbling block was probably the fact that I cannot reference other JavaScript modules using <code>&lt;script src="..."&gt;</code> in the rendered template files, e.g. to pull in the TWGL implementation from <code>twgl-full.min.js</code>.</p>
+
+<p>Due to that, I ended up switching to <a href="http://paularmstrong.github.io/swig">Swig</a>, probably making no difference to that specific problem.</p>
+
+<p>I replaced the express-handlebars engine by swig like this:</p>
+
+<pre class="prettyprint">
+  var swig = require('swig');
+  app.engine('swig', swig.renderFile);
+  app.set('view engine', 'swig');
+  app.set('views', __dirname + '/views');
+  app.set('view cache', false);
+  swig.setDefaults({ cache: false });
+</pre>
+
+<p>More importantly, and probably valid in either case, I finally solved the issue by copying the contents of <code>twgl-full.js</code> right into my template file.</p>
+
+
+<a name="5"></a>
+
+<h4>Transferring Data to the View Template</h4>
+
+<p>The data received by the node server from the submitting form after being handled is contained in the request body.</p>
+
+<p>I can pass it on to the template file very easily like this in the API implementation, without touching its internals at all:</p>
+
+<pre class="prettyprint">
+  res.render('viewer', req.body);
+</pre>
+
+<p>I was not sure that handlebars or swig replace code snippets within the script sections of the template file.</p>
+
+<p>Therefore, I played it safe and transferred the request body data to hidden HTML elements instead:</p>
+
+<pre class="prettyprint">
+  &lt;head:gt;
+    &lt;style:gt;
+      html, body, canvas {
+        margin: 0px;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      p {
+        display: none;
+      }
+    &lt;/style:gt;
+  &lt;/head:gt;
+
+  ...
+
+  &lt;body onload="start_render()":gt;
+    &lt;p id="p":gt;{{ position}}&lt;/p:gt;
+    &lt;p id="n":gt;{{normal}}&lt;/p:gt;
+    &lt;p id="i":gt;{{indices}}&lt;/p:gt;
+  &lt;/body:gt;
+</pre>
+
+<p>As you can see, I also added an onload attribute to the body tag to call the <code>start_render</code> JavaScript function.</p>
+
+<p>That function retrieves the data from the three HTML elements as strings and converts them to arrays of floats and integers like this:</p>
+
+<pre class="prettyprint">
+  var position = document.getElementById('p').innerHTML;
+  var normal = document.getElementById('n').innerHTML;
+  var indices = document.getElementById('i').innerHTML;
+  position = make_float_array(position);
+  normal = make_float_array(normal);
+  indices = make_int_array(indices);
+</pre>
+
+<p>Here are the two conversion helper functions:</p>
+
+<pre class="prettyprint">
+function make_int_array(s) {
+  return s.split(',')
+    .map( function(a){
+      return parseInt(a, 10);
+    });
+}
+
+function make_float_array(s) {
+  return s.split(',')
+    .map( function(a){
+      return parseFloat(a);
+    });
+}
+</pre>
+
+
+<a name="6"></a>
+
+<h4>Complete Node.js Server Implementation</h4>
+
+<p>The entire node.js server now consists of three main pieces:</p>
+
+<ul>
+<li>The server mainline server.js</li>
+<li>The REST API implementation routes/app.js</li>
+<li>The Swig view template views/viewer.swig</li>
+</ul>
+
+<p>Here is the complete mainline implementation in server.js:</p>
+
+<pre class="prettyprint">
+var express = require('express');
+var app = express();
+
+app.set('port', (process.env.PORT || 5000));
+
+app.use(express.static(__dirname + '/public'));
+
+app.get('/', function(req, res) {}); // leads to public/index.html
+
+var bodyParser = require('body-parser');
+app.use( bodyParser.json() );
+app.use( bodyParser.urlencoded({ extended: true }) );
+
+var swig = require('swig');
+app.engine('swig', swig.renderFile);
+app.set('view engine', 'swig');
+app.set('views', __dirname + '/views');
+app.set('view cache', false);
+swig.setDefaults({ cache: false });
+
+var api = require('./routes/api');
+
+app.get('/api/v1', api.v1);
+app.post('/api/v1', api.v1);
+
+app.get('/api/v2', api.v2);
+app.post('/api/v2', api.v2);
+
+app.listen(app.get('port'), function() {
+  console.log("Node WebGL app is running at localhost:"
+    + app.get('port'));
+});
+</pre>
+
+<p>Calling the server with no API route appended is handled and leads to the static index.html provided in the public folder.</p>
+
+<p>The REST API is accessed through the routes <code>api/v1</code> and <code>api/v2</code>.</p>
+
+<p>Both respond to both GET and POST requests.</p>
+
+<p>The (trivial) v1 API remains completely unchanged from the initial implementation, so the previous
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/implementing-node-server-http-post-get-vs-post.html#6">
+original test client and blog post describing it</a> continue
+to run unmodified and unaffected.</p>
+
+<p>A GET request to the REST API v2 again just replies with an explanatory message.</p>
+
+<p>The POST request to the v2 API finally brings up the data driven WebGL viewer by rendering the viewer.swig template file as described above.</p>
+
+<p>This is all implemented in a few lines of code in <code>routes/api.js</code> like this:</p>
+
+<pre class="prettyprint">
+exports.v1 = function(req, res) {
+  if (req.method == 'GET') {
+    res.send('API v1 GET: Hello World!');
+  }
+  else if (req.method == 'POST') {
+    res.send('API v1 POST: '
+      + JSON.stringify(req.body));
+  }
+};
+
+exports.v2 = function(req, res) {
+  if (req.method == 'GET') {
+    res.send('API v2 GET: Here belongs a succinct '
+      + 'explanation how to use The Building Coder '
+      + 'WebGL Viewer REST API v2...');
+  }
+  else if (req.method == 'POST') {
+    console.log('API v2 POST: ' + JSON.stringify(req.body));
+    res.render('viewer', req.body);
+  }
+};
+</pre>
+
+<p>Finally, we have the viewer swig template file viewer.swig:</p>
+
+<pre class="prettyprint">
+&lt;!DOCTYPE html:gt;
+&lt;html:gt;
+  &lt;head:gt;
+    &lt;meta charset="utf8":gt;
+    &lt;title:gt;The Building Coder WebGL Viewer&lt;/title:gt;
+    &lt;style:gt;
+      html, body, canvas {
+        margin: 0px;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      p {
+        display: none;
+      }
+    &lt;/style:gt;
+
+&lt;!-- sourcing a script does not work like this when rendering the file with swig: --:gt;
+
+&lt;!-- &lt;script src="twgl-full.min.js":gt;&lt;/script:gt; --:gt;
+
+&lt;!-- copy the contents of twgl-full.min.js inline instead: --:gt;
+
+&lt;script:gt;
+ // ... contents of twgl-full.min.js
+&lt;/script:gt;
+
+
+&lt;script id="vs" type="notjs":gt;
+  // ... vertex shader code
+&lt;/script:gt;
+
+&lt;script id="fs" type="notjs":gt;
+  // ... fragment shader code
+&lt;/script:gt;
+
+&lt;script:gt;
+"use strict";
+var m4;
+var gl;
+var programInfo;
+
+function make_int_array(s) {
+  return s.split(',')
+    .map( function(a){
+      return parseInt(a, 10);
+    });
+}
+
+function make_float_array(s) {
+  return s.split(',')
+    .map( function(a){
+      return parseFloat(a);
+    });
+}
+
+function start_render() {
+
+  var position = document.getElementById('p').innerHTML;
+  var normal = document.getElementById('n').innerHTML;
+  var indices = document.getElementById('i').innerHTML;
+  position = make_float_array(position);
+  normal = make_float_array(normal);
+  indices = make_int_array(indices);
+
+  var arrays = {
+    position: position,
+    normal:   normal,
+    //texcoord: texcoord,
+    indices: indices
+  };
+
+  twgl.setAttributePrefix("a_");
+  m4 = twgl.m4;
+  gl = twgl.getWebGLContext(document.getElementById("c"));
+  programInfo = twgl.createProgramInfo(gl, ["vs", "fs"]);
+
+  var bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
+
+  // ... rest of TWGL rendering code
+}
+&lt;/script:gt;
+
+  &lt;/head:gt;
+  &lt;body onload="start_render()":gt;
+    &lt;p id="p":gt;{{ position}}&lt;/p:gt;
+    &lt;p id="n":gt;{{normal}}&lt;/p:gt;
+    &lt;p id="i":gt;{{indices}}&lt;/p:gt;
+    &lt;canvas id="c":gt;&lt;/canvas:gt;
+  &lt;/body:gt;
+&lt;/html:gt;
+</pre>
+
+
+<a name="7"></a>
+
+<h4>Interactive Testing Framework</h4>
+
+<p>Just as in previous versions, I implemented an interactive online testing framework for this.</p>
+
+<p>It includes code to support simple toggling between local and global testing.</p>
+
+<p>Below are the two HTML forms for testing the current version <code>v2</code> of the API.</p>
+
+<p>They use JavaScript helpers to define the base URL and to open a new window to host the server:</p>
+
+<pre class="prettyprint">
+// to switch between heroku and localhost,
+// toggle the Boolean 'local' variable below
+
+function get_base_url_0016() {
+  var local = false;
+  return local
+    ? 'http://localhost:5000'
+    : 'https://nameless-harbor-7576.herokuapp.com';
+}
+
+function get_api_url_0016() {
+  var api_route = '/api/v2';
+  return get_base_url_0016() + api_route;
+}
+
+function open_node_server_window_0016() {
+  var w = 400;
+  var h = 400;
+  var features = 'width=' + w.toString()
+    + ',height=' + h.toString();
+
+  window.open(get_api_url_0016(), 'node_server_0016', features);
+}
+
+window.onload = function(e) {
+  var baseurl = get_base_url_0016();
+  var apiurl = get_api_url_0016();
+  document.getElementById('form_0016').action = apiurl;
+  document.getElementById('form2_0016').action = apiurl;
+  document.getElementById('iframe_0016').src = baseurl;
+}
+</pre>
+
+<p>The <code>open_node_server_window_0016</code> function is called from the submit button onclick event before the form routes the node server response to it through the form <code>action</code> &ndash; set by the JavaScript above on window load &ndash; and <code>target</code> attributes.</p>
+
+<p>Here is the HTML source of the first form, for testing the POST request:</p>
+
+<pre class="prettyprint">
+&lt;form method="post" id="form_0016" target="node_server_0016"&gt;
+  &lt;p style="text-align: center"&gt;Form submitting a HTTP POST request:&lt;/p&gt;
+  &lt;table&gt;
+    &lt;tr&gt;&lt;td&gt;position:&lt;/td&gt;&lt;td&gt;&lt;input type="text" name="position" value="1, 1, -1,  1, 1, 1,  1, -1, 1,  1, -1, -1,  -1, 1, 1,  -1, 1, -1,  -1, -1, -1,  -1, -1, 1,  -1, 1, 1,   1, 1, 1,  1, 1, -1,  -1, 1, -1,  -1, -1, -1,  1, -1, -1,  1, -1, 1, -1, -1, 1,  1, 1, 1,   -1, 1, 1,  -1, -1, 1,  1, -1, 1,  -1, 1, -1,   1, 1, -1,  1, -1, -1,  -1, -1, -1"&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;normal:&lt;/td&gt;&lt;td&gt;&lt;input type="text" name="normal" value="1, 0, 0,   1, 0, 0,   1, 0, 0,   1, 0, 0,   -1, 0, 0,  -1, 0, 0,   -1, 0, 0,  -1, 0, 0,   0, 1, 0,   0, 1, 0,   0, 1, 0,   0, 1, 0,   0, -1, 0,  0, -1, 0,  0, -1, 0,  0, -1, 0,   0, 0, 1,   0, 0, 1,   0, 0, 1,   0, 0, 1,   0, 0, -1,  0, 0, -1,  0, 0, -1,  0, 0, -1"&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;indices:&lt;/td&gt;&lt;td&gt;&lt;input type="text" name="indices" value="0, 1, 2,  0, 2, 3,  4, 5, 6,  4, 6, 7,  8, 9, 10,  8, 10, 11,  12, 13, 14,  12, 14, 15,  16, 17, 18,  16,  18, 19,  20, 21, 22,  20, 22, 23"&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;input type="submit" onclick="open_node_server_window_0016()"&gt;&lt;/td&gt;&lt;/tr&gt;
+  &lt;/table&gt;
+&lt;/form&gt;
+</pre>
+
+<p>Finally, here it is for you to try out live:</p>
+
+<script>
+// to switch between heroku and localhost,
+// toggle the Boolean 'local' variable below
+
+function get_base_url_0016() {
+  var local = false;
+  return local
+    ? 'http://localhost:5000'
+    : 'https://nameless-harbor-7576.herokuapp.com';
+}
+
+function get_api_url_0016() {
+  var api_route = '/api/v2';
+  return get_base_url_0016() + api_route;
+}
+
+function open_node_server_window_0016() {
+  var w = 400;
+  var h = 400;
+  var features = 'width=' + w.toString()
+    + ',height=' + h.toString();
+
+  window.open(get_api_url_0016(), 'node_server_0016', features);
+}
+
+window.onload = function(e) {
+  var baseurl = get_base_url_0016();
+  var apiurl = get_api_url_0016();
+  document.getElementById('form_0016').action = apiurl;
+  document.getElementById('form2_0016').action = apiurl;
+  document.getElementById('iframe_0016').src = baseurl;
+}
+</script>
+
+<center>
+<form method="post" id="form_0016" target="node_server_0016">
+  <p style="text-align: center">Form submitting a HTTP POST request:</p>
+  <table>
+    <tr><td>position:</td><td><input type="text" name="position" value="1, 1, -1,  1, 1, 1,  1, -1, 1,  1, -1, -1,  -1, 1, 1,  -1, 1, -1,  -1, -1, -1,  -1, -1, 1,  -1, 1, 1,   1, 1, 1,  1, 1, -1,  -1, 1, -1,  -1, -1, -1,  1, -1, -1,  1, -1, 1, -1, -1, 1,  1, 1, 1,   -1, 1, 1,  -1, -1, 1,  1, -1, 1,  -1, 1, -1,   1, 1, -1,  1, -1, -1,  -1, -1, -1"></td></tr>
+    <tr><td>normal:</td><td><input type="text" name="normal" value="1, 0, 0,   1, 0, 0,   1, 0, 0,   1, 0, 0,   -1, 0, 0,  -1, 0, 0,   -1, 0, 0,  -1, 0, 0,   0, 1, 0,   0, 1, 0,   0, 1, 0,   0, 1, 0,   0, -1, 0,  0, -1, 0,  0, -1, 0,  0, -1, 0,   0, 0, 1,   0, 0, 1,   0, 0, 1,   0, 0, 1,   0, 0, -1,  0, 0, -1,  0, 0, -1,  0, 0, -1"></td></tr>
+    <tr><td>indices:</td><td><input type="text" name="indices" value="0, 1, 2,  0, 2, 3,  4, 5, 6,  4, 6, 7,  8, 9, 10,  8, 10, 11,  12, 13, 14,  12, 14, 15,  16, 17, 18,  16,  18, 19,  20, 21, 22,  20, 22, 23"></td></tr>
+    <tr><td></td><td><input type="submit" onclick="open_node_server_window_0016()"></td></tr>
+  </table>
+</form>
+</center>
+
+<p>As said, calling the same API with the HTTP GET verb just reponds with a simple text message:</p>
+
+<center>
+<form id="form2_0016" target="node_server_0016">
+  <p style="text-align: center">Form submitting a HTTP GET request:</p>
+  <p style="text-align: center"><input type="submit" onclick="open_node_server_window_0016()"></p>
+</form>
+</center>
+
+<p>Once again, the original non-API-driven version and the API version v1 still work exactly as before; I am enhancing the REST API step by step while preserving complete upward compatibility and keeping the original server running continuously at the same time:</p>
+
+<center>
+<iframe id="iframe_0016" style="width: 300px; height: 400px;"></iframe>
+</center>
+
+
+
+<a name="8"></a>
+
+<h4>Download</h4>
+
+<p>The complete node server implementation is available from the
+<a href="https://github.com/jeremytammik/NodeWebGL">NodeWebGL GitHub repo</a>,
+and the version discussed here is
+<a href="https://github.com/jeremytammik/NodeWebGL/releases/tag/1.0.0.4">1.0.0.4</a>.</p>
