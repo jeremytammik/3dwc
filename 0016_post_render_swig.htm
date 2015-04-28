@@ -137,8 +137,8 @@ and an explanation how to
 <p>Therefore, I played it safe and transferred the request body data to hidden HTML elements instead:</p>
 
 <pre class="prettyprint">
-  &lt;head:gt;
-    &lt;style:gt;
+  &lt;head&gt;
+    &lt;style&gt;
       html, body, canvas {
         margin: 0px;
         width: 100%;
@@ -148,16 +148,16 @@ and an explanation how to
       p {
         display: none;
       }
-    &lt;/style:gt;
-  &lt;/head:gt;
+    &lt;/style&gt;
+  &lt;/head&gt;
 
   ...
 
-  &lt;body onload="start_render()":gt;
-    &lt;p id="p":gt;{{ position}}&lt;/p:gt;
-    &lt;p id="n":gt;{{normal}}&lt;/p:gt;
-    &lt;p id="i":gt;{{indices}}&lt;/p:gt;
-  &lt;/body:gt;
+  &lt;body onload="start_render()"&gt;
+    &lt;p id="p"&gt;{{ position}}&lt;/p&gt;
+    &lt;p id="n"&gt;{{normal}}&lt;/p&gt;
+    &lt;p id="i"&gt;{{indices}}&lt;/p&gt;
+  &lt;/body&gt;
 </pre>
 
 <p>As you can see, I also added an onload attribute to the body tag to call the <code>start_render</code> JavaScript function.</p>
@@ -285,12 +285,12 @@ exports.v2 = function(req, res) {
 <p>Finally, we have the viewer swig template file viewer.swig:</p>
 
 <pre class="prettyprint">
-&lt;!DOCTYPE html:gt;
-&lt;html:gt;
-  &lt;head:gt;
-    &lt;meta charset="utf8":gt;
-    &lt;title:gt;The Building Coder WebGL Viewer&lt;/title:gt;
-    &lt;style:gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf8"&gt;
+    &lt;title&gt;The Building Coder WebGL Viewer&lt;/title&gt;
+    &lt;style&gt;
       html, body, canvas {
         margin: 0px;
         width: 100%;
@@ -300,28 +300,28 @@ exports.v2 = function(req, res) {
       p {
         display: none;
       }
-    &lt;/style:gt;
+    &lt;/style&gt;
 
-&lt;!-- sourcing a script does not work like this when rendering the file with swig: --:gt;
+&lt;!-- sourcing a script does not work like this when rendering the file with swig: --&gt;
 
-&lt;!-- &lt;script src="twgl-full.min.js":gt;&lt;/script:gt; --:gt;
+&lt;!-- &lt;script src="twgl-full.min.js"&gt;&lt;/script&gt; --&gt;
 
-&lt;!-- copy the contents of twgl-full.min.js inline instead: --:gt;
+&lt;!-- copy the contents of twgl-full.min.js inline instead: --&gt;
 
-&lt;script:gt;
+&lt;script&gt;
  // ... contents of twgl-full.min.js
-&lt;/script:gt;
+&lt;/script&gt;
 
 
-&lt;script id="vs" type="notjs":gt;
+&lt;script id="vs" type="notjs"&gt;
   // ... vertex shader code
-&lt;/script:gt;
+&lt;/script&gt;
 
-&lt;script id="fs" type="notjs":gt;
+&lt;script id="fs" type="notjs"&gt;
   // ... fragment shader code
-&lt;/script:gt;
+&lt;/script&gt;
 
-&lt;script:gt;
+&lt;script&gt;
 "use strict";
 var m4;
 var gl;
@@ -366,16 +366,16 @@ function start_render() {
 
   // ... rest of TWGL rendering code
 }
-&lt;/script:gt;
+&lt;/script&gt;
 
-  &lt;/head:gt;
-  &lt;body onload="start_render()":gt;
-    &lt;p id="p":gt;{{ position}}&lt;/p:gt;
-    &lt;p id="n":gt;{{normal}}&lt;/p:gt;
-    &lt;p id="i":gt;{{indices}}&lt;/p:gt;
-    &lt;canvas id="c":gt;&lt;/canvas:gt;
-  &lt;/body:gt;
-&lt;/html:gt;
+  &lt;/head&gt;
+  &lt;body onload="start_render()"&gt;
+    &lt;p id="p"&gt;{{ position}}&lt;/p&gt;
+    &lt;p id="n"&gt;{{normal}}&lt;/p&gt;
+    &lt;p id="i"&gt;{{indices}}&lt;/p&gt;
+    &lt;canvas id="c"&gt;&lt;/canvas&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
 </pre>
 
 
