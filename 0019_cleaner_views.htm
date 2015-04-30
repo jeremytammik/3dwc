@@ -12,15 +12,15 @@
 
 <!--
 
-#3dwebcoder #swig #handlebars #nodejs #expressjs #webgl #3dweb #heroku
+#3dwebcoder #jquery #handlebars #nodejs #expressjs #webgl #3dweb #heroku
 akn_include
 
 -->
 
-<h3>Cleaner Heroku Push and Node Server View Implementation</h3>
+<h3>Radical Node Server View and Heroku Push Cleanup</h3>
 
 <p>Two days ago, I implemented an
-<a href="">
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/cleaner-node-server-rest-api-implementation.html">
 enhancement to the node server REST API</a> of my
 <a href="http://the3dwebcoder.typepad.com/blog/2015/04/node-server-rendering-using-either-swig-and-handlebars.html#4">
 WebGL viewer</a> and its
@@ -213,7 +213,9 @@ taking a close look at the contents of the different elements involved in the Ch
   $('#indices').value = arrays['indices'].join(', ');
 </pre>
 
-<p>However, once again, I need to go one level deeper to get at the HTML element I am after:</p>
+<p>That did not work.</p>
+
+<p>Analogously to above, I need to go one level deeper to get at the HTML element I am after:</p>
 
 <pre class="prettyprint">
   $('#position').get(0).value = arrays['position'].join(', ');
@@ -481,7 +483,12 @@ interactive testing framework</a>.</p>
 
 <p>Here is the HTML form for testing the current API version <code>v2</code> GET and POST functionality.</p>
 
-<script src="./files/set_wall_data_0019.js" type="text/javascript"></script>
+<p><i>Please load this blog post as an individual post to allow these forms to work correctly.
+If you are in the main blog view listing multiple posts, they can interfere with previous similar definitions and get confused.</i></p>
+
+<script src="http://the3dwebcoder.typepad.com/files/set_wall_data_0019.js" type="text/javascript"></script>
+
+<!-- <script src="./files/set_wall_data_0019.js" type="text/javascript"></script> -->
 
 <script>
 // to switch between heroku and localhost,
