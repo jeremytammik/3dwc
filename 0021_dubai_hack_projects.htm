@@ -1,0 +1,365 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <!--
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  -->
+</head>
+<body>
+
+<!--
+
+/a/doc/3dwc/3dwc/files/hackathon-strategies.pdf
+/a/doc/3dwc/3dwc/files/hackathon-strategies.pptx
+
+#3dwebcoder #webgl #3dweb #heroku #ah8 #angelhack #ilove3d
+#jquery #handlebars #nodejs #expressjs
+akn_include
+
+-->
+
+<h3>Dubai Hackathon Project Presentation Notes</h3>
+
+<p>As I mentioned yesterday, I am in Dubai attending the
+<a href="http://angelhack.com/hackathon/dubai-2015">AngelHack Dubai Hackathon</a>.</p>
+
+<p>Here are the relevant links:</p>
+
+<ul>
+<li><a href="http://www.hackathon.io">Hackathons</a></li>
+<li><a href="http://www.hackathon.io/angelhack-dubai">Dubai</a></li>
+<li><a href="http://www.hackathon.io/angelhack-dubai/prizes">Prizes</a></li>
+</ul>
+
+<p>We just attended and were amazed by the awesome final project presentations.</p>
+
+<p>Project presentations are judged based on:</p>
+
+<ul>
+<li>solution</li>
+<li>technical aspects</li>
+<li>execution</li>
+<li>design</li>
+</ul>
+
+<p>Tips:</p>
+
+<ul>
+<li>less presentation, more demo</li>
+<li>make answers short so you can take more questions</li>
+</ul>
+
+<p>3 minute demo, 2 minute Q&A</p>
+
+<p>Projects:</p>
+
+<ul>
+<li><a href="#1">virtual view</a></li>
+<li><a href="#2">boardhunt</a></li>
+<li><a href="#3">air intelligent</a></li>
+<li><a href="#4">eat my fridge</a></li>
+<li><a href="#5">job auditor</a></li>
+<li><a href="#6">wrappup</a></li>
+<li><a href="#7">urServed</a></li>
+<li><a href="#8">planbear</a></li>
+<li><a href="#9">sharemybook</a></li>
+<li><a href="#10">fi</a></li>
+<li><a href="#11">alive</a></li>
+<li><a href="#12">happy in happy out</a></li>
+<li><a href="#13">charitysync</a></li>
+</ul>
+
+<p>Presentations:</p>
+
+<a name="1"></a>
+
+<ul>
+<li>virtual view</li>
+<ul>
+<li>virtual reality 3d view of dubai city</li>
+<li>view properties, traffic situation, pro and contra of specific areas</li>
+<li>nr. of floors, regulations for each building</li>
+<li>for buyers and developers</li>
+<li>easy search</li>
+<li>put a rating on the building or neighbourhood</li>
+<li>we put together two or three different technologies</li>
+<li>geometry, algebra, connecting the components</li>
+<li>business model: subscription based fee charging the corporate parties, owners, communities,</li>
+</ul>
+</ul>
+
+<a name="2"></a>
+
+<ul>
+<li>boardhunt</li>
+<ul>
+<li>the first and only billboard search engine in the world</li>
+<li>target market: sme, corporations, agencies</li>
+<li>3d view of every billboard in the world</li>
+<li>is it available?</li>
+<li>how much traffic does this location and billboard attract?</li>
+<li>we generate leads</li>
+<li>we sell intelligent traffic analytics</li>
+<li>we sell advertisement sales to agencies</li>
+<li>node.js server using mongo db, one of the best stacks for realtime</li>
+<li>goto dubai</li>
+<li>click on it, see 3d view</li>
+<li>powered by bing; also tried google</li>
+</ul>
+</ul>
+
+<a name="3"></a>
+
+<ul>
+<li>air intelligent</li>
+<ul>
+<li>combine airline into mobile experience</li>
+<li>elite travellers spend a lot of time and money in the airport</li>
+<li>how can we exploit it better?</li>
+<li>in airport, a terminal recognises your face</li>
+<li>identifies your booking</li>
+<li>validate passport</li>
+<li>connect to booking agencies, IATA and so on</li>
+<li>no more paper tickets, nothing</li>
+<li>how do you recognise faces?</li>
+<li>first time you log in you scan your face and validate the passport</li>
+<li>send them to kean's facebook pi face recognition app:</li>
+<li>http://through-the-interface.typepad.com/through_the_interface/2012/10/creating-a-face-recognising-security-cam-with-a-raspberry-pi-part-4.html</li>
+<li>Creating a face-recognising security cam with a Raspberry Pi – Part 4</li>
+</ul>
+</ul>
+
+<a name="4"></a>
+
+<ul>
+<li>eat my fridge</li>
+<ul>
+<li>keep track of fridge contents</li>
+<li>calculate recipes for the existing food</li>
+<li>manage shopping, connect with existing shopping apps</li>
+<li>grocery market, instacard, facebook</li>
+<li>engage with our fridge</li>
+<li>visualise it</li>
+<li>order directly online</li>
+<li>scan receipts</li>
+<li>commission, marketing, social community</li>
+<li>favourite list, history</li>
+<li>possible recipes</li>
+<li>ingredients</li>
+<li>what's there, what is missing, automatically order more</li>
+<li>implement support for sensors in the fridge</li>
+<li>currently no sensor support, manually enter the amount</li>
+</ul>
+</ul>
+
+<a name="5"></a>
+
+<ul>
+<li>job auditor</li>
+<ul>
+<li>how to evaluate a job opportunity when choosing a new job?</li>
+<li>you can get some nasty surprises</li>
+<li>you want to make sure you have something solid before you join a company</li>
+<li>the web site is up and running and fully working</li>
+<li>you can connect with the company, send message via this platform</li>
+<li>full mobile support</li>
+<li>we will ask people to come and review the company, e.g. big companies, can be anonymous, online</li>
+<li>what is different from glass door?</li>
+<li>focus on middle east, expats</li>
+<li>you can report abuse</li>
+<li>anonymous is a sensitive point here</li>
+</ul>
+</ul>
+
+<a name="6"></a>
+
+<ul>
+<li>wrappup</li>
+<ul>
+<li>keep up momentum of meetings</li>
+<li>document everything that happened</li>
+<li>direct result oriented meetings</li>
+<li>actions outcomes results</li>
+<li>demo live:</li>
+<li>mobile app on phone</li>
+<li>live audio recording with markers</li>
+<li>set points of interest</li>
+<li>automatic tweets, emails</li>
+<li>tracking actions throughout meeting</li>
+<li>seamless efficient collaboration</li>
+<li>immediate voice to text translation</li>
+<li>how are actions captured?</li>
+<li>one meeting participant clicks a button</li>
+<li>afterwards, toggle between them</li>
+<li>we saw action items</li>
+<li>as we are talking, conclusions, questions, etc. are marked</li>
+<li>an hour long meeting can become a two-minute summary</li>
+<li>are you taking notes? no, it is more like dj-ing. he just toggles between agenda items and important points</li>
+<li>how can you take this forward to make it fully automated? machine algorithms can identify pauses, track agenda items, capture keywords</li>
+</ul>
+</ul>
+
+<a name="7"></a>
+
+<ul>
+<li>urServed</li>
+<ul>
+<li>do we need help with mundane routines?</li>
+<li>cleaning, hiring a carpenter, etc.</li>
+<li>discover new services, schedule them automatically and seamlessly</li>
+<li>deliver at convenience</li>
+<li>add service request, suitable time slot</li>
+<li>automatically route this order to suitable small businesses in the immediate vicinity</li>
+<li>rate business, e.g. i only want a five-star business to take my order</li>
+<li>accept or reject task</li>
+<li>user can provide feedback</li>
+<li>user base? start with certain localities, use social media, understand requests coming in, determine pattern of requests, initially contact and engage businesses, they need leads and customers</li>
+</ul>
+</ul>
+
+<a name="8"></a>
+
+<ul>
+<li>planbear</li>
+<ul>
+<li>revolutionise how humans make connections</li>
+<li>have you ever been bored?</li>
+<li>connect it with other people's boredom and make it fun.</li>
+<li>demo on a mobile phone</li>
+<li>register, enter number, security concerned, link with phone number</li>
+<li>create a plan</li>
+<li>another user, a stranger, joins and comments on the plan</li>
+<li>how do you kick people out?</li>
+<li>when was it developed? 50% in the last 24 hours.</li>
+<li>uses tvideo(?)</li>
+</ul>
+</ul>
+
+<a name="9"></a>
+
+<ul>
+<li>sharemybook</li>
+<ul>
+<li>crowd sourced platform model</li>
+<li>hosts with libraries rent, share, connect readers</li>
+<li>guests can publish bio and select topics of interest</li>
+<li>see another user's interests and library</li>
+<li>ask to rent a book</li>
+<li>schedule a visit, find his free slots</li>
+<li>like an airbnb of public libraries</li>
+<li>we want to connect all libraries</li>
+<li>physical books</li>
+<li>how to monetise? commission based, small commission</li>
+<li>also enable sale of books</li>
+<li>why start from scratch? how about existing sites, e.g. good read?</li>
+</ul>
+</ul>
+
+<a name="10"></a>
+
+<ul>
+<li>fi</li>
+<ul>
+<li>a friend indeed</li>
+<li>ai machine learning fried</li>
+<li>helping you in everyday life</li>
+<li>supports you</li>
+<li>personal</li>
+<li>understands you</li>
+<li>it records from past experiences and past choices</li>
+<li>direct integration with imdb</li>
+<li>knows about restaurants</li>
+<li>connects with numerous existing databases</li>
+<li>a platform for services to come together.</li>
+<li>it knows your daily schedule, e.g.</li>
+<li>tries to understand what you do and react to your current actions</li>
+<li>how does it differ from a personal assistant?</li>
+<li>difference is machine learning, learns your personality and builds its own personality</li>
+<li>it is also a network of fis.</li>
+<li>it can share</li>
+<li>we convert natural language to data</li>
+<li>intent, value, subject, object</li>
+<li>backend is mongodb database</li>
+</ul>
+</ul>
+
+<a name="11"></a>
+
+<ul>
+<li>alive</li>
+<ul>
+<li>save lives</li>
+<li>cardiac arrests happen quickly</li>
+<li>ambulance takes too long</li>
+<li>smart watch app with heart rate sensor</li>
+<li>incorporates with google maps</li>
+<li>no internet required</li>
+<li>detects cardiac arrest, take all possible actions automatically</li>
+<li>call ambulance</li>
+<li>no need to sign up, use phone number as identity</li>
+<li>count heart rate automatically</li>
+<li>if it goes to zero, automatically send a request to people nearby and call an ambulance</li>
+<li>remove the watch</li>
+<li>differentiation to other dispatch services?</li>
+<li>it sends a text message to the server with the location, so no internet is required</li>
+</ul>
+</ul>
+
+<a name="12"></a>
+
+<ul>
+<li>happy in happy out</li>
+<ul>
+<li>handle feedback</li>
+<li>feedback is often negative</li>
+<li>we will disrupt the feedback market</li>
+<li>demo:</li>
+<li>company has account</li>
+<li>we want to ensure happy in happy out</li>
+<li>define different criteria</li>
+<li>users give feedback when and where it is required</li>
+<li>check in and immediately feedback</li>
+<li>have feedback at right time</li>
+<li>ask question that matters</li>
+<li>address concerns using machine learning</li>
+<li>app is here live on the phone</li>
+<li>how to rate my happiness?</li>
+<li>what were the high points and low points?</li>
+<li>do not disrupt itinerary.</li>
+<li>every sale line can use this service.</li>
+<li>analytics is only on web, not real time.</li>
+<li>this addresses concerns during the journey time</li>
+<li>address concerns immediately, while you are still on the road</li>
+</ul>
+</ul>
+
+<a name="13"></a>
+
+<ul>
+<li>charitysync</li>
+<ul>
+<li>2 billion people in the world have no water, 1 billion no healthcare, children forced to work, no schooling</li>
+<li>leverage existing charities</li>
+<li>add value on three points:</li>
+<li>their web sites have old fashioned web design, unresponsive</li>
+<li>black box: you donate without seeing the social impact</li>
+<li>gamification element: donate and refer friends</li>
+<li>if you donate $5 and refer 100 friends who donate $1 each, it will show $505</li>
+<li>demo gamification part:</li>
+<li>screen, dashboard, login, avatar reflects status</li>
+<li>select country, cause, amount</li>
+<li>see on a map where your donation goes</li>
+<li>looks like a game</li>
+<li>keeps growing contributions</li>
+<li>all development done here this weekend</li>
+<li>all donations 100% transparent including geolocation of where it goes</li>
+</ul>
+</ul>
+
+</body>
+</html>
