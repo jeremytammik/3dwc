@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <!--
+  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+   -->
+</head>
+<body>
+
+<!--
+
+https://www.airpair.com/node.js/posts/top-10-mistakes-node-developers-make
+
+#3dwebcoder #a360 #webgl #3dweb #adsk #autocad #inventor
+#cloud #nodejs #au2015 #ah8 #milanojs
+#developers #aws #revitapi #jquery #handlebars #nodejs #expressjs #heroku
+akn_include
+
+-->
+
+<h3>50 Ways to View Your Model</h3>
+
+<p>Well, actually just one way, and a very simple one at that, but over fifty different model file formats...</p>
+
+<p>Instantly view your designs online &ndash; no software required.</p>
+
+<p>I pointed out repeatedly how easy the Autodesk View and Data API makes it to interactively view and explore a 3D model in the browser without any further software whatsoever.</p>
+
+<p>Now the new <a href="https://360.autodesk.com/viewer/widget">A360 Viewer Widget</a> simplifies it further still, using a widget that can be embedded in web pages to view design files that are dragged and dropped onto it, enabling you to view them as you would in A360 inside any web page.</p>
+
+<p>Try it out!</p>
+
+<p>Drop a model file of your choice onto this widget:</p>
+
+<center>
+<div id="a360widgetDropAreaContainer" style="width: 450px"></div>
+</center>
+
+<p>How is this achieved?</p>
+
+<p>It is just an empty HTML <code>div</code> element with an arbitrary id attribute defined, e.g., <code>id="a360widgetDropAreaContainer"</code> that is initialised by calling the <code>adskViewerWidget.Init</code> function on it like this (copy and paste to a text editor or view source to see the truncated lines in full):</p>
+
+<pre class="prettyprint">
+&lt;script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="https://api.autodesk.com/content/gateway/2013.1.363776.288/z/Scripts/a360Viewer/widget.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+var adskViewerWidget = adskViewerWidget();
+adskViewerWidget.Init('#a360widgetDropAreaContainer', true);
+&lt;/script&gt;
+</pre>
+
+<p>Dropping a file onto the widget opens a new window.
+It may take a minute or two for a moderately sized model to translate and display, looking something like this when done:</p>
+
+<center>
+<img src="img/a360_widget.png" alt="A360 viewer window" width="400"/>
+</center>
+
+<p>There are two ways to render the widget.
+Above, only the pure drop area is displayed.
+You can also display the full widget including an instruction blurb by leaving off the second <code>true</code> argument:</p>
+
+<center>
+<div id="a360widgetContainer" style="width: 230px"></div>
+</center>
+
+<script type="text/javascript" src= "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript" src="https://api.autodesk.com/content/gateway/2013.1.363776.288/z/Scripts/a360Viewer/widget.js"></script>
+<script type="text/javascript">
+var adskViewerWidget = adskViewerWidget();
+adskViewerWidget.Init('#a360widgetDropAreaContainer', true);
+adskViewerWidget.Init('#a360widgetContainer');
+</script>
+
+<p>You can use this for CAD model files such as DWG from AutoCAD, RVT from Revit, IPT, DWF, formats from SolidWorks, ProE, Catia and others, including large and complex files, all right in your browser with no downloads or plug-ins needed.
+2D and 3D designs in over
+<a href="https://360.autodesk.com/Viewer#supportedFiles">50 file formats</a> are supported.</p>
+
+<p>I recently mentioned how to retrieve the
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html#3.1">full list of file formats</a> yourself, and just suggested adding that functionality as an
+<a href="https://github.com/Developer-Autodesk/workflow-curl-view.and.data.api/issues/1">enhancement to the cURL workflow sample</a>.
+Here they are:</p>
+
+<ul><li>3dm 3ds asm bmp cam360 catpart catproduct cgr csv dae dlv3 doc docx dwf dwfx dwg dwt dxf exp f3d fbx g gbxml iam idw ifc ige iges igs ipt jpeg jpg jt model neu nwc nwd obj pdf png pps ppt pptx prt rcp rtf rvt sab sat session sim sim360 skp sldasm sldprt smb smt ste step stl stla stlb stp tif tiff txt wire x_b x_t xas xls xlsx xpr zip</li></ul>
+
+<p>Stephen Preston already discussed this presenting
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2015/05/a360-widget.html">a widget for the A360 viewer</a>,
+and Kean Walmsley picked it up as well in
+<a href="http://through-the-interface.typepad.com/through_the_interface/2015/05/viewing-50-design-software-formats-from-a-web-page.html">viewing 50+ design software formats from a web page</a>.</p>
+
+<p>As said, the full instructions for embedding this are available at
+<a href="http://360.autodesk.com/viewer/widget">360.autodesk.com/viewer/widget</a>.</p>
+
+<p>Note the typo there, though: the initialization call is <code>adskViewerWidget.Init()</code> with a capital 'I'.</p>
+
+<p>Enjoy!</p>
+
+<!--
+
+./viewerAPI auth
+
+a = {"extensions":["ipt","neu","stla","stl","xlsx","jt","jpg","skp","prt","dwf","xls","png","sldasm","step","dwg","zip","nwc","model","sim","stp","ste","f3d","pdf","iges","idw","dwt","dxf","catproduct","csv","igs","sldprt","cgr","3dm","sab","obj","pptx","cam360","jpeg","bmp","gbxml","exp","ppt","doc","wire","ige","rcp","txt","dae","x_b","3ds","rtf","rvt","g","sim360","iam","asm","dlv3","x_t","pps","session","xas","xpr","docx","catpart","stlb","tiff","nwd","sat","fbx","smb","smt","ifc","dwfx","tif"], ... }
+
+a['extensions'].sort()
+
+for e in a['extensions']: print e,
+
+3dm 3ds asm bmp cam360 catpart catproduct cgr csv dae dlv3 doc docx dwf dwfx dwg dwt dxf exp f3d fbx g gbxml iam idw ifc ige iges igs ipt jpeg jpg jt model neu nwc nwd obj pdf png pps ppt pptx prt rcp rtf rvt sab sat session sim sim360 skp sldasm sldprt smb smt ste step stl stla stlb stp tif tiff txt wire x_b x_t xas xls xlsx xpr zip
+
+http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html#3.1
+
+3DM3DSASMCAM360CATPARTCATPRODUCTCGRDAEDLV3DWFDWFXDWG*DWTDXFEXPF3DFBXGGBXMLIAMIDWIFCIGEIGESIGSIPTJTMODELNEUNWCNWDOBJPRTRVT**SABSATSESSIONSIMSIM360SKPSLDASMSLDPRTSMBSMTSTESTEPSTLSTLASTLBSTPWIREX_BX_TXASXPR
+
+-->
+
+</body>
+</html>
