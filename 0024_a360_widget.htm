@@ -73,8 +73,12 @@ You can also display the full widget including an instruction blurb by leaving o
 <script type="text/javascript" src="https://api.autodesk.com/content/gateway/2013.1.363776.288/z/Scripts/a360Viewer/widget.js"></script>
 <script type="text/javascript">
 var adskViewerWidget = adskViewerWidget();
-adskViewerWidget.Init('#a360widgetDropAreaContainer', true);
-adskViewerWidget.Init('#a360widgetContainer');
+if ( 0 == $('#a360widgetDropAreaContainer').children().length ) {
+  adskViewerWidget.Init('#a360widgetDropAreaContainer', true);
+}
+if ( 0 == $('#a360widgetContainer').children().length ) {
+  adskViewerWidget.Init('#a360widgetContainer');
+}
 </script>
 
 <p>You can use this for CAD model files such as DWG from AutoCAD, RVT from Revit, IPT, DWF, formats from SolidWorks, ProE, Catia and others, including large and complex files, all right in your browser with no downloads or plug-ins needed.
