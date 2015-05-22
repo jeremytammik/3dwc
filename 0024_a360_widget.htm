@@ -87,6 +87,32 @@ Here they are:</p>
 
 <ul><li>3dm 3ds asm bmp cam360 catpart catproduct cgr csv dae dlv3 doc docx dwf dwfx dwg dwt dxf exp f3d fbx g gbxml iam idw ifc ige iges igs ipt jpeg jpg jt model neu nwc nwd obj pdf png pps ppt pptx prt rcp rtf rvt sab sat session sim sim360 skp sldasm sldprt smb smt ste step stl stla stlb stp tif tiff txt wire x_b x_t xas xls xlsx xpr zip</li></ul>
 
+<p>Oops, correction!</p>
+
+<p>I tested viewing a DOC and a PNG file, listed above, and both of them failed.</p>
+
+<p>The response from the call to the View and Data GET <code>/viewingservice/{version}/supported</code> API is actually a bit more complex than I had initially assumed. I cannot just grab all extensions returned, because some of them are supported for extraction only, not viewing.
+The file formats that can be viewed are identified by the channel mappings specified for them.</p>
+
+<p>I can extract them from the data 'a' returned by the <code>supported</code> API using a Python snippet like this:</p>
+
+<pre class="prettyprint">
+  channel_mappings = a['channelMapping']
+
+  keys = channel_mappings.keys()
+  keys.sort()
+
+  for x in keys:
+    if channel_mappings[x].startswith('view'):
+      print x,
+</pre>
+
+<p>That returns the following 57 supported viewable formats:</p>
+
+<ul><li>3dm 3ds asm cam360 catpart catproduct cgr dae dlv3 dwf dwfx dwg dwt dxf exp f3d fbx g gbxml iam idw ifc ige iges igs ipt jt model neu nwc nwd obj prt rcp rvt sab sat session sim sim360 skp sldasm sldprt smb smt ste step stl stla stlb stp wire x_b x_t xas xpr zip</li></ul>
+
+<p>Many thanks to Shiya Luo for pointing this out!</p>
+
 <p>Stephen Preston already discussed this presenting
 <a href="http://adndevblog.typepad.com/cloud_and_mobile/2015/05/a360-widget.html">a widget for the A360 viewer</a>,
 and Kean Walmsley picked it up as well in
@@ -101,9 +127,27 @@ and Kean Walmsley picked it up as well in
 
 <!--
 
+cd /a/src/web/viewer/git/workflow-curl-view.and.data.api/
+
 ./viewerAPI auth
 
-a = {"extensions":["ipt","neu","stla","stl","xlsx","jt","jpg","skp","prt","dwf","xls","png","sldasm","step","dwg","zip","nwc","model","sim","stp","ste","f3d","pdf","iges","idw","dwt","dxf","catproduct","csv","igs","sldprt","cgr","3dm","sab","obj","pptx","cam360","jpeg","bmp","gbxml","exp","ppt","doc","wire","ige","rcp","txt","dae","x_b","3ds","rtf","rvt","g","sim360","iam","asm","dlv3","x_t","pps","session","xas","xpr","docx","catpart","stlb","tiff","nwd","sat","fbx","smb","smt","ifc","dwfx","tif"], ... }
+curl  -k --header "Authorization: Bearer UwqQ8La0Ux7I0osnIT8qPsbfjtQt" https://developer.api.autodesk.com/viewingservice/v1/supported
+
+a = {"extensions":["ipt","neu","stla","stl","xlsx","jt","jpg","skp","prt","dwf","xls","png","sldasm","step","dwg","zip","nwc","model","sim","stp","ste","f3d","pdf","iges","idw","dwt","dxf","catproduct","csv","igs","sldprt","cgr","3dm","sab","obj","pptx","cam360","jpeg","bmp","gbxml","exp","ppt","doc","wire","ige","rcp","txt","dae","x_b","3ds","rtf","rvt","g","sim360","iam","asm","dlv3","x_t","pps","session","xas","xpr","docx","catpart","stlb","tiff","nwd","sat","fbx","smb","smt","ifc","dwfx","tif"],"channelMapping":{"ipt":"viewing-inventor-lmv","neu":"viewing-atf-lmv","stla":"viewing-atf-lmv","stl":"viewing-atf-lmv","xlsx":"extraction-tika","jt":"viewing-atf-lmv","jpg":"extraction-tika","skp":"viewing-atf-lmv","prt":"viewing-atf-lmv","dwf":"viewing-dwf-lmv","xls":"extraction-tika","png":"extraction-tika","sldasm":"viewing-atf-lmv","step":"viewing-atf-lmv","dwg":"viewing-dwg-lmv","zip":"viewing-assimp","nwc":"viewing-nwd-lmv","model":"viewing-atf-lmv","sim":"viewing-sim-lmv","stp":"viewing-atf-lmv","ste":"viewing-atf-lmv","f3d":"viewing-f3d-lmv","pdf":"extraction-tika","iges":"viewing-atf-lmv","idw":"viewing-idw-lmv","dwt":"viewing-dwg-lmv","dxf":"viewing-dwg-lmv","catproduct":"viewing-atf-lmv","csv":"extraction-tika","igs":"viewing-atf-lmv","sldprt":"viewing-atf-lmv","cgr":"viewing-atf-lmv","3dm":"viewing-atf-lmv","sab":"viewing-atf-lmv","obj":"viewing-assimp","pptx":"extraction-tika","cam360":"viewing-f3d-lmv","jpeg":"extraction-tika","bmp":"extraction-tika","gbxml":"viewing-gbxml","exp":"viewing-atf-lmv","ppt":"extraction-tika","doc":"extraction-tika","wire":"viewing-atf-lmv","ige":"viewing-atf-lmv","rcp":"viewing-rcp-lmv","txt":"extraction-tika","dae":"viewing-assimp","x_b":"viewing-atf-lmv","3ds":"viewing-assimp","rtf":"extraction-tika","rvt":"viewing-rvt-lmv","g":"viewing-atf-lmv","sim360":"viewing-sim-lmv","iam":"viewing-inventor-lmv","asm":"viewing-atf-lmv","dlv3":"viewing-atf-lmv","x_t":"viewing-atf-lmv","pps":"extraction-tika","session":"viewing-atf-lmv","xas":"viewing-atf-lmv","xpr":"viewing-atf-lmv","docx":"extraction-tika","catpart":"viewing-atf-lmv","stlb":"viewing-atf-lmv","tiff":"extraction-tika","nwd":"viewing-nwd-lmv","sat":"viewing-atf-lmv","fbx":"viewing-atf-lmv","smb":"viewing-atf-lmv","smt":"viewing-atf-lmv","ifc":"viewing-nwd-lmv","dwfx":"viewing-dwf-lmv","tif":"extraction-tika"},"regExp":{"prt\\.\\d+$":"viewing-atf-lmv","neu\\.\\d+$":"viewing-atf-lmv","asm\\.\\d+$":"viewing-atf-lmv"},"formatMapping":{},"thumbnailMapping":{"dwf":"viewing-thumbnail","dwg":"viewing-thumbnail","f3d":"viewing-f3d-thumbnail","dwt":"viewing-thumbnail","dxf":"viewing-thumbnail","cam360":"viewing-f3d-thumbnail","dwfx":"viewing-thumbnail"}}
+
+channel_mappings = a['channelMapping']
+
+keys = channel_mappings.keys()
+keys.sort()
+
+for x in keys:
+  if channel_mappings[x].startswith('view'):
+    print x,
+
+3dm 3ds asm cam360 catpart catproduct cgr dae dlv3 dwf dwfx dwg dwt dxf exp f3d fbx g gbxml iam idw ifc ige iges igs ipt jt model neu nwc nwd obj prt rcp rvt sab sat session sim sim360 skp sldasm sldprt smb smt ste step stl stla stlb stp wire x_b x_t xas xpr zip
+
+
+viewing_extensions = [x in channel_mappings if channel_mappings[x].startswith('viewing-')]
 
 a['extensions'].sort()
 
