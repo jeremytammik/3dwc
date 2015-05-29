@@ -1,0 +1,191 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <!--
+  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+   -->
+</head>
+<body>
+
+<!--
+
+git push git master
+git pull git master
+
+#3dwebcoder #webgl #vr #3dweb #adsk #nodejs #expressjs #socketio
+#a360 #autocad #inventor
+#cloud #nodejs #au2015 #ah8 #milanojs
+#developers #aws #revitapi #jquery #handlebars #nodejs #expressjs #heroku
+akn_include
+
+-->
+
+<h3>Node.js REST API Enhancement and VR Party</h3>
+
+<p>Let's get back to looking at node.js, a REST API implementation, and a recent San Francisco virtual reality hackathon project:</p>
+
+<ul>
+<li><a href="#1">Node.js REST API enhancement</a></li>
+<li><a href="#2">Top ten nodejs mistakes</a></li>
+<li><a href="#3">Kean's VR party</a></li>
+</ul>
+
+
+
+
+<a name="1"></a>
+
+<h4>Node.js REST API enhancement</h4>
+
+<p>My colleagues
+<a href="http://around-the-corner.typepad.com/adn/cyrille-fauvel.html">Cyrille</a> and
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/philippe-leefsma.html">Philippe</a> were
+not very impressed with one aspect of my previous
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/radical-node-server-view-and-heroku-push-cleanup.html">
+node WebGL viewer server REST API</a> implementation.</p>
+
+<p>Both suggested that each API module implement and export its own router instead of just defining and exporting individual functions.</p>
+
+<p>The main reason I was loath to do that was that Cyrille's initial suggestion required redefining the body parser middleware for each API module.</p>
+
+<p>However, Philippe's sample shows that that is not necessary. He says:</p>
+
+
+<p>Quickly taking a look at your node sample, here is a suggestion on how I manage the API routes:</p>
+
+<p>Instead of specifying separate <code>app.get</code> and <code>app.post</code> functions for each individual API route, I use <code>app.use('route...', export)</code>, which enables me to easily gather all my routes for a specific API in the same file with a single export. More importantly, if I add or modify any route for a specific API in the future, I don’t have to worry about modifying or adding routes to the server.</p>
+
+<p>Here is an example that illustrates this in my <code>server.js</code> module:</p>
+
+<pre class="prettyprint">
+var collectionsApi = require('./routes/api/collections');
+var itemsApi = require('./routes/api/items');
+
+var app = express();
+
+// API routes
+
+app.use('/node/mongo-admin/api/collections', collectionsApi);
+app.use('/node/mongo-admin/api/items', itemsApi);
+</pre>
+
+<p>The API implementation in <code>items.js</code>, for example, looks like this:</p>
+
+<pre class="prettyprint">
+var router = express.Router();
+
+router.get('/:collectionName', function (req, res) {
+  // ...
+
+router.post('/:collectionName', function (req, res) {
+  // ...
+</pre>
+
+<p>I find this approach quite elegant compared to exporting separately all get, post and so on...</p>
+
+<p>A personal feeling that I wanted to point out.</p>
+
+<p>A full sample that I’ve been working on recently, <a href="https://github.com/Developer-Autodesk/mongo-admin">mongo-admin</a>, illustrates a full concrete implementation of this concept.</p>
+
+<p>I changed my NodeWebGL implementation accordingly.</p>
+
+<p>The server module is simplified and just pulls in the API implementations like this:</p>
+
+<pre class="prettyprint">
+var apiv1 = require('./routes/apiv1');
+var apiv2 = require('./routes/apiv2');
+
+app.use ('/api/v1', apiv1);
+app.use ('/api/v2', apiv2);
+</pre>
+
+<p>The API v2 implementation now uses its own router instead of just exporting two standalone functions:</p>
+
+<pre class="prettyprint">
+var express = require('express');
+var router = express.Router();
+
+router.get ('/', function(req, res) {
+  res.send('API v2 GET: Here belongs a succinct '
+    + 'explanation how to use The Building Coder '
+    + 'WebGL Viewer REST API v2...');
+});
+
+router.post ('/', function(req, res) {
+  console.log('API v2 POST: ' + JSON.stringify(req.body));
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.render('viewer', req.body);
+});
+
+module.exports = router;
+</pre>
+
+<p>The body parser middleware, however, is still defined globally in server.js for the whole app.</p>
+
+<p>The complete node server implementation is available from the
+<a href="https://github.com/jeremytammik/NodeWebGL">NodeWebGL GitHub repo</a>,
+and the version discussed here is
+<a href="https://github.com/jeremytammik/NodeWebGL/releases/tag/0.2.9">0.2.9</a>.</p>
+
+<p>I used the unmodified existing
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/radical-node-server-view-and-heroku-push-cleanup.html#11">
+interactive testing framework</a> to
+test it both locally and live on Heroku.</p>
+
+<p>It still seems to be working just fine.</p>
+
+<p>Many thanks to Cyrille and Philippe for their critical review and valuable support!</p>
+
+
+<a name="2"></a>
+
+<h4>Top ten nodejs mistakes</h4>
+
+<p>Talking about suboptimal implementations, here is a useful and illuminating article by Alexandru Vladutu describing the
+<a href="https://www.airpair.com/node.js/posts/top-10-mistakes-node-developers-make">
+top ten mistakes node developers make</a>.</p>
+
+<p>I'm afraid I must admit to committing every single one of them, except the ones that my project is still too small for.</p>
+
+
+<a name="3"></a>
+
+<h4>Kean's VR party</h4>
+
+<p>Before closing, a quick note on Kean Walmsley's recent
+<a href="https://github.com/KeanW/vr-party">vr-party project</a> at the
+<a href="http://vrhackathon.com">virtual reality hackathon</a> in
+<a href="http://vrhackathon.com/san-francisco.html">San Francisco May 22-24</a>.</p>
+
+<p>Quoting from Kean's report on
+<a href="http://through-the-interface.typepad.com/through_the_interface/2015/05/cooling-down-after-the-sf-vr-hackathon.html">
+cooling down after the SF VR hackathon</a>:</p>
+
+<p>vr-party makes VR a collaborative experience: to have someone curate and control the VR session for a number of consumers.</p>
+
+<p>Communicating design information is a really important activity for all parts of our industry, and I think VR could well become a great enabling tool.</p>
+
+<p>We ended up with a 'presenter' page, which allows you to open and view models via the View and Data API, and an arbitrary number of 'participant' pages on the any kind of device, ideally using Google Cardboard to see the page in 3D.</p>
+
+<p>All the events you perform &ndash; apart from changing the viewpoint, which is something we want controlled locally &ndash; get propagated to all of the connected clients via Web Sockets. So, if you isolate geometry in the presenter window, all the viewers see the same thing; the same is true for exploding the model; and even for sectioning!</p>
+
+<p>And still you control the camera yourself... The experience was actually really compelling.</p>
+
+<p>Congratulations on winning the well-deserved award for the best web-based VR project!</p>
+
+<center>
+<img src="img/kean_vr_party.jpg" alt="Kean's VR party" width="394"/>
+</center>
+
+<p>Please refer to
+<a href="http://through-the-interface.typepad.com/through_the_interface/2015/05/cooling-down-after-the-sf-vr-hackathon.html">
+Kean's report</a> for more pictures and the full story, and to the
+<a href="https://github.com/KeanW/vr-party">
+vr-party GitHub repository</a> for the source.</p>
+
+</body>
+</html>
