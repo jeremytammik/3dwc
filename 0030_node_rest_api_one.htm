@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <!--
+  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+   -->
+</head>
+<body>
+
+<!--
+
+#3dwebcoder #webgl #3dweb #adsk #a360 #cloud #milanojs #prague
+#3dwebaccel
+#nodejs #au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #nodejs #expressjs #heroku
+akn_include
+
+http://ow.ly/Oabij
+
+-->
+
+<h3>Node.js REST API Workshop</h3>
+
+<p>As mentioned, I am preparing a
+<a href="http://the3dwebcoder.typepad.com/blog/2015/06/athens-angelhack-hackathon-and-nodejs-rest-workshop.html#3">Node.js REST API class</a> for the
+<a href="http://the3dwebcoder.typepad.com/blog/2015/05/web-fest-hackathons-au-and-webgl-workshops.html#6">Milano WebGL workshop</a> end
+of this month.</p>
+
+<p>I will also need this material &ndash; and much more &ndash; for my RTC Europe and AU classes, assuming my proposal for the latter is accepted.</p>
+
+<p>Let's finally get going with it.</p>
+
+<p>My plan is to create a node server using Express, implement a REST API for it, and drive a simple mongodb database.</p>
+
+<p>I covered lots of preliminary explorations for the first two steps quite extensively:</p>
+
+<!-- 0003 0005 0006 0009 0010 0013 0014 0015 0016 0017 0018 0019 0025 -->
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/the-nodejs-server-platform-icons-3d-and-the-future.html">Node.js</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/processing-query-strings-in-javascript-and-node.html">Processing Query Strings in JavaScript and Node</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/03/hosting-a-node-server-on-heroku-pages-and-3d-web.html">Hosting a Node Server on Heroku</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html#7">Displaying 2D Graphics via a Node Server</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/driving-the-2d-graphics-svg-node-server-from-a-desktop-app.html">Driving the SVG Node Server from a Desktop Application</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/webgl-node-server-with-github-and-heroku-repo-sync.html">WebGL Node Server with GitHub and Heroku Repo Sync</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/implementing-a-node-rest-api-server.html">Implementing a Node REST API Server</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/implementing-node-server-http-post-get-vs-post.html">Implementing Node Server HTTP POST, GET vs POST</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/post-data-and-swig-driven-webgl-viewer-node-server.html">POST Data and Swig Driven WebGL Viewer Node Server</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/node-server-rendering-using-either-swig-and-handlebars.html">Node Server Rendering with either Swig or Handlebars</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/cleaner-node-server-rest-api-implementation.html">Cleaner Node Server REST API Implementation</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/04/radical-node-server-view-and-heroku-push-cleanup.html">Radical Node Server View and Heroku Push Cleanup</a></li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/05/nodejs-rest-api-enhancement-and-vr-party.html">Node.js REST API Enhancement</a></li>
+</ul>
+
+<p>Lets' put together the result in the shape of the following succinct steps:</p>
+
+<ol>
+<li><a href="#1">Install node, npm and express</a></li>
+<li><a href="#2">Create a node server</a></li>
+<li>More to come...</li>
+</ol>
+
+
+<a name="1"></a>
+
+<h4>1. Install Node, Npm and Express</h4>
+
+<p>If you are starting from scratch, you will obviously need to
+<a href="http://nodejs.org">install node</a> and also the JavaScript package manager
+<a href="https://www.npmjs.com">npm</a> before you can continue.</p>
+
+<p>I will call my REST-driven mongodb node server app jmonodb and place it in its own cosy little home directory.</p>
+
+<p>I use Express to read the incoming request HTTP headers and actions, i.e., GET, POST, PUT or DELETE.</p>
+
+<p>In order to use it, we need to install it first as well.</p>
+
+<p>That is most easily achieved by implementing a <code>package.json</code> file describing the application and its dependencies.</p>
+
+<p>I created a rather fleshed out package description, since I copied it from an existing file &ndash; it looks like this:</p>
+
+<pre class="prettyprint">
+{
+  "name": "jmonodb",
+  "description": "A basic REST API driven node.js express mongo server sample",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "*"
+  },
+  "files": [
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": "&gt;= 0.10.0"
+  },
+  "contributors": [
+    "Jeremy Tammik &lt;jeremy.tammik@eur.autodesk.com&gt;"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jeremytammik/jmonodb"
+  }
+}
+</pre>
+
+<p>With that in place, you can install express by running npm:</p>
+
+<pre class="prettyprint">
+$ npm install
+</pre>
+
+
+
+<a name="2"></a>
+
+<h4>2. Create a Node Server</h4>
+
+<p>With node, npm and express successfully installed, we can set up our initial server.</p>
+
+<p>Create a main application entry point <code>server.js</code> for it as follows:</p>
+
+<pre class="prettyprint">
+var express = require('express');
+
+var app = express();
+
+app.get('/', function(request, response) {
+  response.send('Hello World!');
+});
+
+app.set('port', process.env.PORT || 3001);
+
+var server = app.listen( app.get('port'),
+  function() {
+    console.log('Server listening at port '
+                + server.address().port);
+  }
+);
+</pre>
+
+<p>This creates the server that listens for requests at the chosen port.</p>
+<p>The port can be set through an environment variable and defaults to 3001 if none is defined.</p>
+<p>The app.get function takes a callback function expecting two arguments for the request and response.</p>
+<p>You use the response to reply to the request.</p>
+<p>If nothing is returned, the request will simply time out.</p>
+<p>With the code above, requesting the URL path <code>http://localhost:3001/</code> will return 'Hello World!' as plain text content with an OK header.</p>
+<p>To try it out, start the node server from the command line like this:</p>
+
+<pre class="prettyprint">
+$ node server.js
+Server listening at port 3001
+</pre>
+
+<p>That prints 'Server listening at http://127.0.0.1:3001/'.</p>
+
+<p>Opening that URL <code>localhost:3001</code> in the browser will display the expected text message:</p>
+
+<center>
+<img src="img/node_rest_api_02.png" alt="Node.js server running"/>
+</center>
+
+<p>Great, first step complete, all prerequisites installed, server up and running!</p>
+
+<p>I stored this state of affairs in the
+<a href="https://github.com/jeremytammik/jmonodb">jmonodb GitHub repository</a> as
+<a href="https://github.com/jeremytammik/jmonodb/releases/tag/1.0.1">release 1.0.1</a>.</p>
+
+
+<p>To be continued soon...</p>
+
+<!--
+<a name="3"></a>
+
+<h4>3. Add a REST API</h4>
+
+<p>I explored this amply in the discussions listed above, so I will just go ahead and put it in with not too much further ado.</p>
+
+<p>I do need to discuss what I the API is supposed to do, though.</p>
+
+<p>For the sake of simplicity, let's simply assume that I want to store my file system structure in the database</p>
+
+
+<a name="4"></a>
+
+<h4></h4>
+-->
+
+
+
+</body>
+</html>
