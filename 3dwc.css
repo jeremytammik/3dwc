@@ -19,7 +19,8 @@ pre.code {
   background-color : white;
 }
 
-.blue {  color: blue; }
+.darkblue { color: darkblue; }
+.blue { color: blue; }
 .red { color: red; }
 .teal { color: teal; }
 .maroon { color: maroon; }
