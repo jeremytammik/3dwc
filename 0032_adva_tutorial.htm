@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+   -->
+</head>
+<body>
+
+<!--
+
+- hyperlinks ignore top menu bar
+  link within html doc covered by typepad snap
+  i converted my two blogs to be responsive using the typepad snap theme.
+  they now both have an issue when navigating to links within the blog post.
+  when i navigate to a link within the blog post, it is placed at the top of the page, underneath the header menu bar., so the first lines of the link target are covered and invisible.
+  examples:
+  http://the3dwebcoder.typepad.com/blog/2015/06/nodejs-rest-api-workshop-part-one.html#2
+  http://thebuildingcoder.typepad.com/blog/2015/06/dynamo-centroid-volume-calculation-migration-blitz.html#2
+  can you reproduce this?
+  what can i do to resolve this, please?
+  thank you!
+  cheers
+  jeremy
+http://the3dwebcoder.typepad.com/blog/2015/06/nodejs-rest-api-workshop-part-one.html#2
+/a/doc/revit/tbc/img/link_error_the3dwebcoder_nodejs_rest_api_workshop_part_one_2.png
+/a/doc/revit/tbc/img/link_error_thebuildingcoder_dynamo_centroid_volume_calculation_migration_blitz_2.png
+http://stackoverflow.com/questions/10732690/offsetting-an-html-anchor-to-adjust-for-fixed-header
+
+
+
+#3dwebcoder #adsk #cloud #nodejs #milanojs #expressjs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+akn_include
+
+http://ow.ly/Oabij
+
+-->
+
+<h3>WebGL Workshop, Jobs, Anchors and Functional JavaScript</h3>
+
+<p>I returned happily from the successful fourth and last day of the Milano WebGL workshop, which we concluded with a group session guiding through the View and Data API tutorial.</p>
+
+<p>Here is a short report on that and a few other current topics:</p>
+
+<ul>
+<li><a href="#2">WebGL workshop report</a></li>
+<li><a href="#3">Working at Autodesk</a></li>
+<li><a href="#4">Resolving the link offset error caused by the Snap responsive design menu bar</a></li>
+<li><a href="#5">Functional JavaScript workshop</a></li>
+</ul>
+
+
+<a name="1"></a>
+
+<p>I took a break in the middle of the train trip from Milano back home to Switzerland to meet up with a friend in Frutigen for a hike up the mountains.</p>
+
+<p>We were fortunate enough to be able to spend one night out in the open, enjoy nature, space, tranquility and the light of the half moon, followed by a beautiful day hiking over the
+<a href="https://en.wikipedia.org/wiki/First_(Kandersteg)">First</a> mountain,
+providing panorama views over the Bernese alps, overlooking Kandersteg village and the Oeschinensee halfway up the other side of the valley:</p>
+
+<center>
+<img src="file:////j/photo/jeremy/2015/2015-06-28_first/590_jeremy_on_first_with_oeschinensee.jpg" alt="Jeremy on the First with Kandersteg and the Oeschinensee" width="450"/>
+</center>
+
+
+
+<a name="2"></a>
+
+<h4>WebGL Workshop Report</h4>
+
+<!-- <p>I already <a href="http://the3dwebcoder.typepad.com/blog/2015/03/hosting-a-node-server-on-heroku-pages-and-3d-web.html#5">mentioned</a> the plans for a series of hands-on WebGL workshops in Milan, Italy.</p> -->
+
+<p>The
+<a href="http://the3dwebcoder.typepad.com/blog/2015/05/web-fest-hackathons-au-and-webgl-workshops.html#6">
+free and open Milano WebGL workshop</a> held
+during all four Saturdays in June 2015 has now completed.</p>
+
+<p>The course was offered for free, inspired by the <a href="http://www.opentechschool.org">OpenTechSchool</a> initiative, with about two dozen participants.
+Instead of pure self-learning, volunteer coaches helped guide participants through the course curriculum.</p>
+
+<p>Each meeting consisted of a hands-on learning session followed by a free experimentation part, offering the participants a chance to develop something new.</p>
+
+<p>Here is the <a href="https://hackpad.com/Milan-WebGL-Workshop-ilqFmBXiVt0">workshop outline</a> and a
+<a href="https://www.flickr.com/photos/wemake_cc/sets/72157653987455898">Flickr photo album</a>.</p>
+
+<center>
+<img src="img/webgl_workshop_wemake_milano.png" alt="WebGL workshop at WeMake, Milano" width="450"/>
+</center>
+
+<p>I participated in the final session on June 27<sup>th</sup>, where we wrapped up the series by working with the
+<a href="https://developer.autodesk.com">Autodesk View and Data API</a>.
+I guided the group through
+<a href="http://developer-autodesk.github.io">our GitHub samples</a> demonstrating how to use it, and especially the
+<a href="https://github.com/Developer-Autodesk/tutorial-getting.started-view.and.data">
+quickstart tutorial</a> demonstrating
+how to set up a Node.js server and client-side JavaScript code to display and interact with a 3D model.</p>
+
+<p>In detail, the tutorial guides a newbie through the following steps:</p>
+
+<ul>
+<li>Prerequisites: setting up node.js, a git client, and a source code editor</li>
+<li>Registering for the web service and obtaining an API key</li>
+<li>Preparing a model to view</li>
+<li>Implementing the web server</li>
+<li>Customising the web server user interface using JavaScript extensions</li>
+</ul>
+
+<p>All of this can easily be achieved in less than an hour.</p>
+
+<p>It was the perfect way to round off the four weeks with a high-level viewer and data management example after diving into all the nitty-gritty details of low-level WebGL.</p>
+
+
+<a name="3"></a>
+
+<h4>Working at Autodesk</h4>
+
+<p>One of the WebGL participants was so enthused about the Autodesk View and Data API, all our other cloud technologies and <a href="https://en.wikipedia.org/wiki/Platform_as_a_service">PaaS</a> infrastructure &ndash; View and Data, Autodesk BIM 360, AutoCAD I/O, Autodesk InfraWorks 360, Autodesk ReCap, etc. &ndash; that he asked about how to apply for a job with us.</p>
+
+<p>Autodesk is indeed one of the more popular places to work and has been continually listed among the 100 best high-tech employers for years now, e.g. in this
+<a href="http://reviews.greatplacetowork.com/autodesk">great place to work review</a>.</p>
+
+<p>I looked up how to discover the current openings and apply for a job and found these two links:</p>
+
+<ul>
+<li><a href="http://usa.autodesk.com/adsk/servlet/pc/index?id=1060484&siteID=123112">Jobs at Autodesk</a></li>
+<li><a href="http://careers.autodesk.com">careers.autodesk.com</a></li>
+</ul>
+
+<p>Apparently, there are currently a number of interesting open positions in the USA.</p>
+
+
+
+<a name="4"></a>
+
+<h4>Resolving the Link Offset Error Caused by the Snap Responsive Design Menu Bar</h4>
+
+<p>Last week, I converted both this blog and <a href="http://thebuildingcoder.typepad.com">The Building Coder</a> to a responsive design, creating
+<a href="http://the3dwebcoder.typepad.com/blog/2015/06/the-responsive-3d-web-coder.html">The Responsive 3D Web Coder</a> and
+<a href="http://thebuildingcoder.typepad.com/blog/2015/06/the-responsive-building-coder.html">The Responsive Building Coder</a>, respectively.</p>
+<p>One of the snags I hit was that the menu bar at top of page covers the link targets within a blog post.</p>
+<p>For instance, the first internal link target in the last blog post is <code>#2</code>, i.e. <code><a href="http://the3dwebcoder.typepad.com/blog/2015/06/nodejs-rest-api-workshop-part-one.html#2">the3dwebcoder.typepad.com/blog/2015/06/nodejs-rest-api-workshop-part-one.html#2</a></code>.</p>
+<p>The link worked fine, as always &ndash; in theory, anyway.</p>
+<p>In practice, however, as said, it was not taking the menu bar at top of page into account.</p>
+<p>The result initially looked like this, with the menu bar covering the link target:</p>
+
+<center>
+<img src="img/link_offset_error.png" alt="Link offset error" width="450"/>
+</center>
+
+<p>I could have fixed it using CSS, generating an artificial offset, e.g., as suggested by the Stack Overflow solution on
+<a href="http://stackoverflow.com/questions/10732690/offsetting-an-html-anchor-to-adjust-for-fixed-header">offsetting an HTML anchor to adjust for fixed header</a>.</p>
+
+<p>I preferred moving the menu bar to the bottom instead, according to the <a href="https://en.wikipedia.org/wiki/KISS_principle">KISS principle</a>: keep it simple, stupid!</p>
+
+<p>That easily solved the problem for both of the blogs.</p>
+
+
+<a name="5"></a>
+
+<h4>Functional JavaScript Workshop</h4>
+
+<p>Do you think your JavaScript could be improved?</p>
+<p>You can often save a lot of work by using functional programming techniques.</p>
+<p>In .NET, the generic collections library and its functional extensions often enable compression of dozens of lines into one single statement.</p>
+<p>The same applies in JavaScript, and functional programming is totally accessible here as well.</p>
+<p>I dived into that last year participating in the basel.js
+<a href="http://thebuildingcoder.typepad.com/blog/2014/11/functional-programming-view-and-data-api-demos.html">
+functional programming in JavaScript</a> meetup session led by Lukasz Gintowt.</p>
+<p>Another extremely accessible entry point to dive into this topic is provided by
+<a href="https://github.com/timoxley">
+Tim Oxley</a>'s GitHub-based
+<a href="https://github.com/timoxley/functional-javascript-workshop">
+Functional JavaScript Workshop</a>,
+which provides a good starting point and includes coverage of the map and reduce functionality forming the basis of most modern NoSQL database query mechanisms.</p>
+
+</body>
+</html>
