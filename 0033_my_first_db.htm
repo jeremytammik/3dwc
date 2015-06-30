@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+   -->
+</head>
+<body>
+
+<!--
+
+#3dwebcoder #adsk #cloud #nodejs #milanojs #expressjs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+akn_include
+
+http://ow.ly/Oabij
+
+-->
+
+<h3>My First Mongo Database</h3>
+
+<p>Allow me to present a partial log of my very first experiments with <a href="https://www.mongodb.org">mongoDB</a>.</p>
+
+<p>My ultimate (short-term) goal is to convert a very simple Revit SDK sample called FireRating to a cloud-based multi-project implementation.</p>
+
+<p>The existing sample is a Revit add-in implemented in C# .NET that exports the following data for all door instances in a building model to an Excel spreadsheet, enables the user to edit the external fire rating values, and reimports the modified data to the corresponding elements:</p>
+
+<ul>
+<li>Element id</li>
+<li>Level</li>
+<li>Tag</li>
+<li>Fire rating</li>
+</ul>
+
+<p>They are used as follows:</p>
+
+<ul>
+<li>Element id &ndash; identifies the door instance within the Revit project.</li>
+<li>Level &ndash; not used.</li>
+<li>Tag &ndash; not used.</li>
+<li>Fire rating &ndash; the fire rating, a floating-point number, the only data that is actually modified.</li>
+</ul>
+
+<p>I believe and hope I can implement a node.js mongo db server to manage this data for multiple Revit building models quite quickly and easily with very little fuss.</p>
+
+<p>So here goes.</p>
+
+<p>I started off by installing <a href="https://www.mongodb.org">mongoDB</a> and the
+<a href="http://mongoosejs.com">mongoose</a> node.js library to access it programmatically through JavaScript.
+I obviously also have <a href="https://nodejs.org">node.js</a> and <a href="https://www.npmjs.com">npm</a> already installed and set up.</p>
+
+<p>To run the database, start the mongo database daemon:</p>
+
+<pre class="prettyprint">
+$ mongod
+mongod --help for help and startup options
+2015-06-30T16:12:49.620+0200 [initandlisten] MongoDB starting :
+  pid=23595 port=27017 dbpath=/data/db 64-bit host=jeremy.box
+2015-06-30T16:12:49.621+0200 [initandlisten]
+. . .
+</pre>
+
+<p>You can interact with the database using the interactive mongo shell:</p>
+
+<pre class="prettyprint">
+$ mongo
+MongoDB shell version: 2.6.4
+connecting to: test
+&gt; help
+	db.help()                    help on db methods
+	db.mycoll.help()             help on collection methods
+	sh.help()                    sharding helpers
+	rs.help()                    replica set helpers
+	help admin                   administrative help
+  . . .
+  exit                         quit the mongo shell
+&gt;
+</pre>
+
+<p>This enables me to query the database collections though the command line:</p>
+
+<pre class="prettyprint">
+&gt; show dbs
+admin              (empty)
+firerating         0.078GB
+&gt; use firerating
+switched to db firerating
+&gt; show collections
+fireratings
+system.indexes
+</pre>
+
+<p>I can drop a collection from the current database:</p>
+
+<pre class="prettyprint">
+&gt; show collections
+fireratings
+system.indexes
+&gt; db.fireratings.drop()
+true
+&gt; show collections
+system.indexes
+</pre>
+
+<p>The mongo ObjectId has a minimum length, somewhere between 20 and 24 characters:</p>
+
+<pre class="prettyprint">
+&gt; o = new ObjectId()
+ObjectId("5592a9f4cd4c9b9e84396e21")
+&gt; o = new ObjectId('12345')
+2015-06-30T16:38:50.765+0200 Error: invalid object id: length
+&gt; o = new ObjectId('1234567890')
+2015-06-30T16:38:57.882+0200 Error: invalid object id: length
+&gt; o = new ObjectId('1234567890123456')
+2015-06-30T16:39:02.442+0200 Error: invalid object id: length
+&gt; o = new ObjectId('12345678901234567890')
+2015-06-30T16:39:06.346+0200 Error: invalid object id: length
+&gt; o = new ObjectId('123456789012345678901234')
+ObjectId("123456789012345678901234")
+</pre>
+
+<p>You can
+<a href="http://sebastian.formzoo.com/2012/04/12/mongodb-shorten-the-objectid">
+shorten the ObjectId representation using base64 encoding</a>,
+if you like.</p>
+
+<p>I wish to use the existing Revit element UniqueId property as an identifier in my mongo database.</p>
+
+<p>I implemented the following hard-coded node.js server as a proof of concept to ensure that I really can specify my own object id in the mongo db, setting it equal to the pre-existing Revit UniqueId, instead of using the automatic built-in mongo ObjectId generation functionality:</p>
+
+<pre class="prettyprint">
+// given: a Revit door element UniqeId;
+// it must obviously be unique in the database.
+
+var unique_id
+  = '60f91daf-3dd7-4283-a86d-24137b73f3da-0001fd0b';
+
+var mongoose = require( 'mongoose' );
+
+mongoose.connect( 'mongodb://localhost/firerating ');
+
+var Schema = mongoose.Schema;
+
+var RvtUniqueId = String;
+
+var Door = new Schema(
+  { _id          : RvtUniqueId // suppress automatic generation
+    , level      : String
+    , tag        : String
+    , firerating : Number },
+  { _id: false } // suppress automatic generation
+);
+
+var DoorModel = mongoose.model( 'Door', Door );
+
+var instance = new DoorModel();
+instance._id = unique_id; // new RvtUniqueId(unique_id);
+instance.level = 'Level 1';
+instance.tag = 'Tag 1';
+instance.firerating = 123.45;
+
+instance.save(function (err) {
+  console.log( 'save returned err = ' + err );
+});
+</pre>
+
+<p>The complete firerating node.js application lives in its own cosy little
+<a href="https://github.com/jeremytammik/firerating">firerating GitHub repository</a>,
+and the version described here is
+<a href="https://github.com/jeremytammik/firerating/releases/tag/0.0.0">release 0.0.0</a>.</p>
+
+<p>The application implementation also includes another couple of files, e.g., <code>package.json</code>, which specifies which additional npm modules are required.</p>
+
+<p>You need to install the required node modules using npm before executing the server:</p>
+
+<pre class="prettyprint">
+$ npm install
+</pre>
+
+<p>Now we can run the application:</p>
+
+<pre class="prettyprint">
+$ node server.js
+save returned err = null
+</pre>
+
+<p>Doing so displays messages in the mongo console informing us about the generation of the new collection and its index:</p>
+
+<pre class="prettyprint">
+2015-06-30T17:10:48.987+0200 [conn39] build index on:
+  firerating.doors properties: { v: 1, key: { _id: 1 },
+  name: "_id_", ns: "firerating.doors" }
+
+2015-06-30T17:10:48.987+0200 [conn39] 	 added index
+  to empty collection
+</pre>
+
+<p>I can examine the resulting mongo document in the interactive console:</p>
+
+<pre class="prettyprint">
+&gt; show dbs
+admin              (empty)
+firerating         0.078GB
+&gt; use firerating
+switched to db firerating
+&gt; db.doors.find()
+{ "_id" : "60f91daf-3dd7-4283-a86d-24137b73f3da-0001fd0b",
+  "firerating" : 123.45,
+  "tag" : "Tag 1",
+  "level" : "Level 1",
+  "__v" : 0 }
+</pre>
+
+<p>Once the hard-wired door instance has been added to the database and occupies the specified unique id, the command can obviously not be executed again without error:</p>
+
+<pre class="prettyprint">
+$ node server.js
+save returned err = MongoError: insertDocument
+  :: caused by :: 11000 E11000
+  duplicate key error index:
+  firerating.doors.$_id_  dup key:
+  { : "60f91daf-3dd7-4283-a86d-24137b73f3da-0001fd0b" }
+</pre>
+
+<p>Just to prove the case, let's manually remove the one and only entry again manually using the mongo console, then re-execute the server code to successfully reinsert the same document again:</p>
+
+<pre class="prettyprint">
+&gt; show dbs
+admin              (empty)
+firerating         0.078GB
+jeremy_first_test  0.078GB
+&gt; use jeremy_first_test
+switched to db jeremy_first_test
+&gt; db.dropDatabase()
+{ "dropped" : "jeremy_first_test", "ok" : 1 }
+&gt; use firerating
+switched to db firerating
+&gt; db.doors.find()
+{ "_id" : "60f91daf-3dd7-4283-a86d-24137b73f3da-0001fd0b", "firerating" : 123.45, "tag" : "Tag 1", "level" : "Level 1", "__v" : 0 }
+&gt; db.doors.remove({ "_id" : "60f91daf-3dd7-4283-a86d-24137b73f3da-0001fd0b"})
+WriteResult({ "nRemoved" : 1 })
+&gt; db.doors.find()
+&gt;
+</pre>
+
+<p>This also shows me dropping an obsolete test database, by the way.</p>
+
+<p>As expected, the node server now reinserts the record without error:</p>
+
+<pre class="prettyprint">
+$ node server.js
+save returned err = null
+</pre>
+
+<p>Just like before, the door instance is retrieved again by querying the database collection using <code>find</code>:</p>
+
+<pre class="prettyprint">
+&gt; db.doors.find()
+{ "_id" : "60f91daf-3dd7-4283-a86d-24137b73f3da-0001fd0b",
+  "firerating" : 123.45,
+  "tag" : "Tag 1",
+  "level" : "Level 1",
+  "__v" : 0 }
+</pre>
+
+<p>So far, so good.</p>
+
+<p>Here are my plans for my next steps:</p>
+
+<ul>
+<li>Define more complete schema that includes information about the containers, i.e., the Revit RVT BIM or building information model project files.</li>
+<li>Manage the relationships between the door family instances to their container projects.</li>
+<li>Add a REST API to populate and query the database programmatically.</li>
+<li>Implement a Revit add-in exercising the REST API from C# .NET.</li>
+<li>Re-implement the complete cloud-based Revit FireRating SDK sample functionality.</li>
+</ul>
+
+</body>
+</html>
