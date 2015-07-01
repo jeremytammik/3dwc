@@ -1,0 +1,337 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+   -->
+</head>
+<body>
+
+<!--
+
+#3dwebcoder #adsk #cloud #nodejs #milanojs #expressjs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+akn_include
+
+http://ow.ly/Oabij
+
+-->
+
+<h3>Implementing Mongo Database Relationships</h3>
+
+<p>Let's look at how to implement relationships in a mongo database.</p>
+
+<center>
+<img src="img/mongodb.png" alt="mongoDB" width="153"/>
+</center>
+
+<p>Yesterday, I made my very first steps exploring <a href="https://www.mongodb.org">mongoDB</a> to implement a <a href="http://mongoosejs.com">mongoose</a> based node.js database web server.</p>
+
+<p>The example I am using is a hopefully simple project to implement a cloud-based multi-project version of the Revit SDK FireRating sample.</p>
+
+<p>The relationships we have to deal with there are as trivial as they get: we are looking at doors in a building, represented by door family instances in a Revit RVT project file.</p>
+
+<p>We need to be able to retrieve all doors for any given project. A project can contain any number of doors, and any number of projects can be added.</p>
+
+<p>Mongo recommends two main approaches to handle relationships:</p>
+
+<ul>
+<li><a href="http://docs.mongodb.org/manual/tutorial/model-embedded-one-to-many-relationships-between-documents">
+Embedding documents</a></li>
+<li><a href="http://docs.mongodb.org/manual/tutorial/model-referenced-one-to-many-relationships-between-documents">
+Document references</a></li>
+</ul>
+
+<p>In this case, the reference approach seems best suited.</p>
+
+<p>In fact, our door-project relationship is quite similar to the book-publisher one described in the
+<a href="http://docs.mongodb.org/manual/tutorial/model-referenced-one-to-many-relationships-between-documents">
+mongo documentation</a>.</p>
+
+
+<a name="2"></a>
+
+<h4>Identifying a Project</h4>
+
+<p>Yesterday, I described that I decided to use the UniqueId defined by Revit to identify the door instances in mongo.</p>
+
+<p>This will work fine, as long as no two doors in Revit ever have the same UniqueId.</p>
+
+<p>That can only happen if a project containing a door is copied and used as a basis for several different offspring projects.</p>
+
+<p>For a Revit project, identification is significantly harder.</p>
+
+<p>Theoretically, one could use the ProjectInfo singleton's UniqueId.</p>
+
+<p>In practice, that is not reliable, because people apparently do indeed copy projects and create several branches from them.</p>
+
+<p>Let's just hope they never do that after more elements have been added.</p>
+
+<p>Next, I thought of identifying the project by the machine name and full path, e.g.:</p>
+
+<pre class="prettyprint">
+  System.Environment.MachineName
+    + separator
+    + Document.PathName;
+</pre>
+
+<p>This can end up being a pretty long string.
+Since mongo becomes inefficient if the identifier is too long, I thought of compressing it and encoding to base64, or using a message digest or hash algorithm such as
+<a href="https://en.wikipedia.org/wiki/MD5">MD5</a> or the more secure and collision-proof
+<a href="https://en.wikipedia.org/wiki/SHA-2">SHA-2</a>.
+The latter is available in .NET as <code>System.Security.Cryptography.SHA256Managed</code>.</p>
+
+<p>However, all of the above only works for non-workshared projects.
+Workshared ones might potentially be able to use the <code>Document.WorksharingCentralGUID</code> property.</p>
+
+<p>Once I got to this level of complexity, I decided to skip it and use the automatic mongo object id generation functionality for the project instead of defining my own.
+Avoid complexity, <a href="https://en.wikipedia.org/wiki/KISS_principle">kiss</a>, and handle both locally stored and central model projects the same way.</p>
+
+
+<a name="3"></a>
+
+<h4>Adding a Project and Two Doors to the Database</h4>
+
+<p>As an initial proof of concept, here is a node server adding a project containing two doors:</p>
+
+<pre class="prettyprint">
+// given: a Revit door element UniqeId;
+// it must obviously be unique in the database.
+
+var door_unique_id
+  = '60f91daf-3dd7-4283-a86d-24137b73f3da-0001fd0b';
+
+var mongoose = require( 'mongoose' );
+
+mongoose.connect( 'mongodb://localhost/firerating' );
+
+var Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId;
+
+var RvtUniqueId = String;
+
+// use automatic Mongo ObjectId for project.
+
+var projectSchema = new Schema(
+  { computername        : String // .NET System.Environment.MachineName
+    , path              : String // Document.PathName
+    , centralserverpath : String // Document.GetWorksharingCentralModelPath().CentralServerPath
+    , title             : String // Document.Title
+    , numberofsaves     : Number // DocumentVersion.NumberOfSaves
+    , versionguid       : RvtUniqueId // DocumentVersion.VersionGUID
+    , projectinfo_uid   : RvtUniqueId // ProjectInfo.UniqueId
+  }
+);
+
+var ProjectModel = mongoose.model( 'Project', projectSchema );
+
+// use Revit UniqueId for door instances.
+
+var doorSchema = new Schema(
+  { _id          : RvtUniqueId // suppress automatic generation
+    , project_id : ObjectId
+    , level      : String
+    , tag        : String
+    , firerating : Number },
+  { _id: false } // suppress automatic generation
+);
+
+var DoorModel = mongoose.model( 'Door', doorSchema );
+
+var projectInstance = new ProjectModel();
+
+projectInstance.computername = 'JEREMYTAMMIB1D2';
+projectInstance.path = 'C:/Program Files/Autodesk/Revit 2016/Samples/rac_basic_sample_project.rvt';
+projectInstance.centralserverpath = '';
+projectInstance.title = 'rac_basic_sample_project.rvt';
+projectInstance.numberofsaves = 271;
+projectInstance.versionguid = 'f498e8b1-7311-4409-a669-2fd290356bb4';
+projectInstance.projectinfo_uid = '8764c510-57b7-44c3-bddf-266d86c26380-0000c160';
+
+projectInstance.save(function (err) {
+  console.log( 'save project returned err = ' + err );
+  if(!err) {
+    var pid = projectInstance._id;
+    console.log( 'project_id = ' + pid );
+
+    var instance = new DoorModel();
+    instance._id = door_unique_id;
+    instance.project_id = pid;
+    instance.level = 'Level 1';
+    instance.tag = 'Tag 1';
+    instance.firerating = 123.45;
+    instance.save(function (err) {
+      console.log( 'save instance returned err = ' + err );
+      if(!err) {
+        var instance2 = new DoorModel();
+        instance2._id = door_unique_id + '2';
+        instance2.project_id = pid;
+        instance2.level = 'Level 2';
+        instance2.tag = 'Tag 2';
+        instance2.firerating = 678.9;
+        instance2.save(function (err) {
+          console.log( 'save instance2 returned err = ' + err );
+        });
+      }
+    });
+  }
+});
+</pre>
+
+<p>This version of the code is captured as
+<a href="https://github.com/jeremytammik/firerating/releases/tag/0.0.2">release 0.0.2</a> in the
+<a href="https://github.com/jeremytammik/firerating">firerating GitHub repository</a>,
+in case you would like to try it out yourself.</p>
+
+<p>We can look at the result of running it in the mongo console.</p>
+
+<p>First, let's drop any potentially pre-existing data:</p>
+
+<pre class="prettyprint">
+&gt; db.projects.drop()
+true
+&gt; db.doors.drop()
+true
+</pre>
+
+<p>Next, run this trivial little server:</p>
+
+<pre class="prettyprint">
+$ node server.js
+save project returned err = null
+project_id = 5593a8733a003b852142e4eb
+save instance returned err = null
+save instance2 returned err = null
+</pre>
+
+<p>The results displayed in the mongo console look like this:</p>
+
+<pre class="prettyprint">
+&gt; db.projects.find()
+{ "_id" : ObjectId("5593a8733a003b852142e4eb"),
+  "projectinfo_uid" : "8764c510-57b7-44c3-bddf-266d86c26380-0000c160",
+  "versionguid" : "f498e8b1-7311-4409-a669-2fd290356bb4",
+  "numberofsaves" : 271,
+  "title" : "rac_basic_sample_project.rvt",
+  "centralserverpath" : "",
+  "path" : "C:/Program Files/Autodesk/Revit 2016/Samples/rac_basic_sample_project.rvt",
+  "computername" : "JEREMYTAMMIB1D2",
+  "__v" : 0 }
+&gt; db.doors.find()
+{ "_id" : "60f91daf-3dd7-4283-a86d-24137b73f3da-0001fd0b",
+  "firerating" : 123.45,
+  "tag" : "Tag 1",
+  "level" : "Level 1",
+  "project_id" : ObjectId("5593a8733a003b852142e4eb"),
+  "__v" : 0 }
+{ "_id" : "60f91daf-3dd7-4283-a86d-24137b73f3da-0001fd0b2",
+  "firerating" : 678.9,
+  "tag" : "Tag 2",
+  "level" : "Level 2",
+  "project_id" : ObjectId("5593a8733a003b852142e4eb"),
+  "__v" : 0 }
+</pre>
+
+<p>We can easily select the doors belonging to a specific project by adding an appropriate query argument:</p>
+
+<pre class="prettyprint">
+  db.doors.find( { "project_id"
+    : ObjectId("5593a8733a003b852142e4eb") } )
+</pre>
+
+
+<a name="4"></a>
+
+<h4>Pondering the Callback Hell</h4>
+
+<p>Note how in the node.js code implementation, each addition of a new database entry is executed after the previous one completes.</p>
+
+<p>Therefore, each subsequent save operation is wrapped in the callback function provided to the preceding call.</p>
+
+<p>This causes the beginnings of an indentation avalanche.</p>
+
+<p>Bear in mind that any project can potentially contain thousands of door instances.</p>
+
+<p>These are the first beginnings of <a href="http://callbackhell.com">callback hell</a>.</p>
+
+<p>How can we avoid that?</p>
+
+<p>Besides the solution suggested by <a href="http://callbackhell.com">callbackhell.com</a>, the Stack Overflow thread on
+<a href="http://stackoverflow.com/questions/18095107/callback-hell-in-nodejs">callback hell in nodejs</a> provides some good, sensible suggestions.</p>
+
+<p>Reading on, I find a yet better approach, because
+<a href="http://thecodebarbarian.com/2015/03/20/callback-hell-is-a-myth">callback hell is a myth</a>.</p>
+
+
+<a name="5"></a>
+
+<h4>Adding a Project and Many Doors to the Database</h4>
+
+<p>Thus inspired, I notice that my issue is actually very manageable: although all my individual door instances do depend on the project and require its object id, they do not depend on each other, and can therefore be created in parallel.</p>
+
+<p>Here is the code demonstrating addition of any number of doors to the project in a loop:</p>
+
+<pre class="prettyprint">
+projectInstance.save(function (err) {
+  console.log( 'save project returned err = ' + err );
+  if(!err) {
+    var pid = projectInstance._id;
+    console.log( 'project_id = ' + pid );
+
+    for( var i = 0; i &lt; 10; ++i ) {
+      var inst = new DoorModel();
+      var s = i.toString();
+      inst._id = door_unique_id + s;
+      inst.project_id = pid;
+      inst.level = 'Level ' + s;
+      inst.tag = 'Tag ' + s;
+      inst.firerating = 123.45 * (i + 0.1);
+      inst.save(function (err) {
+        console.log( 'save instance returned err = ' + err );
+      });
+    }
+  }
+});
+</pre>
+
+<p>It works fine, and the indentation never needs to exceed these three levels.</p>
+
+<p>This updated version of the node.js code is stored as
+<a href="https://github.com/jeremytammik/firerating/releases/tag/0.0.3">release 0.0.3</a> in the
+<a href="https://github.com/jeremytammik/firerating">firerating GitHub repository</a>.</p>
+
+
+<a name="6"></a>
+
+<h4>Next Steps</h4>
+
+<p>This discussion addresses the first two items in yesterday's list of next steps:</p>
+
+<ul>
+<li>Define more complete schema that includes information about the containers, i.e., the Revit RVT BIM or building information model project files.</li>
+<li>Manage the relationships between the door family instances to their container projects.</li>
+<li>Add a REST API to populate and query the database programmatically.</li>
+<li>Implement a Revit add-in exercising the REST API from C# .NET.</li>
+<li>Re-implement the complete cloud-based Revit FireRating SDK sample functionality.</li>
+</ul>
+
+<p>So let's continue with the rest anon.</p>
+
+
+<a name="7"></a>
+
+<h4>Multi-Colour 3D Printing</h4>
+
+<p>One last little note before wrapping up for today: a new
+<a href="http://3dprint.com/74984/autodesk-patent-multi-color">
+Autodesk patent reveals several advanced multi-color FDM 3D printing methods</a>.
+The detailed description of these ideas is really cool! Check it out for yourself.</p>
+
+</body>
+</html>
