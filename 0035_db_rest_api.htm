@@ -1,0 +1,373 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+   -->
+</head>
+<body>
+
+<!--
+
+#3dwebcoder #adsk #cloud #nodejs #milanojs #expressjs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+akn_include
+
+http://ow.ly/Oabij
+
+-->
+
+<h3>REST API Definition</h3>
+
+<p>Let's equip our node.js <a href="http://mongoosejs.com">mongoose</a>-driven <a href="https://www.mongodb.org">mongoDB</a> database web server with a REST API. To be precise, I will:</p>
+
+<ul>
+<li>Define a URL route schema to map requests to application actions.</li>
+<li>Implement controllers to handle each action.</li>
+<li>Add interfaces to store, access and modify data.</li>
+</ul>
+
+<p>I already discussed <a href="http://the3dwebcoder.typepad.com/blog/2015/06/my-first-mongo-database.html">
+the over-all goal and what to store</a>,
+namely building project models, door instances living in those models, and each door's fire rating value.</p>
+
+<p>Next, we looked at how to <a href="http://the3dwebcoder.typepad.com/blog/2015/07/implementing-mongo-database-relationships.html">
+identify projects and maintain the door-project relationships</a> in the mongo database.</p>
+
+<p>Now we will cover a few fundamental aspects and start implementing the REST API to interact with the database:</p>
+
+<ul>
+<li><a href="#2">Data model</a></li>
+<li><a href="#3">Routes</a></li>
+<li><a href="#4">Request placeholder pattern</a></li>
+<li><a href="#5">Route implementation</a></li>
+<li><a href="#6">Controller implementation</a></li>
+<li><a href="#7">Door routes and controller</a></li>
+<li><a href="#8">Download and test</a></li>
+<li><a href="#9">Next</a></li>
+</ul>
+
+<p>Before we start implementing the API and adding more functionality to our main server module, let's clean it up a bit by moving out the mongo data model definition into separate modules.</p>
+
+
+<a name="2"></a>
+
+<h4>Data Model</h4>
+
+<p>To improve the code maintainability, we extract the mongo data model definitions that were initially implemented inside <code>server.js</code> and place them in separate individual JavaScript modules <code>door.js</code> and <code>project.js</code>, respectively, living in their own new <code>model</code> subdirectory. For instance, here is the content of new <code>door.js</code>:</p>
+
+<pre class="prettyprint">
+  var mongoose = require( 'mongoose' );
+
+  var Schema = mongoose.Schema,
+      ObjectId = Schema.ObjectId;
+
+  var RvtUniqueId = String;
+
+  // use Revit UniqueId for door instances.
+
+  var doorSchema = new Schema(
+    { _id          : RvtUniqueId // suppress automatic generation
+      , project_id : ObjectId
+      , level      : String
+      , tag        : String
+      , firerating : Number },
+    { _id: false } // suppress automatic generation
+  );
+
+  mongoose.model( 'Door', doorSchema );
+</pre>
+
+
+<a name="3"></a>
+
+<h4>Routes</h4>
+
+<p>The REST API that the application responds to is defined by routes.
+Each route specifies three aspects:</p>
+
+<ul>
+<li>The HTTP action that it listens for.</li>
+<li>The URL path that it responds to.</li>
+<li>Its controller, a JavaScript handler function implementing its behaviour.</li>
+</ul>
+
+<p>For instance, this trivial route definition handles all GET requests to the root of the site, the home page:</p>
+
+<pre class="prettyprint">
+  app.get( '/', function( req, res ) {
+    res.send( 'Return plain text, JSON data or HTML view' );
+  });
+</pre>
+
+<p>In this case, the handling method is an anonymous function that responds with plain text.</p>
+
+
+<a name="4"></a>
+
+<h4>Request Placeholder Pattern</h4>
+
+<p>URL paths can be represented as string patterns. They are broken up and translated into <a href="">regular expressions</a> by <a href="">express</a>, using the separator characters '/' and ':'.</p>
+
+<p>In our case, we might want to retrieve projects by their document title:</p>
+
+<pre class="prettyprint">
+  app.get('/project/:title', function(req, res) {
+
+    // GET /project/rac_basic_sample_project
+
+    console.log(req.params.name);
+
+    // displays rac_basic_sample_project
+
+    res.send('{"id": 1,...
+      ,"title":"rac_basic_sample_project.rvt",
+      ...}');
+  });
+</pre>
+
+<p>In this sample, <code>:title</code> represents anything that comes after <code>/project/</code> in the URL. This parameter is available from the <code>params</code> property on the request object <code>req</code>, keyed using the name of the route path placeholder.</p>
+
+<p>Data can also be passed in using the HTTP request body, a possibility we already explored in some depth in the discussion on
+<a href="http://the3dwebcoder.typepad.com/blog/2015/04/implementing-node-server-http-post-get-vs-post.html">
+implementing node server HTTP POST, and GET vs POST</a>.</p>
+
+
+<a name="5"></a>
+
+<h4>Route Implementation</h4>
+
+<p>Let's implement routes to add, query and modify projects in the database.
+They are defined in a new JavaScript module <code>routes.js</code>, which simply hooks up each route with its corresponding controller function:</p>
+
+<pre class="prettyprint">
+  module.exports = function(app) {
+    var projects = require('./controller/projects');
+    app.get('/projects', projects.findAll);
+    app.get('/projects/:id', projects.findById);
+    app.post('/projects', projects.add);
+    app.put('/projects/:id', projects.update);
+    app.delete('/projects/:id', projects.delete);
+  }
+</pre>
+
+<p>All request event handling methods for projects are specified within one single controller module for projects, <code>projects.js</code>, living in a separate <code>controller</code> subdirectory.
+The main REST HTTP actions are handled.
+The URL routes are modelled according to standard REST API conventions, and the handling methods are clearly named.</p>
+
+
+<a name="6"></a>
+
+<h4>Controller Implementation</h4>
+
+<p>The route implementation displayed above requires the controller module <code>controller/project.js</code> to implement the following functions:</p>
+
+<ul>
+<li>findAll</li>
+<li>findById</li>
+<li>add</li>
+<li>update</li>
+<li>delete</li>
+</ul>
+
+<p>Here is the complete implementation, including one extra test function, <code>populate_rac_basic_sample_project</code>, to insert a sample record used for testing purposes:</p>
+
+<pre class="prettyprint">
+var mongoose = require('mongoose'),
+
+Project = mongoose.model('Project');
+
+exports.findAll = function(req, res){
+  Project.find({},function(err, results) {
+    return res.send(results);
+  });
+};
+
+exports.findById = function(req, res){
+  var id = req.params.id;
+  Project.findOne({'_id':id},function(err, result) {
+    return res.send(result);
+  });
+};
+
+exports.add = function(req, res) {
+  Project.create(req.body, function (err, project) {
+    if (err) return console.log(err);
+    return res.send(project);
+  });
+};
+
+exports.update = function(req, res) {
+  var id = req.params.id;
+  var updates = req.body;
+
+  Project.update({"_id":id}, req.body,
+    function (err, numberAffected) {
+      if (err) return console.log(err);
+      console.log('Updated %d projects', numberAffected);
+      return res.send(202);
+  });
+};
+
+exports.delete = function(req, res){
+  var id = req.params.id;
+  Project.remove({'_id':id},function(result) {
+    return res.send(result);
+  });
+};
+
+exports.populate_rac_basic_sample_project = function(req, res){
+  Project.create({
+    'computername': 'JEREMYTAMMIB1D2',
+    'path': 'C:/Program Files/Autodesk/Revit 2016/Samples/rac_basic_sample_project.rvt',
+    'centralserverpath': '',
+    'title': 'rac_basic_sample_project.rvt',
+    'numberofsaves': 271,
+    'versionguid': 'f498e8b1-7311-4409-a669-2fd290356bb4',
+    'projectinfo_uid': '8764c510-57b7-44c3-bddf-266d86c26380-0000c160' }
+  , function (err) {
+    if (err) return console.log(err);
+    return res.send(202);
+  });
+};
+</pre>
+
+
+<a name="7"></a>
+
+<h4>Door routes and controller</h4>
+
+<p>I added the analogue routes and controller functions for doors as well.</p>
+
+<p>The application now consists of the following modules:</p>
+
+<pre>
+  package.json
+  routes.js
+  server.js
+  controller/
+    doors.js
+    projects.js
+  model/
+    door.js
+    project.js
+</pre>
+
+<a name="8"></a>
+
+<h4>Download and Test</h4>
+
+<p>Now, when I start up the node server, it says 'hello' just like before:</p>
+
+<pre class="prettyprint">
+$ node server.js
+Firerating server listening at port 3001
+</pre>
+
+<p>Navigating to the root URL <a href="http://localhost:3001">localhost:3001</a> also behaves the same, just saying 'hello' by returning a hard-wired plain text response:</p>
+
+<center>
+<img src="img/firerating_url_root.png" alt="Firerating root URL" width="415"/>
+</center>
+
+<p>The new REST API clicks in when we navigate to <a href="http://localhost:3001/projects">localhost:3001/projects</a>, for instance, listing all project records:</p>
+
+<center>
+<img src="img/firerating_url_projects.png" alt="Firerating REST API URL to GET projects" width="450"/>
+</center>
+
+<p>Ditto for doors, of course:</p>
+
+<center>
+<img src="img/firerating_url_doors.png" alt="Firerating REST API URL to GET doors" width="450"/>
+</center>
+
+<p>This version of the code is captured as
+<a href="https://github.com/jeremytammik/firerating/releases/tag/0.0.4">release 0.0.4</a> in the
+<a href="https://github.com/jeremytammik/firerating">firerating GitHub repository</a>,
+in case you would like to try it out yourself.</p>
+
+
+<a name="9"></a>
+
+<h4>Next</h4>
+
+<p>The discussion above addresses the third item in our to-do list; the first two are already done:</p>
+
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/07/implementing-mongo-database-relationships.html">Define more complete schema that includes information about the containers, i.e., the Revit RVT BIM or building information model project files</a>.</li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/07/implementing-mongo-database-relationships.html">Manage the relationships between the door family instances to their container projects</a>.</li>
+<li>Add a REST API to populate and query the database programmatically.</li>
+<li>Implement a Revit add-in exercising the REST API from C# .NET.</li>
+<li>Re-implement the complete cloud-based Revit FireRating SDK sample functionality.</li>
+</ul>
+
+<p>Guess what comes next? &nbsp; &ndash; approaching the fun part, real-life testing... </p>
+
+
+<hr/>
+
+What shall we store in our server database?
+
+Let's say that we are interested in CAD models.
+
+Within each model, we have recurring instances of certain assets.
+
+In the Revit architectural package, for instance, the asset instances can be individual doors or windows in building model.
+
+In that case, the door and window geometry is defined in so-called families, and the individual occurences are called insertions or family instances.
+
+If we would like to analyse and report on the usage of assets and their instances across a multitude of projects, we would want to:
+
+Define and store data about the models, assets and instances
+List existing data
+Report and analyse
+
+Let's define the following API to achieve :
+
+models GET return list of CAD models
+models/modelid POST define a new CAD model
+models/modelid GET return specific model data
+
+assets GET return list of assets
+assets/assetid POST define a new asset
+assets/assetid GET return specific asset data
+
+models/modelid/instances GET return list of instances
+models/modelid/instances/instanceid POST define a new instance
+models/modelid/instances/instanceid GET return specific instance data
+
+Models are containers for instances.
+
+Assets are used by instances, but live independent lives from models.
+
+In Revit, a building model is represented by and stored in a Revit RVT project file.
+
+Assets are families, stored in Revit family definition RFA files.
+
+Instances are family instances, placed in the model and referencing a family definition.
+
+The situation is a little bit complicated by the fact that Revit families define multiple types, also known as symbols, and these are referenced by the instances, but we can skip that level for the moment.
+
+Inventor, used for mechanical models such as machinery, engines, cars, planes, etc. defines similar relationships between assemblies and parts.
+
+In both Inventor and Revit, the assets can be nested.
+
+<a name="3"></a>
+
+<h4></h4>
+
+
+<a name="4"></a>
+
+<h4></h4>
+
+
+</body>
+</html>
