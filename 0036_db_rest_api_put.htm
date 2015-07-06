@@ -1,0 +1,343 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+   -->
+</head>
+<body>
+
+<!--
+
+#3dwebcoder #adsk #cloud #nodejs #revitapi #mongodb #mongoosejs #expressjs #restapi
+#adskdevnetwrk
+#milanojs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+akn_include
+
+http://ow.ly/Oabij
+
+-->
+
+<h3>Put, Post, Delete and Curl Testing a REST API</h3>
+
+<p>I continued the the cloud-based FireRating project by equipping my node.js
+<a href="http://mongoosejs.com">mongoose</a>-driven
+<a href="https://www.mongodb.org">mongoDB</a> database web server with a REST API.
+Let's discuss and test the PUT, POST and DELETE implementation.</p>
+
+<p>For the sake of future-proofing, I also added a version prefix to the routing URLs:</p>
+
+<ul>
+<li><a href="#2">Add version prefix to routing URLs</a>.</li>
+<li><a href="#3">Test REST API using browser and cURL</a>.</li>
+<li><a href="#4">Put &ndash; update a record</a>.</li>
+<li><a href="#5">Post &ndash; add a record</a>.</li>
+<li><a href="#6">Delete &ndash; delete a record</a>.</li>
+<li><a href="#7">Wrapping up for today</a>.</li>
+</ul>
+
+<p>So far, we already completed the following steps:</p>
+
+<ul>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/06/my-first-mongo-database.html">My first mongo database</a>:</li>
+<ul>
+<li>Define the over-all goal and what to store, namely building projects, door instances hosted in them, and each door's fire rating value, based on the venerable old Revit SDK FireRating sample.</li>
+</ul>
+
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/07/implementing-mongo-database-relationships.html">Implementing relationships</a>:</li>
+<ul>
+<li>Define a more complete schema that includes information about the container projects, i.e., the Revit RVT BIM or building information model project files.</li>
+<li>Define and maintain the relationships between the door family instances and their container projects.</li>
+</ul>
+
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/07/starting-to-implement-the-firerating-rest-api.html">
+Starting to Implement the FireRating REST API</a>:</li>
+<ul>
+<li>Add a REST API to manage and query the database programmatically.</li>
+</ul>
+</ul>
+
+<p>See <a href="#7">below</a> for the future steps still to come.</p>
+
+
+<a name="2"></a>
+
+<h4>Add Version Prefix to Routing URLs</h4>
+
+<p>I already <a href="http://the3dwebcoder.typepad.com/blog/2015/04/implementing-a-node-rest-api-server.html#4">mentioned</a> the
+importance of version management when implementing a REST API.</p>
+
+<p>After all, from the very first moment a public REST API is published on the web, anybody can start using it and publish web pages that depend on it.</p>
+
+<p>If it subsequently changes, all the web pages and other clients that depend on its functionality may fail.</p>
+
+<p>At this stage, adding a version prefix to the routing URLs is trivial, e.g., <code>/api/v1</code>.</p>
+
+<p>I also renamed the controller modules by appending the suffix <code>_v1</code> to them.</p>
+
+<p>The updated <code>routes.js</code> looks like this:</p>
+
+<pre class="prettyprint">
+module.exports = function(app) {
+  var projects = require('./controller/projects_v1');
+  app.get('/api/v1/projects', projects.findAll);
+  app.get('/api/v1/projects/:id', projects.findById);
+  app.post('/api/v1/projects', projects.add);
+  app.put('/api/v1/projects/:id', projects.update);
+  app.delete('/api/v1/projects/:id', projects.delete);
+
+  var doors = require('./controller/doors_v1');
+  app.get('/api/v1/doors', doors.findAll);
+  app.get('/api/v1/doors/:id', doors.findById);
+  app.post('/api/v1/doors', doors.add);
+  app.put('/api/v1/doors/:id', doors.update);
+  app.delete('/api/v1/doors/:id', doors.delete);
+}
+</pre>
+
+
+
+<a name="3"></a>
+
+<h4>Test REST API using browser and cURL</h4>
+
+<p>We already
+<a href="http://the3dwebcoder.typepad.com/blog/2015/07/starting-to-implement-the-firerating-rest-api.html#8">
+tested some of the read-only HTTP GET routes</a> by
+simply typing them into the browser address bar.</p>
+
+<p>The command-line <a href="http://en.wikipedia.org/wiki/CURL">cURL</a> tool
+comes in handy for testing the read-write PUT, POST and DELETE actions.</p>
+
+
+<a name="4"></a>
+
+<h4>Put &ndash; Update a Record</h4>
+
+<p>The PUT HTTP action in the REST API correlates to an <code>update</code> method in the controller module.</p>
+
+<p>The route for update uses an <code>:id</code> parameter to identify the affected element, e.g., <code>/api/v1/projects/:id</code> handled by <code>projects.update</code>, implemented like this:</p>
+
+<pre class="prettyprint">
+exports.update = function(req, res) {
+  var id = req.params.id;
+  Project.update( {"_id":id}, req.body,
+    function (err, numberAffected) {
+      if (err) return console.log(err);
+      console.log('Updated %d projects', numberAffected);
+      return res.send(202);
+  });
+};
+</pre>
+
+<p>The mongo model update function takes three arguments:</p>
+
+<ul>
+<li>query &ndash; JSON object of matching properties to identify the document to update</li>
+<li>data &ndash; JSON object specifying the properties to update</li>
+<li>callback &ndash; function that is called with the number of modified documents</li>
+</ul>
+
+<p>The data to update is retrieved from the request body, <code>req.body</code>, which is used to pass in larger chunks of data, often stored as a single JSON object.</p>
+
+<p>In this case, the JSON object passed in corresponds to the mongo database schema defining the project documents and includes only the model properties to modify.</p>
+
+<p>We can use curl like this to update a specific property, e.g., <code>numberofsaves</code>, in a specific project's data:</p>
+
+<pre class="prettyprint">
+$ curl -i -X PUT -H 'Content-Type: application/json' -d '{"numberofsaves": "272"}' http://localhost:3001/api/v1/projects/5593c8792fee421039c0afe6
+</pre>
+
+<p>It sends a PUT request with JSON content to the project update endpoint.</p>
+
+<p>The -d argument specifies the request body or data containing the JSON object with the properties to modify.</p>
+
+<p>The routing URL includes the version number and ends with the mongo database id of the project to update.</p>
+
+<p>Curl prints the following response to this request:</p>
+
+<pre class="prettyprint">
+HTTP/1.1 202 Accepted
+Content-Type: text/plain; charset=utf-8
+Content-Length: 8
+ETag: W/"8-OCq1IpMWc8EeOY6tG3sWeA"
+Date: Mon, 06 Jul 2015 07:20:54 GMT
+Connection: keep-alive
+</pre>
+
+<p>The updated project data can be examined by entering the same URL in the browser, which performs a HTTP GET request:</p>
+
+<center>
+<img src="img/firerating_url_project_updated.png" alt="Updated project data" width="450"/>
+</center>
+
+
+<a name="5"></a>
+
+<h4>Post &ndash; Add a Record</h4>
+
+<p>All the above applies analogously for adding new database records.</p>
+
+<p><code>routes.js</code> hooks up the HTTP POST action to the routing URL <code>/api/v1/projects</code> with the controller function <code>projects.add</code>:</p>
+
+<pre class="prettyprint">
+exports.add = function(req, res) {
+  Project.create(req.body, function (err, project) {
+    if (err) return console.log(err);
+    return res.send(project);
+  });
+};
+</pre>
+
+<p>It can be tested from the command line using curl like this:</p>
+
+<pre class="prettyprint">
+curl -i -X POST -H 'Content-Type: application/json' -d '{ "projectinfo_uid": "8764c510-57b7-44c3-bddf-266d86c26380-0000c160", "versionguid": "f498e8b1-7311-4409-a669-2fd290356bb4", "numberofsaves": 271, "title": "rac_basic_sample_project.rvt", "centralserverpath": "", "path": "C:/Program Files/Autodesk/Revit 2016/Samples/rac_basic_sample_project.rvt", "computername": "JEREMYTAMMIB1D2"}' http://localhost:3001/api/v1/projects
+</pre>
+
+<p>Curl replies with an OK response and the new database record based on the JSON body data passed in, extended with the mongo generated <code>_id</code> and <code>__v</code> identifier and version fields:</p>
+
+<pre class="prettyprint">
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 359
+ETag: W/"167-EVjxXWuV17AVWQFqZlC7tA"
+Date: Mon, 06 Jul 2015 07:47:25 GMT
+Connection: keep-alive
+
+{"__v":0,"projectinfo_uid":"8764c510-57b7-44c3-bddf-266d86c26380-0000c160","versionguid":"f498e8b1-7311-4409-a669-2fd290356bb4","numberofsaves":271,"title":"rac_basic_sample_project.rvt","centralserverpath":"","path":"C:/Program Files/Autodesk/Revit 2016/Samples/rac_basic_sample_project.rvt","computername":"JEREMYTAMMIB1D2","_id":"559a328d8e67197a1c00d6dd"}
+</pre>
+
+
+<a name="6"></a>
+
+<h4>Delete &ndash; Delete a Record</h4>
+
+<p>Last and least, for the sake of completeness, let's finish off with the HTTP DELETE action, sent to the same base routing URL <code>/api/v1/projects</code> with the id of the newly added record appended.</p>
+
+<p>The controller function looks like this:</p>
+
+<pre class="prettyprint">
+exports.delete = function(req, res){
+  var id = req.params.id;
+  Project.remove({'_id':id},function(result) {
+    return res.send(result);
+  });
+};
+</pre>
+
+<p>We can test it using the following curl command:</p>
+
+<pre class="prettyprint">
+$ curl -i -X DELETE http://localhost:3001/api/v1/projects/559a328d8e67197a1c00d6dd
+
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Length: 0
+ETag: W/"0-1B2M2Y8AsgTpgAmY7PhCfg"
+Date: Mon, 06 Jul 2015 08:03:03 GMT
+Connection: keep-alive
+</pre>
+
+
+<a name="7"></a>
+
+<h4>Wrapping up for Today</h4>
+
+<p>The application now consists of the following modules:</p>
+
+<pre>
+  package.json
+  routes.js
+  server.js
+  controller/
+    doors_v1.js
+    projects_v1.js
+  model/
+    door.js
+    project.js
+</pre>
+
+<p>This version of the code is captured as
+<a href="https://github.com/jeremytammik/firerating/releases/tag/0.0.5">release 0.0.5</a> in the
+<a href="https://github.com/jeremytammik/firerating">firerating GitHub repository</a>,
+in case you would like to try it out yourself.</p>
+
+<p>The discussion above addresses the fourth item in our to-do list; the first three are already done, and two are currently left:</p>
+
+<ol>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/07/implementing-mongo-database-relationships.html">Define more complete schema that includes information about the containers, i.e., the Revit RVT BIM or building information model project files</a>.</li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/07/implementing-mongo-database-relationships.html">Manage the relationships between the door family instances to their container projects</a>.</li>
+<li><a href="http://the3dwebcoder.typepad.com/blog/2015/07/starting-to-implement-the-firerating-rest-api.html">Adding a REST API to populate and query the database programmatically</a>.</li>
+<li>Implement and test REST API PUT, POST and DELETE requests.</li>
+<li>Implement a Revit add-in exercising the REST API from C# .NET.</li>
+<li>Re-implement the complete cloud-based Revit FireRating SDK sample functionality.</li>
+</ol>
+
+<p>I already started working on the C# .NET <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud</a> Revit
+add-in for live real-life testing from a desktop app, so expect more soon.</p>
+
+<p>More to-do items may well arise in due course.
+For instance, it strikes me already now that I may want to add as many records as possible, or all at once, instead of submitting individual HTTP requests for each one.
+That will require an enhancement of our REST API, of course.</p>
+
+
+<hr/>
+
+What shall we store in our server database?
+
+Let's say that we are interested in CAD models.
+
+Within each model, we have recurring instances of certain assets.
+
+In the Revit architectural package, for instance, the asset instances can be individual doors or windows in building model.
+
+In that case, the door and window geometry is defined in so-called families, and the individual occurences are called insertions or family instances.
+
+If we would like to analyse and report on the usage of assets and their instances across a multitude of projects, we would want to:
+
+Define and store data about the models, assets and instances
+List existing data
+Report and analyse
+
+Let's define the following API to achieve :
+
+models GET return list of CAD models
+models/modelid POST define a new CAD model
+models/modelid GET return specific model data
+
+assets GET return list of assets
+assets/assetid POST define a new asset
+assets/assetid GET return specific asset data
+
+models/modelid/instances GET return list of instances
+models/modelid/instances/instanceid POST define a new instance
+models/modelid/instances/instanceid GET return specific instance data
+
+Models are containers for instances.
+
+Assets are used by instances, but live independent lives from models.
+
+In Revit, a building model is represented by and stored in a Revit RVT project file.
+
+Assets are families, stored in Revit family definition RFA files.
+
+Instances are family instances, placed in the model and referencing a family definition.
+
+The situation is a little bit complicated by the fact that Revit families define multiple types, also known as symbols, and these are referenced by the instances, but we can skip that level for the moment.
+
+Inventor, used for mechanical models such as machinery, engines, cars, planes, etc. defines similar relationships between assemblies and parts.
+
+In both Inventor and Revit, the assets can be nested.
+
+
+</body>
+</html>
