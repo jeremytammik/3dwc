@@ -13,7 +13,9 @@
 
 <!--
 
-#3dwebcoder #adsk #cloud #nodejs #milanojs #expressjs
+#3dwebcoder #adsk #cloud #nodejs #revitapi #mongodb #mongoosejs #expressjs #restapi
+#adskdevnetwrk
+#milanojs
 #3dwebaccel #prague #webgl #3dweb #a360
 #au2015 #autocad #inventor #ah8 #cubeathens #developers
 #aws #revitapi #jquery #handlebars #heroku
@@ -23,7 +25,7 @@ http://ow.ly/Oabij
 
 -->
 
-<h3>REST API Definition</h3>
+<h3>Starting to Implement the FireRating REST API</h3>
 
 <p>Let's equip our node.js <a href="http://mongoosejs.com">mongoose</a>-driven <a href="https://www.mongodb.org">mongoDB</a> database web server with a REST API. To be precise, I will:</p>
 
@@ -309,65 +311,6 @@ in case you would like to try it out yourself.</p>
 </ul>
 
 <p>Guess what comes next? &nbsp; &ndash; approaching the fun part, real-life testing... </p>
-
-
-<hr/>
-
-What shall we store in our server database?
-
-Let's say that we are interested in CAD models.
-
-Within each model, we have recurring instances of certain assets.
-
-In the Revit architectural package, for instance, the asset instances can be individual doors or windows in building model.
-
-In that case, the door and window geometry is defined in so-called families, and the individual occurences are called insertions or family instances.
-
-If we would like to analyse and report on the usage of assets and their instances across a multitude of projects, we would want to:
-
-Define and store data about the models, assets and instances
-List existing data
-Report and analyse
-
-Let's define the following API to achieve :
-
-models GET return list of CAD models
-models/modelid POST define a new CAD model
-models/modelid GET return specific model data
-
-assets GET return list of assets
-assets/assetid POST define a new asset
-assets/assetid GET return specific asset data
-
-models/modelid/instances GET return list of instances
-models/modelid/instances/instanceid POST define a new instance
-models/modelid/instances/instanceid GET return specific instance data
-
-Models are containers for instances.
-
-Assets are used by instances, but live independent lives from models.
-
-In Revit, a building model is represented by and stored in a Revit RVT project file.
-
-Assets are families, stored in Revit family definition RFA files.
-
-Instances are family instances, placed in the model and referencing a family definition.
-
-The situation is a little bit complicated by the fact that Revit families define multiple types, also known as symbols, and these are referenced by the instances, but we can skip that level for the moment.
-
-Inventor, used for mechanical models such as machinery, engines, cars, planes, etc. defines similar relationships between assemblies and parts.
-
-In both Inventor and Revit, the assets can be nested.
-
-<a name="3"></a>
-
-<h4></h4>
-
-
-<a name="4"></a>
-
-<h4></h4>
-
 
 </body>
 </html>
