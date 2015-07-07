@@ -33,3 +33,61 @@ Yes, lucky me  :-)
 Thank you for your comment, by the way... you are number two so far on this blog.
 
 Cheers, Jeremy
+
+2015-07-07
+
+http://the3dwebcoder.typepad.com/blog/2015/07/put-post-delete-and-curl-testing-the-firerating-rest-api.html#comment-2120885272
+
+Theo
+
+Hi Jeremy. It looks like you are building all this locally on your computer. Would there be any way of doing this online so we could actually see a demo or just look at some output?
+
+jeremy tammik asnwered Theo
+
+Dear Theo,
+
+Yes, absolutely!
+
+Thank you for asking.
+
+This is definitely in the works.
+
+I absolutely want to share this for all to see and test.
+
+I also absolutely want to make sure it works, which normally includes finding and fixing a bug or two, before asking you to suffer through it as well.
+
+Therefore, I am now working on the .NET C# desktop add-in, will test that locally, then post the whole thing on the web, e.g., Heroku, just like I did with the last project, from where you can run it live remotely.
+
+It should only be a matter of a few days more until I get to that stage.
+
+Meanwhile, to see a demo live right now, you could fork the GitHub repository, clone to your local machine, and run it locally yourself as well.
+
+Cheers, Jeremy.
+
+2015-07-07
+
+http://the3dwebcoder.typepad.com/blog/2015/07/put-post-delete-and-curl-testing-the-firerating-rest-api.html#comment-2121005384
+
+Theo answered jeremy tammik
+
+Hi Jeremy
+
+Yes, I know I could fork the GitHub repo but I end up almost never doing that. ;-(
+
+Here's the thing: what I have liked in a lot of your previous posts is that at the end of the post I can click and something happens. This turns the post into some kind or experience event and makes people happy that they read the post.
+
+Of course this is not always possible, but the more you include features like this the more attractive the work becomes.
+
+Theo
+
+jeremy tammik answered Theo
+
+Dear Theo,
+
+Thank you very much for letting me know and confirming that.
+
+I am the same :-)
+
+I'll try to provide that for this sample as well real soon now!
+
+Cheers, Jeremy.
