@@ -1,0 +1,323 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+   -->
+</head>
+<body>
+
+<!--
+
+#3dwebcoder #adsk #cloud #nodejs #revitapi #mongodb #mongoosejs #expressjs #restapi
+#adskdevnetwrk
+#milanojs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+akn_include
+
+-->
+
+<h3>Adding a MongoDB Document from C# .NET via REST API</h3>
+
+<p>I discussed some manual testing of the REST API and the PUT, POST and Delete HTTP action implementations.</p>
+
+<p>I also promised some live testing from a C# .NET desktop app.</p>
+
+<p>In this case, it means adding documents to the fireratingdb node.js mongo web server via the REST API.</p>
+
+<p>We'll take a look at that today:</p>
+
+<ul>
+<li><a href="#2">Installing MongoDB on Windows</a></li>
+<li><a href="#3">Running MongoDB and the node.js web server on Windows</a></li>
+<li><a href="#4">Storing a document in mongo via REST API from C# .NET</a></li>
+<li><a href="#5">Generating the JSON data representing a project document</a></li>
+<li><a href="#6">Using JavaScriptSerializer to format JSON data</a></li>
+<li><a href="#7">Hand-formatted JSON project data</a></li>
+<li><a href="#8">The new project document in the mongo database</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Installing MongoDB on Windows</h4>
+
+<p>The C# .NET desktop app needs to access the mongo database and the node.js web server driving it to programmatically add new documents via the REST API.</p>
+
+<p>We'll start off with the server running locally on the Windows system.</p>
+
+<p>That requires a mongo installation on my Windows system.</p>
+
+<p>Easily said and done; I simply grabbed <code>mongodb-win32-x86_64-2008plus-ssl-3.0.4-signed.msi</code> from <a href="https://www.mongodb.org">mongodb.org</a> and clicked it to install and start up the mongo database daemon.</p>
+
+
+<a name="3"></a>
+
+<h4>Running MongoDB and the Node.js Web Server on Windows</h4>
+
+<p>In my case, that installed the daemon <code>mongod.exe</code> and interactive command line console <code>mongo.exe</code> in <code>C:\Program Files\MongoDB\Server\3.0\bin</code> and all is well.</p>
+
+<p>I can simply enter that directory and start them up on the command line:</p>
+
+<center>
+<img src="img/mongodb_win_01.png" alt="Starting mongoDB on Windows" width="668"/>
+</center>
+
+<p>Oops.</p>
+
+<p>Well, not quite yet... I do have to set up a data directory, e.g. <code>C:\data\db\</code>.</p>
+
+<p>Once that is done, I can successfully start the daemon:</p>
+
+<center>
+<img src="img/mongodb_win_02.png" alt="Starting mongoDB on Windows" width="668"/>
+</center>
+
+<p>With the daemon is up and running, I can launch the console and start interacting with the database:</p>
+
+<center>
+<img src="img/mongodb_win_03.png" alt="Starting mongoDB on Windows" width="668"/>
+</center>
+
+<p>Actually, all I want to do is start my node web server, which happily runs happily on Windows as well, completely unmodified:</p>
+
+<center>
+<img src="img/mongodb_win_04.png" alt="Starting the node web server on Windows" width="668"/>
+</center>
+
+<p>Now the web server is up and running locally, I can GET the current list of project via the REST API by typing the appropriate URL in the browser address bar:</p>
+
+<center>
+<img src="img/mongodb_win_05.png" alt="Accessing the GET REST API" width="481"/>
+</center>
+
+<p>No projects defined, yet.</p>
+
+<p>Let's define one, then.</p>
+
+
+<a name="4"></a>
+
+<h4>Storing a document in mongo via REST API from C# .NET</h4>
+
+<p>I struggled a bit to make my first successful REST API request from the desktop C# .NET app.</p>
+
+<p>The code that ended up doing the trick looks like this:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> POST JSON data to the specified mongoDB collection.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">string</span> PostJsonData(
+&nbsp; &nbsp; <span class="blue">string</span> collection_name,
+&nbsp; &nbsp; <span class="blue">string</span> json )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> uri = <span class="teal">Util</span>.RestApiUri + <span class="maroon">&quot;/&quot;</span> + collection_name;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">HttpWebRequest</span> request = <span class="teal">HttpWebRequest</span>.Create(
+&nbsp; &nbsp; &nbsp; uri ) <span class="blue">as</span> <span class="teal">HttpWebRequest</span>;
+&nbsp;
+&nbsp; &nbsp; request.ContentType = <span class="maroon">&quot;application/json; charset=utf-8&quot;</span>;
+&nbsp; &nbsp; request.Accept = <span class="maroon">&quot;application/json, text/javascript, */*&quot;</span>;
+&nbsp; &nbsp; request.Method = <span class="maroon">&quot;POST&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">StreamWriter</span> writer = <span class="blue">new</span> <span class="teal">StreamWriter</span>(
+&nbsp; &nbsp; &nbsp; request.GetRequestStream() ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; writer.Write( json );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">WebResponse</span> response = request.GetResponse();
+&nbsp; &nbsp; <span class="teal">Stream</span> stream = response.GetResponseStream();
+&nbsp; &nbsp; <span class="blue">string</span> jsonResponse = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">StreamReader</span> reader = <span class="blue">new</span> <span class="teal">StreamReader</span>(
+&nbsp; &nbsp; &nbsp; stream ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">while</span>( !reader.EndOfStream )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; jsonResponse += reader.ReadLine();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> jsonResponse;
+&nbsp; }
+</pre>
+
+<p>It takes the mongoDB collection name and the JSON data specifying the document to add to the collection.</p>
+
+<p>I call it with the collection name <code>project</code> and the appropriate JSON data, just like in the
+<a href="http://the3dwebcoder.typepad.com/blog/2015/07/put-post-delete-and-curl-testing-the-firerating-rest-api.html#5">
+manual testing using curl</a>.</p>
+
+
+<a name="5"></a>
+
+<h4>Generating the JSON Data Representing a Project Document</h4>
+
+<p>I was loath to use too many ready-built components and thought I could easily implement my own JSON formatting by hand.</p>
+
+<p>I can indeed, and I can also make lots of silly mistakes in the process.</p>
+
+<p>To discover the mistakes I was making, I ended up implementing the formatting code twice over, once using the .NET <code>JavaScriptSerializer</code> helper class, and then again using my own hand-written format string.</p>
+
+
+<a name="6"></a>
+
+<h4>Using JavaScriptSerializer to Format JSON Data</h4>
+
+<p>The <code>JavaScriptSerializer.Serialize</code> method takes a class and formats it into a JSON string representing the same data as a JavaScript dictionary object.</p>
+
+<p>I implemented the following .NET class to represent my project data:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Data holder to use JavaScriptSerializer.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">ProjectData</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> projectinfo_uid { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> versionguid { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">int</span> numberofsaves { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> title { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> centralserverpath { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> path { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> computername { <span class="blue">get</span>; <span class="blue">set</span>; }
+&nbsp; }
+</pre>
+
+<p>I can populate that and serialize it to JSON like this:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">ProjectData</span> project_data = <span class="blue">new</span> <span class="teal">ProjectData</span>()
+&nbsp; {
+&nbsp; &nbsp; projectinfo_uid = doc.ProjectInformation.UniqueId,
+&nbsp; &nbsp; versionguid = doc_version.VersionGUID.ToString(),
+&nbsp; &nbsp; numberofsaves = doc_version.NumberOfSaves,
+&nbsp; &nbsp; title = doc.Title,
+&nbsp; &nbsp; centralserverpath = central_server_path,
+&nbsp; &nbsp; path = path,
+&nbsp; &nbsp; computername = System.<span class="teal">Environment</span>.MachineName
+&nbsp; };
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="teal">JavaScriptSerializer</span>().Serialize(
+&nbsp; &nbsp; project_data );
+</pre>
+
+
+
+<a name="6"></a>
+
+<h4>Hand-Formatted JSON Project Data</h4>
+
+<p>The same result is obtained without using external libraries or any other helpers by this hand-written code:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Retrieve the project identification information </span>
+&nbsp; <span class="gray">///</span><span class="green"> to store in the external database and return it</span>
+&nbsp; <span class="gray">///</span><span class="green"> as a dictionary in a JSON formatted string.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">string</span> GetProjectDataJson( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> path = doc.PathName.Replace( <span class="maroon">'\\'</span>, <span class="maroon">'/'</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">BasicFileInfo</span> file_info = <span class="teal">BasicFileInfo</span>.Extract( path );
+&nbsp; &nbsp; <span class="teal">DocumentVersion</span> doc_version = file_info.GetDocumentVersion();
+&nbsp; &nbsp; <span class="teal">ModelPath</span> model_path = doc.GetWorksharingCentralModelPath();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> central_server_path = <span class="blue">null</span>!= model_path
+&nbsp; &nbsp; &nbsp; ? model_path.CentralServerPath
+&nbsp; &nbsp; &nbsp; : <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Do my own hand-written JSON formatting.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{7} \&quot;projectinfo_uid\&quot;: \&quot;{0}\&quot;,&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\&quot;versionguid\&quot;: \&quot;{1}\&quot;,&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\&quot;numberofsaves\&quot;: {2},&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\&quot;title\&quot;: \&quot;{3}\&quot;,&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\&quot;centralserverpath\&quot;: \&quot;{4}\&quot;,&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\&quot;path\&quot;: \&quot;{5}\&quot;,&quot;</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\&quot;computername\&quot;: \&quot;{6}\&quot; {8}&quot;</span>,
+&nbsp; &nbsp; &nbsp; doc.ProjectInformation.UniqueId,
+&nbsp; &nbsp; &nbsp; doc_version.VersionGUID,
+&nbsp; &nbsp; &nbsp; doc_version.NumberOfSaves,
+&nbsp; &nbsp; &nbsp; doc.Title,
+&nbsp; &nbsp; &nbsp; central_server_path,
+&nbsp; &nbsp; &nbsp; path,
+&nbsp; &nbsp; &nbsp; System.<span class="teal">Environment</span>.MachineName,
+&nbsp; &nbsp; &nbsp; <span class="maroon">'{'</span>, <span class="maroon">'}'</span> );
+&nbsp; }
+</pre>
+
+<p>Two of the hurdles I ran into were escaping the backslash characters and printing the curly braces.</p>
+
+
+<a name="7"></a>
+
+<h4>The new Project Document in the Mongo Database</h4>
+
+<p>Using the methods listed above, these two lines of code successfully add a new project document to the mongo database:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">string</span> json = GetProjectDataJson( doc );
+&nbsp;
+&nbsp; <span class="blue">string</span> jsonResponse = PostJsonData( <span class="maroon">&quot;projects&quot;</span>, json );
+</pre>
+
+<p>For example, the string passed in for one sample project looks like this:</p>
+
+<pre class="prettyprint">
+{ "projectinfo_uid": "8764c510-57b7-44c3-bddf-266d86c26380-0000c160",
+  "versionguid": "194b64e6-8132-4497-ae66-74904f7a7710",
+  "numberofsaves": 2,
+  "title": "little_house_2016.rvt",
+  "centralserverpath": "",
+  "path": "Z:/a/rvt/little_house_2016.rvt",
+  "computername": "JEREMYTAMMIB1D2" }
+</pre>
+
+<p>PostJsonData packages that into the HTTP POST request to the fireratingdb server and returns the result, consisting of basically the same data, with the mongo version number and id added:</p>
+
+<pre class="prettyprint">
+{ "__v":0,
+  "projectinfo_uid":"8764c510-57b7-44c3-bddf-266d86c26380-0000c160",
+  "versionguid":"194b64e6-8132-4497-ae66-74904f7a7710",
+  "numberofsaves":2,
+  "title":"little_house_2016.rvt",
+  "centralserverpath":"",
+  "path":"Z:/a/rvt/little_house_2016.rvt",
+  "computername":"JEREMYTAMMIB1D2",
+  "_id":"559c16306d56ee040f3f800f"}
+</pre>
+
+<p>Now, when I GET the current list of project via the REST API by typing the appropriate URL in the browser address bar, the new project is listed:</p>
+
+<center>
+<img src="img/mongodb_win_06.png" alt="First project added via the POST REST API" width="481"/>
+</center>
+
+<p>By the way, for the sake of clarity, I renamed the node.js mongo db web server from <code>firerating</code> to <code>fireratingdb</code>.</p>
+
+<p>This version of the node.js server code is captured as
+<a href="https://github.com/jeremytammik/firerating/releases/tag/0.0.6">release 0.0.6</a> in the
+<a href="https://github.com/jeremytammik/firerating">fireratingdb GitHub repository</a>,
+in case you would like to try it out yourself.</p>
+
+<p>Much more importantly, the Revit add-in hosting the C# .NET code discussed above is provided in
+<a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2016.0.0.1">release 2016.0.0.1</a> in the
+<a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud GitHub repository</a>.</p>
+
+<p>The next step will be to extract the mongo id from the newly created project document and add all the door instances in the project to the database as well.</p>
+
+<p>Oh, and we obviously also need to check whether a project has already been stored in the database.
+If so, we should reuse the existing document for it instead of creating a new one.</p>
+
+</body>
+</html>
