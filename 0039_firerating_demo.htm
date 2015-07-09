@@ -1,0 +1,692 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+   -->
+</head>
+<body>
+
+<!--
+
+#3dwebcoder #nodejs #revitapi #mongodb #mongoosejs #restapi
+#adsk #cloud #expressjs
+#adskdevnetwrk
+#milanojs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+akn_include
+
+tweet the video:
+
+FireRating in the Cloud demo https://youtu.be/noy9da61weY @YouTube #3dwebcoder #nodejs #revitapi #mongodb #mongoosejs #restapi #cloud
+
+-->
+
+<h3>FireRatingCloud Round Trip and on Mongolab</h3>
+
+<p>I completed the initial FireRating conversion to the cloud.</p>
+
+<p>Here are the steps it took to reach that point:</p>
+
+<ul>
+<li><a href="#2">Revit project identification</a></li>
+<li><a href="#3">Complete Revit Add-in Implementation</a></li>
+<li><a href="#4">Demo Run Log</a></li>
+<li><a href="#5">Demo Video</a></li>
+<li><a href="#6">Mongolab &ndash; really in the cloud</a></li>
+<li><a href="#7">Postman does more than cURL</a></li>
+<li><a href="#8">Wrap-up, Download and Outlook</a></li>
+</ul>
+
+<p>It now runs full circle, storing Revit building model door instance fire rating values for multiple projects in a cloud-based mongo database.</p>
+
+<p>It implements the same three commands as the original FireRating SDK sample to create and bind the shared fire rating parameter, export the values, and import modified data back into the BIM.</p>
+
+<p>I worked hard yesterday afternoon &ndash; and night, to tell the truth &ndash; to clean up my C# .NET REST API calls and the database structure.</p>
+
+<!--
+  Still working on the
+  Yesterday, I discussed exporting the fire rating  afternoon, after publishing
+  Extreme series of failed attampts and total craziness.
+  Finally calmed down enough to radically simplify.
+-->
+
+<a name="#2"></a>
+
+<h4>Revit project identification</h4>
+
+<p>The main problem was the
+<a href="http://the3dwebcoder.typepad.com/blog/2015/07/implementing-mongo-database-relationships.html#2">
+identification of projects</a>, defining the possibility to search for and retrieve them and their doors again.</p>
+
+<p>My initial attempts involved use of the Revit project information singleton object and its <code>UniqueId</code> property.
+That failed rather miserably, since existing projects can be copied to new ones, thus duplicating this identifier.</p>
+
+<p>I ended up implementing a radical simplification.</p>
+
+<p>The initial data structure exported a separate document for each project and referred to that from the door instances.</p>
+
+<p>I now created a method to generate a single short string to identify which Revit project each door instance belongs to, and simply store that single string in each door instance document instead of the project document reference.</p>
+
+<p>The method I use to identify the projects and generate a unique string for each currently looks like this:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Convert a string to a byte array.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">byte</span>[] GetBytes( <span class="blue">string</span> str )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">byte</span>[] bytes = <span class="blue">new</span> <span class="blue">byte</span>[str.Length
+&nbsp; &nbsp; &nbsp; * <span class="blue">sizeof</span>( <span class="blue">char</span> )];
+&nbsp;
+&nbsp; &nbsp; System.<span class="teal">Buffer</span>.BlockCopy( str.ToCharArray(),
+&nbsp; &nbsp; &nbsp; 0, bytes, 0, bytes.Length );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> bytes;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Define a project identifier for the </span>
+&nbsp; <span class="gray">///</span><span class="green"> given Revit document.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">string</span> GetProjectIdentifier(
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">SHA256</span> hasher = <span class="teal">SHA256Managed</span>.Create();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> key = System.<span class="teal">Environment</span>.MachineName
+&nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;:&quot;</span> + doc.PathName;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">byte</span>[] hashValue = hasher.ComputeHash( GetBytes(
+&nbsp; &nbsp; &nbsp; key ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> hashb64 = <span class="teal">Convert</span>.ToBase64String(
+&nbsp; &nbsp; &nbsp; hashValue );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> hashb64.Replace( <span class="maroon">'/'</span>, <span class="maroon">'_'</span> );
+&nbsp; }
+</pre>
+
+<p>It builds a string of all the relevant data needed to identify the project, which might include information on the Revit server, central model, computer name, full project file path, etc., depending on your situation.</p>
+
+<p>It creates a hash code of the concatenated string, encodes that in <a href="https://en.wikipedia.org/wiki/Base64">base64</a> format, and finally converts that to <a href="https://en.wikipedia.org/wiki/Base64#URL_applications">base64url</a>, to it can be included in the URIs used to communicate with the mongo database.</p>
+
+<p>In my case, for the URL encoding, all I worry about is the slash character '/', since including that in the URI messes up the routing.</p>
+
+<p>According to the base64url convention, I simply replace it by underscore '_'.</p>
+
+<p>Now I can use this string in the door instance data to identify the project it belongs to.</p>
+
+<p>Its one and only purpose really is to enable me to retrieve all the door data for a given Revit project when importing modified data back into the building model.</p>
+
+
+
+
+<a name="#3"></a>
+
+<h4>Complete Revit Add-in Implementation</h4>
+
+<p>Let's look at the entire implementation of the three Revit external commands.</p>
+
+<p>Note that the first one includes a lot of commented code discussing various ways to determine other categories that one might wish to equip with shared parameters.</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> System.Linq;
+<span class="blue">using</span> Autodesk.Revit.ApplicationServices;
+<span class="blue">using</span> Autodesk.Revit.Attributes;
+<span class="blue">using</span> Autodesk.Revit.DB;
+<span class="blue">using</span> Autodesk.Revit.UI;
+<span class="blue">#endregion</span>
+&nbsp;
+<span class="blue">namespace</span> FireRatingCloud
+{
+<span class="blue">&nbsp; #region</span> Cmd_1_CreateAndBindSharedParameter
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Create and bind shared parameter.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Cmd_1_CreateAndBindSharedParameter</span>
+&nbsp; &nbsp; : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// What element type are we interested in? The standard </span>
+&nbsp; &nbsp; <span class="green">// SDK FireRating sample uses BuiltInCategory.OST_Doors. </span>
+&nbsp; &nbsp; <span class="green">// We also test using BuiltInCategory.OST_Walls to </span>
+&nbsp; &nbsp; <span class="green">// demonstrate that the same technique works with system </span>
+&nbsp; &nbsp; <span class="green">// families just as well as with standard ones.</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">// To test attaching shared parameters to inserted </span>
+&nbsp; &nbsp; <span class="green">// DWG files, which generate their own category on </span>
+&nbsp; &nbsp; <span class="green">// the fly, we also identify the category by </span>
+&nbsp; &nbsp; <span class="green">// category name.</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">// The last test is for attaching shared parameters </span>
+&nbsp; &nbsp; <span class="green">// to model groups.</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">public</span> <span class="teal">BuiltInCategory</span> Target = <span class="teal">BuiltInCategory</span>.OST_Doors;
+&nbsp;
+&nbsp; &nbsp; <span class="green">//static public BuiltInCategory Target = BuiltInCategory.OST_Walls;</span>
+&nbsp; &nbsp; <span class="green">//static public string Target = &quot;Drawing1.dwg&quot;;</span>
+&nbsp; &nbsp; <span class="green">//static public BuiltInCategory Target = BuiltInCategory.OST_IOSModelGroups; // doc.Settings.Categories.get_Item returns null</span>
+&nbsp; &nbsp; <span class="green">//static public string Target = &quot;Model Groups&quot;; // doc.Settings.Categories.get_Item throws an exception SystemInvalidOperationException &quot;Operation is not valid due to the current state of the object.&quot;</span>
+&nbsp; &nbsp; <span class="green">//static public BuiltInCategory Target = BuiltInCategory.OST_Lines; // model lines</span>
+&nbsp; &nbsp; <span class="green">//static public BuiltInCategory Target = BuiltInCategory.OST_SWallRectOpening; // Rectangular Straight Wall Openings, case 1260656 [Add Parameters Wall Opening]</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uiapp.ActiveUIDocument.Document;
+&nbsp; &nbsp; &nbsp; <span class="teal">Category</span> cat = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// The category to define the parameter for.</span>
+&nbsp;
+<span class="blue">&nbsp; &nbsp; &nbsp; #region</span> Determine model group category
+<span class="blue">#if</span> DETERMINE_MODEL_GROUP_CATEGORY
+<span class="gray">&nbsp; &nbsp; &nbsp; List&lt;Element&gt; modelGroups = new List&lt;Element&gt;();</span>
+<span class="gray">&nbsp; &nbsp; &nbsp; //Filter fType = app.Create.Filter.NewTypeFilter( typeof( Group ) ); // &quot;Binding the parameter to the category Model Groups is not allowed&quot;</span>
+<span class="gray">&nbsp; &nbsp; &nbsp; Filter fType = app.Create.Filter.NewTypeFilter( typeof( GroupType ) ); // same result &quot;Binding the parameter to the category Model Groups is not allowed&quot;</span>
+<span class="gray">&nbsp; &nbsp; &nbsp; Filter fCategory = app.Create.Filter.NewCategoryFilter( BuiltInCategory.OST_IOSModelGroups );</span>
+<span class="gray">&nbsp; &nbsp; &nbsp; Filter f = app.Create.Filter.NewLogicAndFilter( fType, fCategory );</span>
+<span class="gray">&nbsp; &nbsp; &nbsp; if ( 0 &lt; doc.get_Elements( f, modelGroups ) )</span>
+<span class="gray">&nbsp; &nbsp; &nbsp; {</span>
+<span class="gray">&nbsp; &nbsp; &nbsp; &nbsp; cat = modelGroups[0].Category;</span>
+<span class="gray">&nbsp; &nbsp; &nbsp; }</span>
+<span class="blue">#endif</span> <span class="green">// DETERMINE_MODEL_GROUP_CATEGORY</span>
+<span class="blue">&nbsp; &nbsp; &nbsp; #endregion</span> <span class="green">// Determine model group category</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == cat )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; cat = doc.Settings.Categories.get_Item( Target );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Retrieve shared parameter definition file.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">DefinitionFile</span> sharedParamsFile = <span class="teal">Util</span>
+&nbsp; &nbsp; &nbsp; &nbsp; .GetSharedParamsFile( app );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == sharedParamsFile )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Error getting the shared params file.&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get or create the shared parameter group.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">DefinitionGroup</span> sharedParamsGroup
+&nbsp; &nbsp; &nbsp; &nbsp; = sharedParamsFile.Groups.get_Item(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.SharedParameterGroupName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == sharedParamsGroup )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; sharedParamsGroup = sharedParamsFile.Groups
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Create( <span class="teal">Util</span>.SharedParameterGroupName );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Visibility of the new parameter: the</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Category.AllowsBoundParameters property</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// determines whether a category is allowed to</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// have user-visible shared or project parameters.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// If it is false, it may not be bound to visible</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// shared parameters using the BindingMap. Note</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// that non-user-visible parameters can still be</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// bound to these categories. In our case, we</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// make the shared parameter user visibly, if</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the category allows it.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> visible = cat.AllowsBoundParameters;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get or create the shared parameter definition.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Definition</span> def = sharedParamsGroup.Definitions
+&nbsp; &nbsp; &nbsp; &nbsp; .get_Item( <span class="teal">Util</span>.SharedParameterName );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == def )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ExternalDefinitionCreationOptions</span> opt
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ExternalDefinitionCreationOptions</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.SharedParameterName,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ParameterType</span>.Number );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; opt.Visible = visible;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; def = sharedParamsGroup.Definitions.Create(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; opt );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == def )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Error creating shared parameter.&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Create the category set for binding and</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// add the category of interest to it.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">CategorySet</span> catSet = app.Create.NewCategorySet();
+&nbsp;
+&nbsp; &nbsp; &nbsp; catSet.Insert( cat );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Bind the parameter.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Bind FireRating Shared Parameter&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Binding</span> binding = app.Create.NewInstanceBinding(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; catSet );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// We could check if it is already bound; if so,</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Insert will apparently just ignore it.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; doc.ParameterBindings.Insert( def, binding );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// You can also specify the parameter group here:</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//doc.ParameterBindings.Insert( def, binding, </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; BuiltInParameterGroup.PG_GEOMETRY );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Cmd_1_CreateAndBindSharedParameter</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Cmd_2_ExportSharedParameterValues
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Export all target element ids and their</span>
+&nbsp; <span class="gray">///</span><span class="green"> FireRating parameter values to external database.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.ReadOnly )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Cmd_2_ExportSharedParameterValues</span>
+&nbsp; &nbsp; : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Retrieve the door instance data to store in </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> the external database and return it as a</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> dictionary in a JSON formatted string.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">string</span> GetDoorDataJson(
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> door,
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> project_id,
+&nbsp; &nbsp; &nbsp; <span class="teal">Guid</span> paramGuid )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = door.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;\&quot;_id\&quot;: \&quot;{0}\&quot;,&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\&quot;project_id\&quot;: \&quot;{1}\&quot;,&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\&quot;level\&quot;: \&quot;{2}\&quot;,&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\&quot;tag\&quot;: \&quot;{3}\&quot;,&quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;\&quot;firerating\&quot;: {4}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; door.UniqueId,
+&nbsp; &nbsp; &nbsp; &nbsp; project_id,
+&nbsp; &nbsp; &nbsp; &nbsp; doc.GetElement( door.LevelId ).Name,
+&nbsp; &nbsp; &nbsp; &nbsp; door.get_Parameter( <span class="teal">BuiltInParameter</span>.ALL_MODEL_MARK ).AsString(),
+&nbsp; &nbsp; &nbsp; &nbsp; door.get_Parameter( paramGuid ).AsDouble() );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;{&quot;</span> + s + <span class="maroon">&quot;}&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uiapp.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get shared parameter GUID.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Guid</span> paramGuid;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.GetSharedParamGuid( app, <span class="blue">out</span> paramGuid ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Shared parameter GUID not found.&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Determine custom project identifier.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> project_id = <span class="teal">Util</span>.GetProjectIdentifier( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Loop through all elements of the given target</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// category and export the shared parameter value </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// specified by paramGuid for each.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">Util</span>.GetTargetInstances( doc,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Cmd_1_CreateAndBindSharedParameter</span>.Target );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = collector.Count&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> json;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> jsonResponse;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> collector )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; json = GetDoorDataJson( e, project_id,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; paramGuid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( json );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; jsonResponse = <span class="teal">Util</span>.QueryOrUpsert(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;doors/&quot;</span> + e.UniqueId, <span class="blue">string</span>.Empty, <span class="maroon">&quot;GET&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == jsonResponse.Length )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; jsonResponse = <span class="teal">Util</span>.QueryOrUpsert(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;doors&quot;</span>, json, <span class="maroon">&quot;POST&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; jsonResponse = <span class="teal">Util</span>.QueryOrUpsert(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;doors/&quot;</span> + e.UniqueId, json, <span class="maroon">&quot;PUT&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( jsonResponse );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Cmd_2_ExportSharedParameterValues</span>
+&nbsp;
+<span class="blue">&nbsp; #region</span> Cmd_3_ImportSharedParameterValues
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Import updated FireRating parameter values </span>
+&nbsp; <span class="gray">///</span><span class="green"> from external database.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; [<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Manual )]
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Cmd_3_ImportSharedParameterValues</span>
+&nbsp; &nbsp; : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">UIApplication</span> uiapp = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span> app = uiapp.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uiapp.ActiveUIDocument.Document;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Guid</span> paramGuid;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.GetSharedParamGuid( app, <span class="blue">out</span> paramGuid ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = <span class="maroon">&quot;Shared parameter GUID not found.&quot;</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Determine custom project identifier.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> project_id = <span class="teal">Util</span>.GetProjectIdentifier( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get all doors referencing this project.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> query = <span class="maroon">&quot;doors/project/&quot;</span> + project_id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> jsonResponse = <span class="teal">Util</span>.QueryOrUpsert( query,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span>.Empty, <span class="maroon">&quot;GET&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">object</span> obj = <span class="teal">JsonParser</span>.JsonDecode( jsonResponse );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != obj )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ArrayList</span> doors = obj <span class="blue">as</span> <span class="teal">ArrayList</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != doors &amp;&amp; 0 &lt; doors.Count )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> t = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; t.Start( <span class="maroon">&quot;Import Fire Rating Values&quot;</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Retrieve element unique id and </span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// FireRating parameter values.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">object</span> door <span class="blue">in</span> doors )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Hashtable</span> d = door <span class="blue">as</span> <span class="teal">Hashtable</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> uid = d[<span class="maroon">&quot;_id&quot;</span>] <span class="blue">as</span> <span class="blue">string</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = doc.GetElement( uid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; message = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Error retrieving element for unique id {0}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; uid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Parameter</span> p = e.get_Parameter( paramGuid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == p )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; message = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Error retrieving shared parameter on element with unique id {0}.&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; uid );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">object</span> fire_rating = d[<span class="maroon">&quot;firerating&quot;</span>];
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p.Set( (<span class="blue">double</span>) fire_rating );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; t.Commit();
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// Cmd_3_ImportSharedParameterValues</span>
+}
+</pre>
+
+<p>All very straight forward, really.</p>
+
+
+<a name="#4"></a>
+
+<h4>Demo Run Log</h4>
+
+<p>Here is a complete demo run of the three steps &ndash; well, four, actually, counting the shared parameter binding:</p>
+
+<ul>
+<li>Create and bind shared parameter</li>
+<li>Export fire rating data from Revit</li>
+<li>Modify externally:
+<pre class="prettyprint">
+&gt; db.doors.find().forEach(function (u) {
+...    u.firerating = 33; db.doors.save(u); });
+&gt; db.doors.find()
+</pre>
+</li>
+<li>Import back into building model</li>
+</ul>
+
+<p>Before doing anything else, clean up the mongo database from the console interface by removing the entire previous firerating data set:</p>
+
+<pre class="prettyprint">
+> show dbs
+firerating  0.078GB
+local       0.078GB
+> use firerating
+switched to db firerating
+> db.dropDatabase()
+{ "dropped" : "firerating", "ok" : 1 }
+> show dbs
+local  0.078GB
+</pre>
+
+<p>We can examine the effect of this as logged by the mongo database daemon:</p>
+
+<pre>
+2015-07-09T08:27:39.955+0200 I COMMAND  [conn1] dropDatabase firerating starting
+2015-07-09T08:27:39.958+0200 I JOURNAL  [conn1] journalCleanup...
+2015-07-09T08:27:39.965+0200 I JOURNAL  [conn1] removeJournalFiles
+2015-07-09T08:27:39.969+0200 I JOURNAL  [conn1] journalCleanup...
+2015-07-09T08:27:39.969+0200 I JOURNAL  [conn1] removeJournalFiles
+2015-07-09T08:27:39.972+0200 I COMMAND  [conn1] dropDatabase firerating finished
+</pre>
+
+<p>Let's also restart the fireratingdb node.js web server to make sure the latest updates are active:</p>
+
+<pre>
+Y:\a\src\web\mongo\firerating &gt; node server.js
+Firerating server listening at port 3001
+</pre>
+
+<p>I start up the FireRatingCloud add-in in the Visual Studio debugger, which launches Revit and loads a minimalistic test building model with just one door.</p>
+
+<p>Initially, the door properties do not include the fire rating shared parameter, since it does not yet exist.</p>
+
+<p>It appears &ndash; with an undefined value &ndash; after running the add-in external command Cmd_1_CreateAndBindSharedParameter to create it:</p>
+
+<center>
+<img src="img/firerating_demo_02.png" alt="FireRating in the Cloud round trip demo" width="400"/>
+</center>
+
+<p>I export the shared parameters for this project to fireratingdb using Cmd_2_ExportSharedParameterValues and look at the result in the mongo console:</p>
+
+<pre class="prettyprint">
+> show dbs
+firerating  0.078GB
+local       0.078GB
+> use firerating
+switched to db firerating
+> show collections
+doors
+system.indexes
+> db.doors.find()
+{ "_id" : "194b64e6-8132-4497-ae66-74904f7a7710-0004b28a", "project_id" : "qaSh_VLHTABQgzTeWedTLrOoriamVoTLY_BpjGwddhw=", "level" : "Level 1", "tag" : "1", "firerating" : 0, "__v" : 0 }
+</pre>
+
+<p>I modify the fire rating value in the external database, e.g., setting it to 33:</p>
+
+<pre class="prettyprint">
+> db.doors.find().forEach(function (u) { u.firerating = 33; db.doors.save(u); });
+> db.doors.find()
+{ "_id" : "194b64e6-8132-4497-ae66-74904f7a7710-0004b28a", "project_id" : "qaSh_VLHTABQgzTeWedTLrOoriamVoTLY_BpjGwddhw=", "level" : "Level 1", "tag" : "1", "firerating" : 33, "__v" : 0 }
+</pre>
+
+<p>Finally, I launch the third command Cmd_3_ImportSharedParameterValues to import the modified shared parameter value back into the building model.</p>
+
+<p>The change is immediately reflected in the door properties:</p>
+
+<center>
+<img src="img/firerating_demo_03.png" alt="FireRating in the Cloud demo" width="400"/>
+</center>
+
+<a name="#5"></a>
+
+<h4>Demo Video</h4>
+
+<p>Here is an <a href="https://youtu.be/noy9da61weY">82-second video</a> showing the addition of a few more doors and the full round trip data flow live:</p>
+
+<center>
+<iframe width="450" height="338" src="https://www.youtube.com/embed/noy9da61weY" frameborder="0" allowfullscreen></iframe>
+</center>
+
+<a name="#6"></a>
+
+<h4>Mongolab &ndash; Really in the Cloud</h4>
+
+<p>Cyrille suggests never installing mongo locally at all:</p>
+<blockquote>
+<p>Instead you can use the free hosting service provided by <a href="https://mongolab.com">mongolab.com</a>.</p>
+<p>This has several advantages. First, I do not have to install another service on my machine. Secondly, I can run and debug my code from all of my computers using the same dataset without having to worry about static IP addresses or location, e.g., while travelling. Another advantage is the fact that you automatically test and debug your solution with something real in the outside world, not just in your local development setup.</p>
+</blockquote>
+
+<p>I followed Cyrille's advice and was surprised how quick, easy and useful it was.</p>
+
+<p>It took me about ten minutes to sign up for a free mongolab account and create a database named <code>firerating</code>.</p>
+
+<p>It took just about one minute more to switch my node.js server to use the mongolab hosted database instead of a local one.</p>
+
+<p>Connecting obviously requires a user name and password.</p>
+
+<p>For this demo, I used <code>revit</code> for both, so the database connection string becomes <code>mongodb://revit:revit@ds047742.mongolab.com:47742/firerating</code>.</p>
+
+<p>In the server implementation, all I did was change one single line of code:</p>
+
+<pre class="prettyprint">
+// local database
+//var mongo_uri = 'mongodb://localhost/firerating';
+
+// mongolab hosted
+var mongo_uri = 'mongodb://revit:revit'
+  + '@ds047742.mongolab.com:47742/firerating';
+</pre>
+
+<p>I ran through a minimal test, and all looks good. Here is a snapshot of the firerating data of the first door instance hosted on mongolab:</p>
+
+<center>
+<img src="img/firerating_demo_04.png" alt="FireRating database on mongolab" width="400"/>
+</center>
+
+<p>I can browse and edit it freely right there and then.</p>
+
+<p>Very handy indeed.</p>
+
+<p>Thanks to Cyrille for the good advice!</p>
+
+
+<a name="#7"></a>
+
+<h4>Postman does more than cURL</h4>
+
+<p>Cyrille also points out another powerful and useful set of tools:</p>
+
+<blockquote>
+<p>I found your
+<a href="http://the3dwebcoder.typepad.com/blog/2015/07/put-post-delete-and-curl-testing-the-firerating-rest-api.html#3">
+cURL testing description</a> very cool.
+However, what about people on Windows?
+They need to install it &nbsp; :-( &nbsp; or people who do not like command line stuff?
+I was thinking an article on <a href="https://www.getpostman.com">Postman</a> would be a nice addition
+(<a href="https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en">Chrome add-in</a>).</p>
+</blockquote>
+
+
+<a name="#8"></a>
+
+<h4>Wrap-up, Download and Outlook</h4>
+
+<p>The <a href="https://github.com/jeremytammik/firerating">fireratingdb</a> node.js server obviously evolved since yesterday, in the following steps:</p>
+
+<ul>
+<li><a href="https://github.com/jeremytammik/firerating/releases/tag/0.0.8">implemented doors.findAllForProject and its rest api route</a></li>
+<li><a href="https://github.com/jeremytammik/firerating/releases/tag/0.0.9">eliminated project documents and use hash id in door document instead</a></li>
+<li><a href="https://github.com/jeremytammik/firerating/releases/tag/0.0.10">use express res.sendStatus instead of res.send and switched from local mongo to mongolab hosted</a></li>
+</ul>
+
+<p>The Revit add-in C# .NET source code, Visual Studio and add-n manifest is provided in the
+<a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud GitHub repository</a>,
+and the version discussed above is
+<a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2016.0.0.6">release 2016.0.0.6</a>.</p>
+
+<p>Where do we go from here?</p>
+
+<p>Well, now that the mongo database is cloud hosted, I will obviously also move the node server to a globabally accessible place, for example
+<a href="http://the3dwebcoder.typepad.com/blog/2015/03/hosting-a-node-server-on-heroku-pages-and-3d-web.html">Heroku</a>.</p>
+
+<p>For the Revit add-in, I would like to implement an external application to provide more convenient user interface access to the three commands.</p>
+
+<p>I can also imagine implementing a batching functionality, to traverse all Revit projects one by one and run the three commands programmatically in each project.</p>
+
+<p>What would <b><i>you</i></b> like to see?</p>
+
+</body>
+</html>
