@@ -519,14 +519,14 @@ That failed rather miserably, since existing projects can be copied to new ones,
 <p>Before doing anything else, clean up the mongo database from the console interface by removing the entire previous firerating data set:</p>
 
 <pre class="prettyprint">
-> show dbs
+&gt; show dbs
 firerating  0.078GB
 local       0.078GB
-> use firerating
+&gt; use firerating
 switched to db firerating
-> db.dropDatabase()
+&gt; db.dropDatabase()
 { "dropped" : "firerating", "ok" : 1 }
-> show dbs
+&gt; show dbs
 local  0.078GB
 </pre>
 
@@ -561,23 +561,23 @@ Firerating server listening at port 3001
 <p>I export the shared parameters for this project to fireratingdb using Cmd_2_ExportSharedParameterValues and look at the result in the mongo console:</p>
 
 <pre class="prettyprint">
-> show dbs
+&gt; show dbs
 firerating  0.078GB
 local       0.078GB
-> use firerating
+&gt; use firerating
 switched to db firerating
-> show collections
+&gt; show collections
 doors
 system.indexes
-> db.doors.find()
+&gt; db.doors.find()
 { "_id" : "194b64e6-8132-4497-ae66-74904f7a7710-0004b28a", "project_id" : "qaSh_VLHTABQgzTeWedTLrOoriamVoTLY_BpjGwddhw=", "level" : "Level 1", "tag" : "1", "firerating" : 0, "__v" : 0 }
 </pre>
 
 <p>I modify the fire rating value in the external database, e.g., setting it to 33:</p>
 
 <pre class="prettyprint">
-> db.doors.find().forEach(function (u) { u.firerating = 33; db.doors.save(u); });
-> db.doors.find()
+&gt; db.doors.find().forEach(function (u) { u.firerating = 33; db.doors.save(u); });
+&gt; db.doors.find()
 { "_id" : "194b64e6-8132-4497-ae66-74904f7a7710-0004b28a", "project_id" : "qaSh_VLHTABQgzTeWedTLrOoriamVoTLY_BpjGwddhw=", "level" : "Level 1", "tag" : "1", "firerating" : 33, "__v" : 0 }
 </pre>
 
