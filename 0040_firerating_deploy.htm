@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+   -->
+</head>
+<body>
+
+<!--
+
+#3dwebcoder #nodejs #revitapi #mongodb #mongolab #heroku
+#mongoosejs #restapi
+#adsk #cloud #expressjs
+#adskdevnetwrk
+#milanojs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+akn_include
+
+tweet the video:
+
+FireRating in the Cloud demo https://youtu.be/noy9da61weY @YouTube #3dwebcoder #nodejs #revitapi #mongodb #mongoosejs #restapi #cloud #mongolab
+
+-->
+
+<h3>FireRatingCloud Heroku + Mongolab Deployed</h3>
+
+<p>Fully and completely deploying the FireRatingCloud support database on the cloud was much easier than expected.</p>
+
+<p>Please refer to the
+<a href="https://github.com/jeremytammik/firerating">fireratingdb node.js web server</a> and
+<a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud Revit add-in</a> GitHub repositories for an overview of the exploration and project evolution.</p>
+
+<p>I already moved the
+<a href="http://the3dwebcoder.typepad.com/blog/2015/07/fireratingcloud-round-trip-and-on-mongolab.html#6">
+database off-site to the mongolab host</a> yesterday, but I still had the node web server running locally.</p>
+
+<p>To do so, I created a new Heroku app and linked it to the existing <a href="https://github.com/jeremytammik/firerating">fireratingdb GitHub repo</a>.</p>
+
+<p>I asked Heroku for the name <code>fireratingdb</code>, and it was available, so my fireratingdb web server base URL now becomes <a href="http://fireratingdb.herokuapp.com">http://fireratingdb.herokuapp.com</a>.</p>
+
+<p>Click on <a href="http://fireratingdb.herokuapp.com">the link</a> and see for yourself &nbsp; :-)</p>
+
+<p>I modified the Revit add-in HTTP and REST API access information to use the global database server instead of the local one:</p>
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> HTTP access constant to toggle between local and global server.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">bool</span> UseLocalServer = <span class="blue">false</span>;
+
+&nbsp; <span class="green">// HTTP access constants.</span>
+
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _base_url_local = <span class="maroon">&quot;http://127.0.0.1:3001&quot;</span>;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _base_url_global = <span class="maroon">&quot;http://fireratingdb.herokuapp.com&quot;</span>;
+&nbsp; <span class="blue">const</span> <span class="blue">string</span> _api_version = <span class="maroon">&quot;api/v1&quot;</span>;
+</pre>
+
+<p>Recompiling and testing worked right away.</p>
+
+<p>Since the mongo database is already hosted online on mogolab.com, you can see and edit the currently stored door instance documents at
+<a href="https://mongolab.com/databases/firerating/collections/doors">mongolab.com/databases/firerating/collections/doors</a>.</p>
+
+<p>Hmm.</p>
+
+<p>Not much more to say, really.</p>
+
+<p>All done.</p>
+
+<p>Surprise, surprise.</p>
+
+
+<a name="3"></a>
+
+<h4>Using the Mongo Console on a Remote Database</h4>
+
+<p>Doing a bit more testing, I discover that the manipulation facilities provided by the mongolab web page are rather limited.</p>
+
+<p>However, they clearly state that I can also use the standard mongo console, so I tried that right away.</p>
+
+<p>It works fine and is easy:</p>
+
+<pre class="prettyprint">
+$ mongo -u revit -p revit ds047742.mongolab.com:47742/firerating
+MongoDB shell version: 2.6.4
+connecting to: ds047742.mongolab.com:47742/firerating
+rs-ds047742:PRIMARY&gt; show dbs
+2015-07-09T14:30:40.986+0200 listDatabases failed:{
+	"ok" : 0,
+	"errmsg" : "not authorized on admin to execute command { listDatabases: 1.0 }",
+	"code" : 13
+} at src/mongo/shell/mongo.js:47
+rs-ds047742:PRIMARY&gt; use firerating
+switched to db firerating
+rs-ds047742:PRIMARY&gt; show collections
+doors
+system.indexes
+rs-ds047742:PRIMARY&gt; db.doors.find()
+{ "_id" : "194b64e6-8132-4497-ae66-74904f7a7710-0004b28a", "project_id" : "qaSh_VLHTABQgzTeWedTLrOoriamVoTLY_BpjGwddhw=", "level" : "Level 1", "tag" : "1", "firerating" : 145, "__v" : 0 }
+. . .
+rs-ds047742:PRIMARY&gt; db.doors.find({'firerating':123})
+{ "_id" : "2fc77d67-1af0-4a43-aa66-c544d411df04-000693d8", "project_id" : "SLBt0i_SDljQHp_vW25LvQMPFlWd3hdwCak8cEdyi6M=", "level" : "Level 2", "tag" : "204", "firerating" : 123, "__v" : 0 }
+rs-ds047742:PRIMARY&gt;
+</pre>
+
+<p>Just to ensure all works fine with the whole cloud-based setup, with the server on Heroku and the database on Mongolab, I ran an update command on the mongo console, for example, by selecting all doors whose current fire rating value is 256, and raising it to 300:</p>
+
+<pre class="prettyprint">
+rs-ds047742:PRIMARY> db.doors.find({'firerating':256}).forEach(
+... function (u) { u.firerating = 300; db.doors.save(u); });
+</pre>
+
+<p>Launching the FireRatingCloud import command instantaneously updates the corresponding modified door properties.</p>
+
+<p>The
+<a href="https://github.com/jeremytammik/firerating">fireratingdb node.js mongo database web server</a> and
+<a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud Revit add-in</a> GitHub
+repositories provide an overview of the complete project analysis, exploration and implementation.</p>
+
+<p>The current releases are
+<a href="https://github.com/jeremytammik/firerating/releases/tag/0.0.11">0.0.11</a> and
+<a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2016.0.0.7">2016.0.0.7</a>,
+respectively.</p>
+
+
+<!--
+<a name="4"></a>
+
+<h4>RTC and AU Projects</h4>
+
+<p>I am planning more complex projects based on this for my presentations at the Revit Technology Conference
+<a href="http://rtcevents.cvent.com/events/rtc-europe-2015/event-summary-001dd661ce284b26b3dbf1a8859d40c3.aspx">RTC Europe</a> in Budapest and
+<a href="http://au.autodesk.com">Autodesk University</a> in
+Las Vegas coming up this autumn, so we'll see where those take me.</p>
+
+<p>This is a good starting point, anyway.</p>
+-->
+
+</body>
+</html>
