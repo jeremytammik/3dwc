@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+   -->
+</head>
+<body>
+
+<!--
+
+- calendar support
+  http://pcal.sourceforge.net -- pcal and lcal PostScript calendar programs
+  https://www.google.com/calendar -- Google Calendar GCal
+  https://en.wikipedia.org/wiki/CalDAV -- Calendaring Extensions to WebDAV, or CalDAV
+  http://lifehacker.com/399407/how-to-sync-any-desktop-calendar-with-google-calendar
+  https://developers.google.com/google-apps/calendar/caldav -- Google Calendar CalDAV API Developer's Guide
+  https://console.developers.google.com/project -- Create a project: Project ID: jcaldav Project Number: 793494317189
+  /a/src/web/jcaldav/jcaldav-f333c3b3877d.json
+  Principal collection as the starting point URI to connect to:
+  https://apidata.googleusercontent.com/caldav/v2/calid/user
+  calid should be replaced by the "calendar ID" of the calendar to be accessed.
+  This can be found through the Google Google Calendar web interface as follows:
+  in the pull-down menu next to the calendar name, select Calendar Settings.
+  On the resulting page the calendar ID is shown in a section labelled Calendar Address.
+  The calendar ID for a user's primary calendar is the same as that user's email address.
+  https://developers.google.com/google-apps/calendar/quickstart/python
+  https://developers.google.com/api-client-library/python
+  https://developers.google.com/api-client-library/python/apis/calendar/v3
+  Calendar ID: jeremytammik@gmail.com
+  HTML https://www.google.com/calendar/embed?src=jeremytammik%40gmail.com&ctz=Europe/Zurich
+  ICAL https://www.google.com/calendar/ical/jeremytammik%40gmail.com/public/basic.ics
+  XML https://www.google.com/calendar/feeds/jeremytammik%40gmail.com/public/basic
+  credentials
+  usr 793494317189-t3u0835arsmoo4hfni5crqp7pj5kqvjj@developer.gserviceaccount.com
+  pwd f333c3b3877dc7f7c8ad5b760d122ffac0cb6253
+  OAuth client ID 793494317189-38qefvgnvmrm712neerprtr8a6ar54ar.apps.googleusercontent.com
+  OAuth client secret r4EVqSj0wEyaISu_wzlq9l48
+  sample insert: https://developers.google.com/google-apps/calendar/v3/reference/events/insert
+
+#3dwebcoder #python #gcal #caldav #cloud
+#nodejs #revitapi #mongodb #mongolab #heroku
+#mongoosejs #restapi
+#adsk #expressjs
+#adskdevnetwrk
+#milanojs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+akn_include
+
+-->
+
+<h3>Populate GCal Using Google Calendar API</h3>
+
+<p>Today I present a Python script using the Google Calendar API to read events from my text-based desktop calendar and push them to the cloud for global access.</p>
+
+<p>I was busy last week with the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API</a> and
+<a href="http://thebuildingcoder.typepad.com">The Building Coder</a>, after returning from my vacation and
+<a href="http://thebuildingcoder.typepad.com/blog/2015/08/revit-api-context-and-form-creation-errors.html#1">
+lots of nice places and activities in Ticino, Mont Blanc, and the French Jura</a>.</p>
+
+<p>Now I finally got to look at something not related to the Revit API, or to any other CAD modelling, for a change:</p>
+
+<ul>
+<li><a href="#2">My Text Based Calendar</a></li>
+<li><a href="#3">The pcal PostScript calendar program</a></li>
+<li><a href="#4">The Google Calendar API</a></li>
+<li><a href="#5">Adding an event to the Google calendar</a></li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>My Text Based Calendar</h4>
+
+<p>I use a simple text file to manage my personal and profession calendar events.</p>
+
+<p>Here is a typical series of entries, for the
+<a href="http://the3dwebcoder.typepad.com/blog/2015/06/vrok-it-webgl-workshop-and-cloud-accelerator.html#4">Autodesk cloud accelerator</a>
+<a href="http://thebuildingcoder.typepad.com/blog/2015/06/accelerator-appstore-disqus-and-aec-devblog-articles.html#2">in Prague</a> next month:</p>
+
+<pre>
+2015-09-13 accelerator@prague begin
+2015-09-13 12:35-13:55 zrh-prg # lx1486, confirmation... trip record locator...
+2015-09-13 19:00 dinner # Brasileiro Slovanský dům, Na Příkopě 22
+2015-09-14 prague
+2015-09-15 prague
+2015-09-16 prague
+2015-09-17 prague
+2015-09-18 accelerator@prague end
+2015-09-18 14:45-16:05 prg-zrh # lx1487
+</pre>
+
+<p>I prefer text files for storing and managing data, and avoid commercial proprietary formats and software whenever possible.</p>
+
+<p>This solution has proved optimal for me ever since I started using it in February 2003.</p>
+
+<p>I can tell you the exact date I started using it, because all my appointments since then are still stored in this one single file, currently still just 165 KB is size:</p>
+
+<pre>
+$ ls -o /j/doc/db/calendar.txt
+-rw-rw-rw-  1 jta  164870 Aug 18 22:02 /j/doc/db/calendar.txt
+</pre>
+
+<p>This is obviously extremely handy for editing, searching and archiving.</p>
+
+<p>It also obviously does not provide a very useful visual overview over a week or month.</p>
+
+<p>That is where tools come in handy.</p>
+
+<p>Ever since then, I have also been using pcal to visualise the calendar file contents.</p>
+
+
+<a name="3"></a>
+
+<h4>The Pcal PostScript Calendar Program</h4>
+
+<p><a href="http://pcal.sourceforge.net">Pcal</a> is a calendar-generation program that produces nice-looking PostScript output.</p>
+
+<p>It is often used to generate monthly-format calendars, one month per page, with optional embedded text and images to mark special events.</p>
+
+<p>I actually use the HTML output option and a yearly format instead, producing this view in the browser:</p>
+
+<center>
+<img src="img/pcal_html_output.png" alt="Pcal HTML output" width="400"/>
+</center>
+
+<p>This works perfectly fine on the desktop, or wherever I can access the generated HTML output.</p>
+
+<p>Now and then, though, it would be handy to have global access to this data, e.g. to share with friends and colleagues or on the road with no access to this file.</p>
+
+<p>One solution is to feed this data into a Google calendar.</p>
+
+
+<a name="4"></a>
+
+<h4>The Google Calendar API</h4>
+
+<p>Accordingly, I set up a <a href="https://www.google.com/calendar">Google Calendar (GCal)</a> and
+read about the <a href="https://en.wikipedia.org/wiki/CalDAV">CalDAV, the Calendaring Extensions to WebDAV</a>,
+<a href="http://lifehacker.com/399407/how-to-sync-any-desktop-calendar-with-google-calendar">how to synchronise desktop calendars with Google calendar</a> and the
+<a href="https://developers.google.com/google-apps/calendar/caldav">Google Calendar CalDAV API Developer's Guide</a>.</p>
+
+<p>As it turns out, I did not need to know much about the underlying technology, because all I need is provided by the Google Calendar API tutorials and samples.</p>
+
+<p>I opted for a solution using Python and headed straight to the <a href="https://developers.google.com/google-apps/calendar/quickstart/python">Python Quickstart</a>.</p>
+
+<p>I ran into a few hiccups getting it started, which I pretty quickly resolved by consulting StackOverflow, defining the Python search path, installing <code>httplib2</code>, and a couple of reinstallations of the various components using <code>pip</code>:</p>
+
+<pre class="prettyprint">
+export PYTHONPATH="/Library/Python/2.7/site-packages:$PYTHONPATH"
+</pre>
+
+<p>After a bit longer than the five minutes promised in the quickstart guide &ndash; but not toooo much longer &ndash; the <code>quickstart.py</code> sample was up and running.</p>
+
+<p>In order to set up the credentials, the Google libraries open up a web page, ask you to identify yourself, and cache the result locally on your system, e.g., in the file <code>~/.credentials/calendar-quickstart.json</code>.</p>
+
+
+<a name="4"></a>
+
+<h4>Adding an Event to the Google Calendar</h4>
+
+<p>Following the lines of the Google calendar API Python quickstart example, the following function adds a new event to my calendar:</p>
+
+<pre class="prettyprint">
+def add_event():
+  """Add an event using the Google Calendar API.
+
+  Creates a Google Calendar API service object
+  and creates a new event on the user's calendar.
+  """
+  credentials = get_credentials()
+  http = credentials.authorize(httplib2.Http())
+  service = discovery.build('calendar', 'v3', http=http)
+
+  body = {
+    u'status': u'confirmed',
+    u'kind': u'calendar#event',
+    u'start': {u'dateTime': u'2015-08-19T10:00:00+02:00'},
+    u'end': {u'dateTime': u'2015-08-19T10:50:00+02:00'},
+    u'summary': u'jeremy test event summary',
+    u'organizer': {u'self': True, u'displayName': u'Jeremy Tammik', u'email': u'jeremytammik@gmail.com'},
+    u'creator': {u'self': True, u'displayName': u'Jeremy Tammik', u'email': u'jeremytammik@gmail.com'}
+  }
+  service.events().insert( calendarId='primary', body=body).execute()
+</pre>
+
+<p>The new entry appears immediately in my online calendar like this:</p>
+
+<center>
+<img src="img/gcal_new_entry.png" alt="New Google calendar entry" width="400"/>
+</center>
+
+<p>Now I just need to parse my entire calendar file and add all or a selected set of the events defined there.</p>
+
+<p>A later step might be to read back the calendar events from the online calendar, determine what has been modified or added, and update my holy calendar master text file.</p>
+
+<p>I hope this is of use and interest to you as well.</p>
+
+</body>
+</html>
