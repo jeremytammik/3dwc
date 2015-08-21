@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The 3D Web Coder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="3dwc.css"/>
+  <script src="run_prettify.js" type="text/javascript"></script>
+  <!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+   -->
+</head>
+<body>
+
+<!--
+
+#3dwebcoder #python #gcal #caldav #cloud #googleapi #restapi
+#nodejs #revitapi #mongodb #mongolab #heroku
+#mongoosejs
+#adsk #expressjs
+#milanojs
+#adskdevnetwrk
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+akn_include
+
+-->
+
+<h3>Adding GCal Entries Using Google Calendar API</h3>
+
+<p>Today I complete my discussion of a
+<a href="http://the3dwebcoder.typepad.com/blog/2015/08/populate-google-calendar-using-google-calendar-api.html">
+Python script using the Google Calendar API</a> to
+parse events from a text-based desktop calendar file and push them to the cloud for global access.</p>
+
+<ul>
+<li><a href="#2">Google OAuth credential handling</a>.</li>
+<li><a href="#3">Date and time parsing and formatting</a>.</li>
+<li><a href="#4">Adding a calendar event</a>.</li>
+<li><a href="#5">Mainline</a>.</li>
+<li><a href="#6">GitHub pages</a>.</li>
+<li><a href="#7">GitHub repository</a>.</li>
+</ul>
+
+
+<a name="2"></a>
+
+<h4>Google OAuth Credential Handling</h4>
+
+<p>Pretty interesting system...</p>
+
+<p>The following code snippets take you to a login page in your browser, prompting you to identify yourself manually in the user interface, and then cache the resulting credentials in your local file system:</p>
+
+<pre class="prettyprint">
+def get_credentials():
+  """Gets valid user credentials from storage.
+
+  If nothing has been stored, or if the stored credentials
+  are invalid, the OAuth2 flow is completed to obtain the
+  new credentials.
+
+  Returns:
+    Credentials, the obtained credential.
+  """
+  home_dir = os.path.expanduser('~')
+  credential_dir = os.path.join(home_dir, '.credentials')
+  if not os.path.exists(credential_dir):
+    os.makedirs(credential_dir)
+  credential_path = os.path.join(credential_dir,
+                   'calendar-quickstart.json')
+
+  store = oauth2client.file.Storage(credential_path)
+  credentials = store.get()
+  if not credentials or credentials.invalid:
+    flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+    flow.user_agent = APPLICATION_NAME
+    if flags:
+      credentials = tools.run_flow(flow, store, flags)
+    else: # Needed only for compatability with Python 2.6
+      credentials = tools.run(flow, store)
+    print 'Storing credentials to ' + credential_path
+  return credentials
+</pre>
+
+<p>The credential retrieval and caching method is called and used like this to obtain a Google API service object, in this case for the Calendar API:</p>
+
+<pre class="prettyprint">
+  credentials = get_credentials()
+  http = credentials.authorize(httplib2.Http())
+  service = discovery.build('calendar', 'v3', http=http)
+</pre>
+
+<p>As <a href="http://the3dwebcoder.typepad.com/blog/2015/08/populate-google-calendar-using-google-calendar-api.html#4">mentioned</a>,
+this code caches the user credentials in the local system after completing the web site identification process, e.g., in the file <code>~/.credentials/calendar-quickstart.json</code>.</p>
+
+
+
+
+<a name="3"></a>
+
+<h4>Date and time parsing and formatting</h4>
+
+<p>My text file calendar entries obviously needed quite a bit of massage to be properly parsed, since they have only been edited for my own human eyes and manual use in the past.</p>
+
+<p>They all have a date, some have a start time and some have an end time as well.</p>
+
+<p>The start and end times are separated by a hyphen '-', and spaces are used to separate the date, time and event summary fields.</p>
+
+<p>The list of events starting back in the year 2003 required significant cleanup to ensure that all dates and times were correctly recognised and parsed.</p>
+
+<p>The final challenge was cased by a number of long airline flight times, with an arrival time specified for the following day.</p>
+
+<p>I ended up marking those times with a trailing '+1' suffix, and adjusting the date to the subsequent day for those.</p>
+
+<p>My final parsing code looks like this:</p>
+
+<pre class="prettyprint">
+def clean_calendar_entry(s):
+  "Clean up a calendar entry for publication."
+  s = s.strip()
+  i = s.find('#')
+  if -1 &lt; i: s = s[:i]
+  n = 50
+  if n &lt; len(s): s = s[:n-3] + '...'
+  return s.strip()
+
+def get_calendar_entries(log):
+  """Retrieve all event entries from
+  the master text-based calendar file."""
+  f = open('/j/doc/db/jcal/calendar.txt')
+  entries = [clean_calendar_entry(x)
+             for x in f.readlines()
+             if x.startswith('20')]
+  f.close()
+  if log:
+    for x in entries: print x
+  return entries
+
+def is_number(s):
+  try:
+    int(s)
+    return True
+  except ValueError:
+    return False
+
+def parse_calendar_entry(e, log):
+  """Extract and return start time, end time
+  and summary from calendar entry."""
+  if log: print e
+  i = e.find(' ')
+  assert -1 &lt; i
+  (date,summary) = e.split( None, 1 )
+  i = summary.find(' ')
+  if -1 == i: time = None
+  else: (time,summary) = summary.split( None, 1 )
+
+  starttime = endtime = None
+
+  if time and time[0] in '0123456789':
+    a = time.split('-')
+    assert(len(a) in [1,2])
+    starttime = a[0]
+    if 1 &lt; len(a): endtime = a[1]
+    else: endtime = None
+
+  if not starttime: starttime = '06:00'
+
+  # switch to datetime objects
+
+  starttime = datetime.datetime.strptime(
+    date + 'T' + starttime, '%Y-%m-%dT%H:%M')
+
+  if endtime:
+    if endtime.endswith('+1'):
+      endtime = endtime[:-2]
+      next_day = starttime + relativedelta(days=+1)
+      date = next_day.strftime('%Y-%m-%d')
+
+    endtime = datetime.datetime.strptime(
+      date + 'T' + endtime, '%Y-%m-%dT%H:%M')
+  else:
+    endtime = starttime + relativedelta(minutes=+10)
+
+  # switch back to string representation;
+  # Google Calendar API requires trailing seconds
+
+  starttime = starttime.strftime('%Y-%m-%dT%H:%M:%S')
+  endtime = endtime.strftime('%Y-%m-%dT%H:%M:%S')
+
+  if log: print starttime, endtime, summary
+
+  return (starttime, endtime, summary)
+</pre>
+
+<p>While debugging this method and cleaning up my calendar entries, every time I found an error, I deleted all the entries and restarted the parsing and upload from scratch, leading to very liberal use of the steps described in the Google help forum discussion on
+<a href="https://productforums.google.com/forum/#!topic/calendar/HjyCdrZydEI">
+how to delete all Google calendar entries in my primary calendar</a>.</p>
+
+<a name="4"></a>
+
+<h4>Adding a Calendar Event</h4>
+
+<p>Once all the start and end times have been determined and validated, I can use this method to add the event to GCal:</p>
+
+<pre class="prettyprint">
+def add_calendar_event( service, starttime, endtime, summary, log ):
+  "Add an event using the Google Calendar API."
+
+  if log: print starttime, endtime, summary
+
+  me = {u'self': True,
+        u'displayName': u'Jeremy Tammik',
+        u'email': u'jeremytammik@gmail.com'}
+
+  body = {
+    u'status': u'confirmed',
+    u'kind': u'calendar#event',
+    u'start': {u'dateTime': starttime, u'timeZone': u'Europe/Zurich'}, # trailing seconds are required!
+    u'end': {u'dateTime': endtime, u'timeZone': u'Europe/Zurich'},
+    u'summary': summary,
+    u'organizer': me,
+    u'creator': me
+  }
+  service.events().insert( calendarId='primary', body=body).execute()
+</pre>
+
+<p>I attempted to use the <code>endTimeUnspecified</code> property to request an unspecified end time, but that caused an error saying 'Forbidden', so I simply specify a dummy end time in that case.</p>
+
+
+<a name="5"></a>
+
+<h4>Mainline</h4>
+
+<p>The following mainline drives the entire process of authentication, parsing and uploading the events:</p>
+
+<pre class="prettyprint">
+def main():
+  """Add event entries from the master text-based
+  calendar file to the online GCal using the Google
+  Calendar API.
+
+  Create a Google Calendar API service object, parse
+  the text file, extract all events, and add them to
+  GCal one by one.
+  """
+  credentials = get_credentials()
+  http = credentials.authorize(httplib2.Http())
+  service = discovery.build('calendar', 'v3', http=http)
+
+  entries = get_calendar_entries( log=False )
+
+  for e in entries:
+    (starttime, endtime, summary) = parse_calendar_entry(e, False)
+    add_calendar_event( service, starttime, endtime, summary, True )
+</pre>
+
+<p>I would have loved to say that the process completed and I am finally finished with this mini-project.</p>
+
+<p>Unfortunately, on my umpteenth attempt to delete, re-parse and re-add all events, the Google API call failed, saying:</p>
+
+<pre>googleapiclient.errors.HttpError:
+  &lt;HttpError 403 when requesting
+    https://www.googleapis.com/calendar/v3/calendars/primary/events?alt=json
+    returned "<strong>Rate Limit Exceeded</strong>"&gt;
+</pre>
+
+<p>Ah well, time to rest and try again another day.</p>
+
+
+<a name="6"></a>
+
+<h4>GitHub Pages</h4>
+
+<p>By the way, I also found and implemented another, simpler, grass roots method to share my calendar: upload the generated HTML output files to GitHub and use GitHub Pages to make them available as a stand-alone web site.</p>
+
+<p>I simply added the following lines to the end of my HTML calendar generation script to push it to GitHub as well as display it locally:</p>
+
+<pre class="prettyprint">
+open $DIR/out/$YEAR.htm
+
+cd $DIR
+git add .
+git commit -m "calendar update"
+git push
+</pre>
+
+<p>Two solutions to choose from are better than none &nbsp; :-)</p>
+
+
+<a name="7"></a>
+
+<h4>GitHub Repository</h4>
+
+<p>I created the
+<a href="https://github.com/jeremytammik/jcal">jcal GitHub repository</a> to
+host the following components:</p>
+
+<ul>
+<li>The <a href="https://github.com/jeremytammik/jcal/blob/gh-pages/jcal">
+jcal</a> shell script driving the PostScript calendar-generation program
+<a href="http://pcal.sourceforge.net">pcal</a> to generate the HTML calendar output.</li>
+
+<li>The <a href="https://github.com/jeremytammik/jcal/tree/gh-pages/out">
+HTML calendar output</a> files, comfortably viewable through the
+<a href="http://jeremytammik.github.io/jcal">GitHub pages web site</a>.</li>
+
+<li>The <a href="https://github.com/jeremytammik/jcal/blob/gh-pages/jcaldav.py">
+jcaldav.py</a> Python script described above that parses the calendar text file and uploads the entries to GCal via the Google Calendar API.</li>
+
+</ul>
+
+<p>I hope you find this useful.</p>
+
+</body>
+</html>
