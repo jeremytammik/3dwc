@@ -1,0 +1,134 @@
+<p><head>
+<title>The 3D Web Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+#3dwebcoder #python #adskdevnetwrk #adsk #markdown #asciidoc
+#gcal #caldav #cloud #googleapi #restapi
+#nodejs #revitapi #mongodb #mongolab #heroku
+#mongoosejs #expressjs
+#milanojs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+akn_include
+
+-->
+
+<h3>Hackergarten, Chromium and Markdown</h3>
+<p>I visited the
+<a href="http://www.meetup.com/Hackergarten-Basel/events/224530234">August meetup</a> of the Basel
+<a href="http://hackergarten.net">Hackergarten</a> last Tuesday, made a small contribution or two and learned several interesting new things:</p>
+<ul>
+<li><a href="#2">Hackergarten Angular web page achievements popup</a></li>
+<li><a href="#3">Chromium browser</a></li>
+<li><a href="#4">AsciiDoc and Markdown</a></li>
+</ul>
+<h4><a name="2"></a>Hackergarten Angular Web Page Achievements Popup</h4>
+<p>Every Hackergarten meetup starts with a brainstorming session to determine a list of potential achievable work tasks.</p>
+<p>Participants then vote for the projects they would like to join.</p>
+<p>I ended up with the little group around <a href="https://github.com/victorparmar">@victorparmar</a> working on two issues related to the hackergarten web site itself:</p>
+<ul>
+<li>Added details modal for hackergarten events to main website.</li>
+<li>Fixed past event date sorting on hackergarten main website (sort not correctly displaying in Chrome).</li>
+</ul>
+<p>The Hackergarten web site is implemented in Angular and hosted on GitHub, and our enhancements are captured in the
+<a href="https://github.com/hackergarten/hackergarten.github.io/pull/46">pull request #46</a>, <em>adding details modal to events + fixing past event sort order in chrome</em>.</p>
+<p>The sort problem really was a bug, and Firefox does something rather strange to hide it.</p>
+<p>Events were being sorted by date like this:</p>
+<pre class="prettyprint">
+  eventList.sort(function (a, b) {
+    return new Date(a.date) < new Date(b.date);
+  });
+</pre>
+
+<p>This should not work, since the sort function expects a compare function returning -1, 0 or +1, not an operator like <code>&lt;</code> returning a Boolean value.</p>
+<p>We fixed the issue like this:</p>
+<pre class="prettyprint">
+  eventList.sort(function (a, b) {
+    var isLess = new Date(a.date) < new Date(b.date);
+    return (isLess ? 1 : -1);
+  });
+</pre>
+
+<h4><a name="3"></a>Chromium Browser</h4>
+<p>I was aware of the open source <a href="https://www.chromium.org">Chromium</a> project, its C++ library and the <a href="https://github.com/cefsharp/CefSharp">CefSharp</a> .NET bindings to embed a web browser in my own application.</p>
+<p>I was not aware of the Chromium <strong>browser</strong>, though, similar to the <a href="http://www.google.com/chrome">Google Chrome browser</a>, with a smaller footprint, and completely open source, unlike the Google browser.</p>
+<p>Victor was using that, and I installed and started using it as well now.</p>
+<p>Both browsers share my cloud-hosted bookmarks, so the switch was very easy.</p>
+<p>The only snag I hit so far was lack of support for one specific video format in YouTube &ndash; I simply temporarily switched back to Chrome to watch that.</p>
+<h4><a name="4"></a>AsciiDoc and Markdown</h4>
+<p>Ever since I started working on
+<a href="http://thebuildingcoder.typepad.com">The Building Coder</a>
+blog in 2008, I have been writing my blog posts in pure handcrafted HTML.</p>
+<p>I often thought of using
+<a href="http://daringfireball.net/projects/markdown">Markdown</a>
+or some other more lightweight format to avoid some of the syntactic mess and typing effort.</p>
+<p>One of the Hackergarten projects was looking at fixing
+<a href="https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/166">issue #165</a>
+integrating <a href="http://asciidoctor.org">AsciiDoctor</a> into the Gradle documentation workflow.</p>
+<p>That prompted me to look at the Python
+<a href="http://asciidoc.org">AsciiDoc</a> project and rekindled my interest in using Markdown to generate the HTML for my blog posts.</p>
+<p>This is the first result.</p>
+<p>Here are the problem descriptions and solutions to two of the issues I encountered in the process:</p>
+<ul>
+<li><a href="http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax">Adding metadata and comments to the markdown source</a></li>
+<li><a href="http://stackoverflow.com/questions/5319754/cross-reference-named-anchor-in-markdown">Defining a named anchor in markdown</a></li>
+</ul>
+<p>As an example, here is the Markdown source for this paragraph:</p>
+<pre class="prettyprint">
+#### &lt;a name="4"&gt;&lt;/a&gt;AsciiDoc and Markdown
+
+Ever since I started working on
+[The Building Coder](http://thebuildingcoder.typepad.com)
+blog in 2008, I have been writing my blog posts in pure handcrafted HTML.
+
+I often thought of using
+[Markdown](http://daringfireball.net/projects/markdown)
+or some other more lightweight format to avoid some of the syntactic mess and typing effort.
+
+One of the Hackergarten projects was looking at fixing
+[issue #165](https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/166)
+integrating [AsciiDoctor](http://asciidoctor.org) into the Gradle documentation workflow.
+
+That prompted me to look at the Python
+[AsciiDoc](http://asciidoc.org) project and rekindled my interest in using Markdown to generate the HTML for my blog posts.
+
+This is the first result.
+
+Here are the problem descriptions and solutions to two of the issues I encountered in the process:
+
+- [Adding metadata and comments to the markdown source](http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
+- [Defining a named anchor in markdown](http://stackoverflow.com/questions/5319754/cross-reference-named-anchor-in-markdown)
+</pre>
+
+<p>I promise you that the HTML generated from that is a lot messier and less readable  :-)</p>
+<p>I generate it using the <a href="https://pythonhosted.org/Markdown">Python Markdown library</a> using its <a href="https://pythonhosted.org/Markdown/cli.html">command line interface</a> like this:</p>
+<pre class="prettyprint">
+$ markdown_py 0043_md_chromium_hg.md > 0043_md_chromium_hg.html
+</pre>
+
+<p>I don't need to do so for the Typepad blog entry, though, because it supports markdown right out of the box:</p>
+<p><center>
+<img src="img/typepad_markdown.png" alt="Typepad Markdown" width="600"/>
+</center></p>
+<p>Oops.</p>
+<p>Another problem became apparent after publishing the initial version of this post.</p>
+<p>The Typepad automatic excerpt generator does not understand markdown hypertext references:</p>
+<p><center>
+<img src="img/typepad_md_preview.png" alt="Typepad Markdown" width="600"/>
+</center></p>
+<p>I guess I will have to switch to HTML for the initial table of contents at the top of the post after all.</p>
+<p>I wonder what other surprises are in store for me.</p>
+<p>Oops again.</p>
+<p>That did not help, so I ended up hand editing the excerpt instead.</p>
+<p>And replacing the HTML table of contents by markdown again.</p>
+<p>Apparently, once the excerpt has been automatically generated, that's that.</p>
+<p>Happily, I can redefine it manually afterwards, at least.</p>
+<p>Ah well.</p>
