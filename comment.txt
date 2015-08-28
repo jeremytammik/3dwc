@@ -18,7 +18,7 @@ Cheers, Jeremy
 
 April 14, 2015 at 02:13
 
-View the post and comment: http://the3dwebcoder.typepad.com/blog/2015/05/50-ways-to-view-your-model.html?cid=6a01bb07e2ba20970d01bb0832c55d970d#comment-6a01bb07e2ba20970d01bb0832c55d970d
+http://the3dwebcoder.typepad.com/blog/2015/05/50-ways-to-view-your-model.html?cid=6a01bb07e2ba20970d01bb0832c55d970d#comment-6a01bb07e2ba20970d01bb0832c55d970d
 
 Stephen Preston has left you a comment:
 
@@ -68,7 +68,7 @@ Cheers, Jeremy.
 
 http://the3dwebcoder.typepad.com/blog/2015/07/put-post-delete-and-curl-testing-the-firerating-rest-api.html#comment-2121005384
 
-Theo answered jeremy tammik
+Theo --> jeremy tammik
 
 Hi Jeremy
 
@@ -80,7 +80,7 @@ Of course this is not always possible, but the more you include features like th
 
 Theo
 
-jeremy tammik answered Theo
+jeremy tammik --> Theo
 
 Dear Theo,
 
@@ -89,5 +89,49 @@ Thank you very much for letting me know and confirming that.
 I am the same :-)
 
 I'll try to provide that for this sample as well real soon now!
+
+Cheers, Jeremy.
+
+http://the3dwebcoder.typepad.com/blog/2015/06/my-first-mongo-database.html#comment-2124861945
+
+David Mettler
+
+I see a very good idea using mongodb and revit! I've been playing with mongodb and revit trying to simplify the way revit segments data and package the data as a document packet. Good Stuff!!
+
+4:06 p.m., Wednesday July 8
+
+jeremy tammik --> David Mettler
+
+Dear David,
+
+Great, very glad you like it.
+
+Thank you for your appreciation!
+
+I am totally enthusiastic too.
+
+Looking forward to hearing more about what you come up with.
+
+Cheers, Jeremy.
+
+http://the3dwebcoder.typepad.com/blog/2015/08/hackergarten-chromium-and-markdown.html#comment-2221472800
+
+Theo
+
+Welcome to the world of Markdown - as used by GitHub, StackOverflow, Reddit and in many more sites.
+
+BTW, I use https://github.com/showdownjs/... to convert Markdown to HTML in all my JavaScript apps.
+
+1:40 p.m., Thursday Aug. 27
+
+jeremy tammik --> Theo
+
+Dear Theo,
+
+Wow, great, thank you for the useful pointer!
+
+That fits exactly what I was thinking of looking into next.
+
+If each page generates its own HTML from the embedded MD, there is no need more for an external conversion step.
 
 Cheers, Jeremy.
