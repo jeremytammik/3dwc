@@ -10,7 +10,7 @@
 
 <!---
 
-JS-Embedded #Markdown Using #Showdown #atx #setext #3dwebcoder #python #adskdevnetwrk #adsk #jacascript #html #github
+Live Web Site Editing Rendering #Markdown via #Showdown #atx #setext #3dwebcoder #python #adskdevnetwrk #adsk #jacascript #html #github
 #asciidoc
 #gcal #caldav #cloud #googleapi #restapi
 #nodejs #revitapi #mongodb #mongolab #heroku
@@ -21,10 +21,14 @@ JS-Embedded #Markdown Using #Showdown #atx #setext #3dwebcoder #python #adskdevn
 #aws #revitapi #jquery #handlebars #heroku
 akn_include
 
+Theo Armour uses Showdown to convert Markdown to HTML in all his JavaScript apps.
+Each page generates its own HTML from the embedded MD and there is no need more for any external intermediate conversion steps.
+Theo later demonstrated a method to implement an entire web site written in markdown and updated live through GitHub pages.
+
 -->
 
 
-### JS-Embedded Markdown Using Showdown
+### Live Web Site Render Markdown via Showdown
 
 [Theo Armour](https://github.com/theo-armour) raised a very valid point in a
 [comment](http://the3dwebcoder.typepad.com/blog/2015/08/hackergarten-chromium-and-markdown.html#comment-2221472800) on my last post on
