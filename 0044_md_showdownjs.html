@@ -1,0 +1,66 @@
+<p><head>
+<title>The 3D Web Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+JS-Embedded #Markdown Using #Showdown #atx #setext #3dwebcoder #python #adskdevnetwrk #adsk #jacascript #html #github
+#asciidoc
+#gcal #caldav #cloud #googleapi #restapi
+#nodejs #revitapi #mongodb #mongolab #heroku
+#mongoosejs #expressjs
+#milanojs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+akn_include
+
+-->
+
+<h3>JS-Embedded Markdown Using Showdown</h3>
+<p><a href="https://github.com/theo-armour">Theo Armour</a> raised a very valid point in a
+<a href="http://the3dwebcoder.typepad.com/blog/2015/08/hackergarten-chromium-and-markdown.html#comment-2221472800">comment</a> on my last post on
+<a href="http://the3dwebcoder.typepad.com/blog/2015/08/hackergarten-chromium-and-markdown.html">Hackergarten, Chromium and Markdown</a>:</p>
+<blockquote>
+<p>Welcome to the world of Markdown &ndash; as used by GitHub, StackOverflow, Reddit and in many more sites.
+BTW, I use <a href="https://github.com/showdownjs/showdown">Showdown</a> to convert Markdown to HTML in all my JavaScript apps.</p>
+</blockquote>
+<p>Happily, that fits exactly what I was thinking of looking into next.</p>
+<p>If each page generates its own HTML from the embedded MD, there is no need more for any external intermediate conversion steps.</p>
+<p>Looking at the Showdown documentation also led me to discover some important precursors, e.g.,
+<a href="http://www.aaronsw.com/2002/atx/intro">atx</a>, <em>the true structured text format</em>, and
+<a href="https://en.wikipedia.org/wiki/Setext">Setext</a>.
+Interesting to know where this all comes from.</p>
+<p>Theo later came back with another even more interesting
+<a href="http://the3dwebcoder.typepad.com/blog/2015/08/hackergarten-chromium-and-markdown.html#comment-2226802960">update</a>,
+demonstrating a method to implement an entire web site written in markdown and updated live through GitHub pages:</p>
+<blockquote>
+<p>Here's a demo showing how I use Showdown on GitHub to do several fun things:
+<a href="https://github.com/theo-armour/explayrimental/tree/gh-pages/tammik/showdown">Showdown demo for Jeremy</a></p>
+</blockquote>
+<p>Adding the
+<a href="https://github.com/showdownjs/showdown">Showdown</a> JavaScript functionality to convert the markdown to HTML in real time and hosting the entire site on
+<a href="https://pages.github.com">GitHub pages</a> enables anybody to easily edit, push, and have the generated site reflect the changes live.</p>
+<p><a href="https://github.com/theo-armour/explayrimental/tree/gh-pages/tammik/showdown">Theo's demo</a> can be driven to render either the default HTML index.html, or the other two pages defined in markdown, by passing their filenames as hash hypertext navigation arguments appended to the URL:</p>
+<ul>
+<li>Default HTML index.html <br/>&rarr; <a href="http://theo-armour.github.io/explayrimental/tammik/showdown">index.html</a></li>
+<li>First markdown file rendered to HTML <br/>&rarr; <a href="http://theo-armour.github.io/explayrimental/tammik/showdown/index.html#another-markdown-file-1.md">index.html#another-markdown-file-1.md</a></li>
+<li>Second markdown file rendered to HTML <br/>&rarr; <a href="http://theo-armour.github.io/explayrimental/tammik/showdown/index.html#another-markdown-file-2.md">index.html#another-markdown-file-2.md</a></li>
+</ul>
+<p>Pretty cool!</p>
+<p>Thank you for the very clear and minimal example, Theo!</p>
+<h4>Beautiful Sad Funny Short Film on Robots</h4>
+<p>For something completely different, let a sad-looking robot melt your heart and ponder friendship, cooperation and greed in
+<a href="https://vimeo.com/jackanders">Jack Anderson</a>'s
+nine-minute short film
+<a href="https://vimeo.com/137531269">Wire Cutters</a>:</p>
+<p><center>
+<iframe src="https://player.vimeo.com/video/137531269?title=0&byline=0&portrait=0" width="480" height="270" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+<br/>
+<p style="font-style:italic;font-size:80%">A chance encounter proves fateful for two robots mining on a desolate planet</p>
+</center></p>
