@@ -135,3 +135,35 @@ That fits exactly what I was thinking of looking into next.
 If each page generates its own HTML from the embedded MD, there is no need more for an external conversion step.
 
 Cheers, Jeremy.
+
+http://the3dwebcoder.typepad.com/blog/2015/08/hackergarten-chromium-and-markdown.html#comment-2226802960
+
+Theo
+
+Hi Jeremy
+
+You are getting it!
+
+Here's a demo showing how I use Showdown on GitHub to do several fun things:
+
+Showdown demo for Jeremy:
+
+https://github.com/theo-armou%20r/explayrimental/tree/gh-pages/tammik/showdown
+
+Theo
+
+Dear Theo,
+
+Brilliant, thank you for the wonderful sample!
+
+That fits exactly what I was thinking of, once again.
+
+Very useful!
+
+I went right ahead and promoted it to a main blog post:
+
+http://the3dwebcoder.typepad.com/blog/2015/09/js-embedded-markdown-using-showdown.html
+
+Now I can supply all my non-savvy friends with web sites that they can easily edit themselves :-)
+
+Cheers, Jeremy.
