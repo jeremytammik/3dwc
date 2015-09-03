@@ -167,3 +167,26 @@ http://the3dwebcoder.typepad.com/blog/2015/09/js-embedded-markdown-using-showdow
 Now I can supply all my non-savvy friends with web sites that they can easily edit themselves :-)
 
 Cheers, Jeremy.
+
+http://the3dwebcoder.typepad.com/blog/2015/07/put-post-delete-and-curl-testing-the-firerating-rest-api.html#comment-2212051915
+
+yellowstone
+
+Hi Jeremy. What are the requirements to get all this working (database, .NET framework, etc.). How do I use it with SQL server ?
+
+2:24 p.m., Monday Aug. 24
+
+jeremy tammik Mod  yellowstone
+
+Dear Yellowstone,
+
+The part discussed above has no database or .NET requirements at all, nor does it have anything whatsoever to do with SQL server.
+
+For a full description of the entire project, how to start, what to install and where it leads to in the end, please refer to the two FireRating GitHub projects, one for the Revit add-in on the desktop, the other for the cloud-based mongo database:
+
+https://github.com/jeremytammik/FireRatingCloud
+
+https://github.com/jeremytammik/firerating
+
+Cheers, Jeremy.
+
