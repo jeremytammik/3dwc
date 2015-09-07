@@ -10,6 +10,10 @@
 
 <!---
 
+- asciidoc - use asciidoc to write html and other docs, maybe also slide shows using slidy
+
+- asciidoc easy web site framework
+
 #3dwebcoder #python #adskdevnetwrk #adsk #markdown #asciidoc
 #gcal #caldav #cloud #googleapi #restapi
 #nodejs #revitapi #mongodb #mongolab #heroku
