@@ -25,7 +25,7 @@ Comphound, #JsFiddle, My First #Reactjs Widget #3dwebcoder #javascript #autodesk
 
 Comphound, JsFiddle and My First React Component
 - prepare for conferences, RTC Europe in Budapest and Autodesk University in Las Vegas
-- implement a cloud-based universal component and asset usage analysis, visualisation and reporting, christened Comphound, for hounding our and tracking down those pesky components :-)
+- implement a cloud-based universal component and asset usage analysis, visualisation and reporting, christened Comphound, for hounding out and tracking down those pesky components :-)
 - looking at the React JavaScript library
 - implemented my first JsFiddle
 - taking a new look at the Autodesk View and Data API
@@ -44,7 +44,7 @@ For both of them, I committed to implementing and demonstrating a *cloud-based u
 
 > We describe the nitty-gritty programming details to implement a cloud-based system to analyse, visualise and report on universal component and asset usage. The components could be Revit family instances used in BIM or any other kind of assets in any other kind of system. The focus is on the cloud-based database used to manage the component occurrences, either in global or project based coordinate systems. Searches can be made based on geographical location or keywords. Models are visualised using the Autodesk View and Data API, providing support for online viewing and model navigation.
 
-I just christened this project *Comphound*, for hounding our and tracking down those pesky components &nbsp; :-)
+I just christened this project *Comphound*, for hounding out and tracking down those pesky components &nbsp; :-)
 
 Besides the web server and database aspects already explored for the [firerating](https://github.com/jeremytammik/firerating) sample that I recently discussed here in depth, the new tool will also sport a user interface.
 
