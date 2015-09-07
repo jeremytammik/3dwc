@@ -24,12 +24,12 @@ akn_include
 Comphound, #JsFiddle, My First #Reactjs Widget #3dwebcoder #javascript #autodesku #rtceur #revitapi #adsk
 
 Comphound, JsFiddle and My First React Component
-- prepare for conferences, RTC Europe in Budapest and Autodesk University in Las Vegas
-- implement a cloud-based universal component and asset usage analysis, visualisation and reporting, christened Comphound, for hounding out and tracking down those pesky components :-)
-- looking at the React JavaScript library
-- implemented my first JsFiddle
-- taking a new look at the Autodesk View and Data API
-- prepare for the cloud accelerator in Prague...
+&ndash; prepare for conferences, RTC Europe in Budapest and Autodesk University in Las Vegas
+&ndash; implement a cloud-based universal component and asset usage analysis, visualisation and reporting, christened Comphound, for hounding out and tracking down those pesky components
+&ndash; looking at the React JavaScript library
+&ndash; implemented my first JsFiddle
+&ndash; taking a new look at the Autodesk View and Data API
+&ndash; prepare for the cloud accelerator in Prague...
 
 -->
 
