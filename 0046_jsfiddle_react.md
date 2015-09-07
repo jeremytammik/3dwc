@@ -44,7 +44,9 @@ For both of them, I committed to implementing and demonstrating a *cloud-based u
 
 > We describe the nitty-gritty programming details to implement a cloud-based system to analyse, visualise and report on universal component and asset usage. The components could be Revit family instances used in BIM or any other kind of assets in any other kind of system. The focus is on the cloud-based database used to manage the component occurrences, either in global or project based coordinate systems. Searches can be made based on geographical location or keywords. Models are visualised using the Autodesk View and Data API, providing support for online viewing and model navigation.
 
-I just christened this project *Comphound*, for hounding out and tracking down those pesky components &nbsp; :-)
+I just christened this project
+*[Comphound](https://github.com/jeremytammik/comphound)*,
+for hounding out and tracking down those pesky components &nbsp; :-)
 
 Besides the web server and database aspects already explored for the [firerating](https://github.com/jeremytammik/firerating) sample that I recently discussed here in depth, the new tool will also sport a user interface.
 
