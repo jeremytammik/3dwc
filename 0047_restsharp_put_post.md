@@ -105,7 +105,7 @@ to quickly achieve the following functionality for CompHound as well:
 
 Note that stepping through all of these tasks for the new CompHound project only took an hour or so in all, from scratch.
 
-It took me several weeks to discover all the details ther first time around, for the FireRating project &nbsp; :-)
+It took me several weeks to discover how to achieve all this the first time around, for the FireRating project &nbsp; :-)
 
 While doing so, I was once again irritated by the GET, PUT and POST issue I encountered in the firerating project for creating versus updating existing records.
 
