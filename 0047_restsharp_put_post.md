@@ -69,8 +69,7 @@ Back to my work at hand:
 
 #### <a name="2"></a>The CompHound Component Tracker
 
-I started work on the CompHound component tracker project for my
-upcoming conference presentations
+I started work on the CompHound component tracker project for my upcoming conference presentations at 
 [RTC Europe](http://www.rtcevents.com/rtc2015eu) in Budapest end of October and
 [Autodesk University](http://au.autodesk.com) in Las Vegas in December.
 

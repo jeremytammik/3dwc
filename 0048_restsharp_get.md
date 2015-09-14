@@ -24,10 +24,13 @@ akn_include
 
 #RestSharp #Mongoose #3dwebcoder #revitapi #restapi #javascript #mongodb #nodejs
 
+Using #RestSharp for Rest API GET #3dwebcoder #revitapi #restapi #mongolab #heroku #adskdevnetwrk #adsk
+
+I arrived safe and sound in Prague for the Autodesk cloud accelerator. During the trip, I continued to convert my C# REST API client from HttpWebRequest to RestSharp. I implemented the RestSharp PUT call last week; now, let's address the GET call, and remove all traces of the use of HttpWebRequest. The REST GET call implementation...
 -->
 
 
-### Use RestSharp instead of HttpWebRequest for Rest API GET
+### Using RestSharp for Rest API GET
 
 I arrived safe and sound in Prague for the Autodesk cloud accelerator.
 
