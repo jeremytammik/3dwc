@@ -21,8 +21,11 @@
 #ViewAndDataAPI
 #JsFiddle #Reactjs #3dwebcoder #autodesku #rtceur
 akn_include
+#RestSharp
 
-#RestSharp #Mongoose #3dwebcoder #revitapi #restapi #javascript #mongodb #nodejs
+#Mongodb Upsert #Mongoose #3dwebcoder #revitapi #restapi #javascript #nodejs adskdevnetwrk #adsk #bim #aec
+
+Last week, I searched for and struggled to implement an upsert call for my CompHound and FireRating samples, i.e. a REST PUT call that does both PUT to update the data of an existing record as well as POST to create a new record, if none exists. I ended up calling the mongoose <code>findOne</code> function and then selecting either <code>update</code> or <code>create</code> based on whether an existing record is found. Luckily, a much easier solution exists, adding an argument specifying the options <code>{upsert:true}</code> to the update call...
 
 -->
 
@@ -46,7 +49,7 @@ mentions a much easier solution, adding an argument specifying the options `{ups
 That is exactly what I had searched for, fruitlessly, high and low.
 
 After learning about the existence of this, I finally also found the official
-[mongodb upsert Option documentation](http://docs.mongodb.org/manual/tutorial/modify-documents/#upsert-option).
+[mongodb upsert Option documentation](http://docs.mongodb.org/manual/tutorial/modify-documents/#upsert-option) on it.
 
 I implemented a new, simpler, `update3` function making use of it, and it works flawlessly:
 
