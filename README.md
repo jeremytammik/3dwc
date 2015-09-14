@@ -1,6 +1,6 @@
 # The 3D Web Coder
 
-Source code and text for
+Source code, full text and chronological index for
 [The 3D Web Coder](http://the3dwebcoder.typepad.com) blog.
 
 ## Author
