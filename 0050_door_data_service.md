@@ -23,9 +23,14 @@
 akn_include
 #RestSharp
 
-#Mongodb Upsert #Mongoose #3dwebcoder #revitapi #restapi #javascript #nodejs adskdevnetwrk #adsk #bim #aec
+C# DoorData and Node.js DoorService Classes #Mongodb #Mongoose #3dwebcoder #revitapi #restapi #javascript #nodejs #adskdevnetwrk #adsk #bim #aec
 
-Last week, I searched for and struggled to implement an upsert call for my CompHound and FireRating samples, i.e. a REST PUT call that does both PUT to update the data of an existing record as well as POST to create a new record, if none exists. I ended up calling the mongoose <code>findOne</code> function and then selecting either <code>update</code> or <code>create</code> based on whether an existing record is found. Luckily, a much easier solution exists, adding an argument specifying the options <code>{upsert:true}</code> to the update call...
+I continued improving my REST API node.js web server, mongo database and C# REST API client, and also set up a Google domain rerouting
+&ndash; CompHound domain, organisation web site and rerouting
+&ndash; Implement a DoorData container class
+&ndash; Updated Get to return a list of deserialised DoorData instances
+&ndash; Pass a DoorData instance to the Put method
+&ndash; Implementing a REST API router DoorService class...
 
 -->
 
@@ -37,10 +42,10 @@ I continued implementing the numerous improvements suggested by
 my REST API node.js web server, mongo database and C# REST API client:
 
 - [CompHound domain, organisation web site and rerouting](#2)
-- [Implement a DoorData container class](#3)
-- [Updated Get to return a list of deserialised DoorData instances](#4)
-- [Pass a DoorData instance to the Put method](#5)
-- [Implement a REST API DoorService class](#6)
+- [Implementing a DoorData container class](#3)
+- [Updating Get to return a list of deserialised DoorData instances](#4)
+- [Passing a DoorData instance to the Put method](#5)
+- [Implementing a REST API router DoorService class](#6)
 
 This finally completes the list improvements to the
 [FireRating in the cloud](https://github.com/jeremytammik/firerating) sample:
@@ -81,7 +86,7 @@ I paid $12 to buy the top-level domain name `comphound.net` from
 </center>
 
 
-#### <a name="3"></a>Implement a DoorData Container Class
+#### <a name="3"></a>Implementing a DoorData Container Class
 
 Back to the firerating sample, I continued the seemingly never-ending process of perfectioning the
 [firerating mongo database node.js web server](https://github.com/jeremytammik/firerating) and its
@@ -139,7 +144,7 @@ The steps today define an explicit helper class for RestSharp to serialise and d
 </pre>
 
 
-#### <a name="4"></a>Updated Get to Return a List of Deserialised DoorData Instances
+#### <a name="4"></a>Updating Get to Return a List of Deserialised DoorData Instances
 
 With the DoorData class in place, I updated the RestSharp REST API GET method to return a list of deserialised DoorData instances like this:
 
@@ -226,7 +231,7 @@ These enhancements are captured in
 Now that the RestSharp JSON deserialiser is generating the C# DoorData instances, I can remove the JsonParser.cs module that was previously needed to achieve this.
 
 
-#### <a name="5"></a>Pass a DoorData instance to the Put method
+#### <a name="5"></a>Passing a DoorData Instance to the Put Method
 
 With that in place, let's clean up the PUT call and pass in a DoorData instance to that as well, instead of a generic object:
 
@@ -292,7 +297,9 @@ This update was captured in [FireRatingCloud release 2016.0.0.12](https://github
 With that, we are finally all done cleaning up the C# REST API client, as far as I know.
 
 
-#### <a name="6"></a>Implement a REST API DoorService Class Instead of Individual Separate `module.exports` Functions
+#### <a name="6"></a>Implementing a REST API Router DoorService Class
+
+...Instead of individual separate `module.exports` functions.
 
 With the C# REST API client utterly perfected, there are one little hiccup to iron out in the node.js web server.
 

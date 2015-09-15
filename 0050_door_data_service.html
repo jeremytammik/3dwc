@@ -22,9 +22,14 @@
 akn_include
 #RestSharp
 
-#Mongodb Upsert #Mongoose #3dwebcoder #revitapi #restapi #javascript #nodejs adskdevnetwrk #adsk #bim #aec
+C# DoorData and Node.js DoorService Classes #Mongodb #Mongoose #3dwebcoder #revitapi #restapi #javascript #nodejs #adskdevnetwrk #adsk #bim #aec
 
-Last week, I searched for and struggled to implement an upsert call for my CompHound and FireRating samples, i.e. a REST PUT call that does both PUT to update the data of an existing record as well as POST to create a new record, if none exists. I ended up calling the mongoose <code>findOne</code> function and then selecting either <code>update</code> or <code>create</code> based on whether an existing record is found. Luckily, a much easier solution exists, adding an argument specifying the options <code>{upsert:true}</code> to the update call...
+I continued improving my REST API node.js web server, mongo database and C# REST API client, and also set up a Google domain rerouting
+&ndash; CompHound domain, organisation web site and rerouting
+&ndash; Implement a DoorData container class
+&ndash; Updated Get to return a list of deserialised DoorData instances
+&ndash; Pass a DoorData instance to the Put method
+&ndash; Implement a REST API DoorService class...
 
 -->
 
