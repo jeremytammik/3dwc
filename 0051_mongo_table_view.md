@@ -25,6 +25,12 @@ akn_include
 
 Towards a CompHound #MongoDB Table View #Mongoose #3dwebcoder #revitapi #javascript #nodejs #adsk #bim #aec
 
+We are already more than halfway through the Cloud Accelerator in Prague.
+&ndash; Steps towards the CompHound Mongo database table view
+&ndash; Express, ES6, React and more crash courses and best practices
+&ndash; A real scalable server side mongo database table view
+&ndash; CompHound road map...
+
 -->
 
 
