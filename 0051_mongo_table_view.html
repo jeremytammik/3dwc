@@ -1,0 +1,184 @@
+<p><head>
+<title>The 3D Web Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+#mongolab #heroku #mongoosejs #expressjs
+#Autodesk #IoT #SeeControl #cloud #adsk
+#3dwebcoder #python #adskdevnetwrk #adsk #markdown #asciidoc
+#gcal #caldav #cloud #googleapi #restapi
+#milanojs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+#ViewAndDataAPI
+#JsFiddle #Reactjs #3dwebcoder #autodesku #rtceur
+akn_include
+#RestSharp
+
+Towards a CompHound #MongoDB Table View #Mongoose #3dwebcoder #revitapi #javascript #nodejs #adsk #bim #aec
+
+-->
+
+<h3>Towards a CompHound Mongo Database Table View</h3>
+<p>We are already more than halfway through the
+<a href="http://through-the-interface.typepad.com/through_the_interface/2015/09/at-the-cloud-accelerator-in-prague.html">Cloud Accelerator in Prague</a>.</p>
+<p>Happily, Kean Walmsley already
+<a href="http://through-the-interface.typepad.com/through_the_interface/2015/09/at-the-cloud-accelerator-in-prague.html">talked about that</a>,
+so no need for me to add anything more beyond pointing to my
+<a href="https://www.flickr.com/photos/jeremytammik/sets/72157656369939043">Cloud Accelerator Prague photo album</a>:</p>
+<p><center>
+<a data-flickr-embed="true"
+  href="https://www.flickr.com/photos/jeremytammik/albums/72157656369939043"
+  title="Autodesk Cloud Accelerator Prague">
+    <img src="https://farm6.staticflickr.com/5818/21435184406_b8b8b659c9_z.jpg"
+      width="640" height="480" alt="Autodesk Cloud Accelerator Prague" />
+</a>
+<script async src="https://embedr.flickr.com/assets/client-code.js" charset="utf-8"></script></p>
+<p></center></p>
+<p>Instead, I'll discuss what I've been up to during the last 36 hours &ndash; almost non-stop, by the way:</p>
+<ul>
+<li><a href="#2">Steps towards the CompHound Mongo database table view</a></li>
+<li><a href="#3">Express, ES6, React and more crash courses and best practices</a></li>
+<li><a href="#4">A real scalable server side mongo database table view</a></li>
+<li><a href="#5">CompHound road map</a>
+<!--- - <a href="#10">Coming steps towards the CompHound Mongo database table view</a> --></li>
+</ul>
+<h4><a name="2"></a>Steps Towards the CompHound Mongo Database Table View</h4>
+<p>I finally started moving forward with my
+<a href="http://the3dwebcoder.typepad.com/blog/2015/09/comphound-restsharp-mongoose-put-and-post.html#2">CompHound component tracker</a> project
+for my upcoming conference presentations at
+<a href="http://www.rtcevents.com/rtc2015eu">RTC Europe</a> in Budapest end of October and
+<a href="http://au.autodesk.com">Autodesk University</a> in Las Vegas in December.</p>
+<p>This project lives in its own
+<a href="https://github.com/comphound">CompHound organisation GitHub repository collection</a>.</p>
+<p>I laboured away really hard for the last 36 hours at creating a mongo database table view for it.</p>
+<p>My initial attempts turned out be totally misdirected.</p>
+<p>Miraculously enough, running into this dead end was also totally illuminating.</p>
+<p>I worked all through the night until I finally understood, went to bed a six in the morning, got up again and had a nice walk in the sun at 8:30, coffee in the sun and now back to the office to write this...</p>
+<p>The task I struggled with so hard is simply implementing a table view for the comphound database.</p>
+<p>I first thought I would use some kind of intelligent component, e.g., based on <a href="https://facebook.github.io/react">React</a>.</p>
+<p>I also selected and explored several different react data grid and table libraries, e.g.:</p>
+<ul>
+<li><a href="/a/src/web/react/griddle/testgriddle.html">griddle-react</a></li>
+<li><a href="https://github.com/zippyui/react-datagrid">react-datagrid</a></li>
+<li><a href="http://facebook.github.io/fixed-data-table">fixed-data-table</a> <!--- https://github.com/facebook/fixed-data-table --></li>
+</ul>
+<p>I finally gave up on react and implemented my own much simpler initial custom table view solution using <a href="http://handlebarsjs.com">handlebars</a>.</p>
+<p>I then spent the rest of the night exploring ways to add sorting and filtering functionality to the basic HTML table element it generates using either pure old JavaScript or jQuery, e.g.:</p>
+<ul>
+<li><a href="http://www.javascriptkit.com/script/script2/tablefilter.shtml">Cut and paste HTML table filter script</a> by Max Guglielmi</li>
+<li><a href="http://www.javascripttoolbox.com/lib/table/index.php">Table sorting, filtering, etc.</a> by Matt Kruse</li>
+<li><a href="http://pieroblunda.github.io/pb-table">pbTable</a> by <a href="http://pieroblunda.github.io">Piero Blunda</a></li>
+</ul>
+<p>I created the following series of releases of the corresponding <a href="https://github.com/CompHound/CompHoundWeb">CompHoundWeb</a> implementations during the night:</p>
+<ul>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.3">0.0.3</a> &ndash; implemented instance view in HTML using handlebars</li>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.4">0.0.4</a> &ndash; added separate public css file to handlebars rendered view</li>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.5">0.0.5</a> &ndash; implemented static table sort and filter using old-fashioned js</li>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.6">0.0.6</a> &ndash; switched from dumb old javascript to jquery table sort and filter using <a href="https://github.com/pieroblunda/pb-table">pb-table</a>.</li>
+</ul>
+<h4><a name="3"></a>Express, ES6, React and More Crash Courses and Best Practices</h4>
+<p>During my struggles with this, I happened to run into Sahat Yalkabov's very nice tutorial explaining how to
+<a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio">create a character voting app using React, Node.js, MongoDB and Socket.IO</a>.</p>
+<p>Besides being well written and beautifully formatted, it also presents a large number of best practices setting up the various components:</p>
+<ol>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-1-new-express-project">New Express Project</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-2-build-system">Build System</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-3-project-structure">Project Structure</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-4-es6-crash-course">ES6 Crash Course</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-5-react-crash-course">React Crash Course</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-6-flux-architecture-crash-course">Flux Architecture Crash Course</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-7-react-routes-client-side">React Routes (Client-Side)</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-8-react-routes-server-side">React Routes (Server-Side)</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-9-footer-and-navbar-components">Footer and Navbar Components</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-10-socket-io-real-time-user-count">Socket.IO - Real-time User Count</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-11-add-character-component">Add Character Component</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-12-database-schema">Database Schema</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-13-express-api-routes-1-of-2">Express API Routes (1 of 2)</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-15-home-component">Home Component</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-14-express-api-routes-2-of-2">Express API Routes (2 of 2)</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-16-character-profile-component">Character (Profile) Component</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-17-top-100-component">Top 100 Component</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-18-stats-component">Stats Component</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-19-deployment">Deployment</a></li>
+<li><a href="http://sahatyalkabov.com/create-a-character-voting-app-using-react-nodejs-mongodb-and-socketio#step-20-additional-resources">Additional Resources</a></li>
+</ol>
+<p>Before that, I also had a look though Christopher Buecheler's
+<a href="http://cwbuecheler.com/web/tutorials/2013/node-express-mongo">dead-simple step-by-step guide for front-end developers to getting up and running with node.js, express, jade, and mongodb</a> and
+Stéphane Derosiaux'
+<a href="http://ctheu.com/2015/02/09/a-journey-through-the-creation-of-an-app-with-node-mongodb-react-gulp">journey through the creation of an app with Node, MongoDB, React, Gulp</a>.
+While they are not as in-depth, experienced or professional as Sahat's tutorial, they still both provide helpful quick reads.</p>
+<p>By the way, Stéphane is also a great fan of the
+<a href="https://atom.io">Atom editor</a>, cf.
+<em><a href="http://ctheu.com/2015/02/03/youre-tired-of-notepad-use-atom">tired of Notepad++? Use Atom!</a></em>,
+so I had a quick look at that as well and was quite favourably impressed.</p>
+<p>Finally, I also found the overview of
+<a href="http://react.rocks/tag/DataTable">21 react DataTable samples</a> very
+helpful, which led me to take a deeper look at
+<a href="http://glittershark.github.io/reactable">reactable</a>.</p>
+<p>As said, I ended up ditching it all for a simple handlebars template, only to realise later still that what I really need is a server-side database selection tool to avoid dumping the entire database contents to the client before even starting to browse.</p>
+<h4><a name="4"></a>A Real Scalable Server Side Mongo Database Table View</h4>
+<p>Working during the night through the slow hotel WiFi Internet connection, every attempt to retrieve the ca. thousand records from the mongolab-hosted remote test database took a significant amount of time, up to a minute or two.</p>
+<p>The database is intended to manage an unlimited number of component instances from an unlimited number of projects of unlimited size, so the solution needs to be able to manage millions of entries.</p>
+<p>Obviously, all the approaches described above are completely unfeasible.</p>
+<p>I cannot believe that I did not realise that until I actually finished a rough initial solution.</p>
+<p>Apparently, I was unable to take a step back and <strong>think</strong> until <strong>after</strong> successfully completing the hack.</p>
+<p>The only solution for this is a dynamic server-side approach.</p>
+<p>A realistic solution absolutely must strongly limit the number of entries to retrieve from the database and only extract the number required to populate the current view.</p>
+<p>Once that was clear, I found a couple of new directions and samples to explore:</p>
+<ul>
+<li><a href="https://github.com/eherve/mongoose-datatable">mongoose-datatable library and test project</a> &ndash; server side data table request support for mongoose</li>
+<li><a href="http://blog.dephyned.com/web-development/using-jquery-datatables-with-nodejs-and-mongodb-using-mongoose-datatables">Using mongoose-datatables with jQuery, NodeJS and MongoDb</a> &ndash; article on using mongoose-datatable</li>
+<li><a href="https://github.com/lepazmino/mongoose-datatable-demo">mongoose-datatable demo</a> &ndash; working demo of npm module mongoose-datatable</li>
+</ul>
+<p>Summary:</p>
+<ul>
+<li>Sorry for describing my convoluted path here in such detail...</li>
+<li>Thinking about tables, filters, sorting, all on the client side...</li>
+<li>Looked at React and other powerful table widgets...</li>
+<li>Simplified to JavaScript modification of a table populated by Handlebars...</li>
+<li>Implemented more sophisticated and modern table pimping using jquery...</li>
+<li>Realised that I really cannot do this client-side at all, since the database might have millions of entries...</li>
+<li>All these releases in between...</li>
+<li>Now moving to mongoose-datatable server-side.</li>
+</ul>
+<h4><a name="5"></a>CompHound Road Map</h4>
+<p>The next steps on the
+<a href="https://github.com/comphound">CompHound project</a> will
+include:</p>
+<ul>
+<li>Implementing the mongoose-datatable data table view</li>
+<li>Adding the <a href="https://developer.autodesk.com/">View and Data API</a> viewing component</li>
+<li>Posting the server live to Heroku</li>
+<li>Rerouting the nice new <a href="http://comphound.net">comphound.net</a> domain to it</li>
+</ul>
+<p>The current versions discussed above are the
+<a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.6">CompHoundWeb 0.0.6</a> node.js mongodb web server,
+<a href="https://github.com/CompHound/CompHoundRvt/releases/tag/2016.0.0.1">CompHoundRvt 2016.0.0.1</a> C# REST API client populating it, and
+the (placeholder) landing page
+<a href="https://github.com/CompHound/CompHound.github.io/releases/tag/0.0.1">CompHound.github.io 0.0.1</a>.</p>
+<p>I was originally hoping to finish it all off this week, which is starting to seem a bit illusory...</p>
+<!---
+
+<center>
+<img src="img/.png" alt="" width="600"/>
+</center>
+
+<pre class="prettyprint">
+</pre>
+
+run mongod
+
+run /a/src/web/mongo/mongoose-datatable/test/app.js
+
+http://localhost:8042/
+
+/a/src/web/mongo/mongoose-datatable-demo/
+-->
