@@ -104,9 +104,9 @@ I simply added the following snippet to `index.js`:
 
 <pre class="prettyprint">
 $(document).ready(function() {
-  $("div#datatable_wrapper > table#datatable > tbody > tr > td")
+  $("div#datatable_wrapper &gt; table#datatable &gt; tbody &gt; tr &gt; td")
     .live('click', function() {
-      alert("You clicked my <td>: " + $(this).html()
+      alert("You clicked my &lt;td&gt;: " + $(this).html()
        + "... My TR is: " + $(this).parent("tr").html());
     }
   );
