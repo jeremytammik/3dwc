@@ -140,11 +140,3 @@ The current versions discussed above are the
 [CompHoundRvt 2016.0.0.2](https://github.com/CompHound/CompHoundRvt/releases/tag/2016.0.0.2) C# REST API client populating it, and
 the (placeholder) landing page
 [CompHound.github.io 0.0.1](https://github.com/CompHound/CompHound.github.io/releases/tag/0.0.1).
-
-<!---
-
-<center>
-<img src="img/.png" alt="" width="600"/>
-</center>
-
--->
