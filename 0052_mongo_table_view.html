@@ -1,0 +1,121 @@
+<p><head>
+<title>The 3D Web Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+#mongolab #heroku #mongoosejs #expressjs
+#Autodesk #IoT #SeeControl #cloud #adsk
+#3dwebcoder #python #adskdevnetwrk #adsk #markdown #asciidoc
+#gcal #caldav #cloud #googleapi #restapi
+#milanojs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #revitapi #jquery #handlebars #heroku
+#ViewAndDataAPI
+#JsFiddle #Reactjs #3dwebcoder #autodesku #rtceur
+akn_include
+#RestSharp
+
+The CompHound #Mongoose DataTable #MongoDB #3dwebcoder #revitapi #jquery #javascript #nodejs #adsk #bim #aec
+
+I continued working on the CompHound component tracker project. To-do:
+&ndash; Implement a datatable view
+&ndash; Post the server live to Heroku
+&ndash; Add a View and Data API viewing component
+&ndash; Reroute the comphound.net domain...
+The solution was easy
+&ndash; Hooking up the mongoose-datatable
+&ndash; Implementing a row clicked event handler...
+
+-->
+
+<h3>The CompHound Mongoose DataTable</h3>
+<p>I continued working on the
+<a href="https://github.com/comphound">CompHound component tracker project</a>.
+My previous to-do list included the following steps:</p>
+<ul>
+<li>Implement a datatable view</li>
+<li>Post the server live to Heroku</li>
+<li>Add a <a href="https://developer.autodesk.com/">View and Data API</a> viewing component</li>
+<li>Reroute the <a href="http://comphound.net">comphound.net</a> domain to it</li>
+</ul>
+<p>I worked on the first of them in the past few days.</p>
+<p>The solution was actually very easy:</p>
+<ul>
+<li><a href="#2">Hooking up the mongoose-datatable</a></li>
+<li><a href="#3">Implementing a row clicked event handler</a></li>
+</ul>
+<h4><a name="2"></a>Hooking up the mongoose-datatable</h4>
+<p>Viewing a database obviously requires a datatable.</p>
+<p>The datatable retrieves a subset of database records required for the current view, known as
+<a href="https://en.wikipedia.org/wiki/Pagination">pagination</a>.</p>
+<p>Happily, <a href="http://www.datatables.net">DataTables</a> provides a suitable plug-in for jQuery.</p>
+<p>Before realising that, I struggled a bit to
+<a href="http://the3dwebcoder.typepad.com/blog/2015/09/towards-a-comphound-mongo-database-table-view.html#2">display the database in a table</a>.</p>
+<p>Once I had that up and running, the need for a real scalable
+<a href="http://the3dwebcoder.typepad.com/blog/2015/09/towards-a-comphound-mongo-database-table-view.html#4">server side mongo database table view</a> became apparent.</p>
+<p>That was quite easily achieved by plugging in the
+<a href="https://github.com/eherve/mongoose-datatable">mongoose-datatable</a>.</p>
+<p>Integrating that, looking at and learning from various samples of using it prompted several important improvements:</p>
+<ul>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.7">0.0.7</a> implemented config.json server configuration</li>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.8">0.0.8</a> improved config.json server configuration</li>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.9">0.0.9</a> check db connection before launching web server</li>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.10">0.0.10</a> mongoose datatable is up and running</li>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.11">0.0.11</a> cleanup and smaller datatable font size</li>
+</ul>
+<p>The resulting datatable looks like this:</p>
+<p><center>
+<img src="img/comphound_datatable.png" alt="CompHound datatable"/>
+</center></p>
+<h4><a name="4"></a>Implementing a row clicked event handler</h4>
+<p>Once I can view and navigate the database records, each of them displaying a component instance, I wish to select a specific occurrence to explore it further and display it graphically.</p>
+<p>Ergo, a row selection handler is required.</p>
+<p>This turned out to be really simple as well, and happily completely disconnected from the datatable implementation.</p>
+<p>Based on the StackOverflow answers to
+<a href="http://stackoverflow.com/questions/3458571/jquery-click-event-on-tr-elements-with-in-a-table-and-getting-td-element-v">jQuery &ndash; click event on <tr> elements with in a table and getting <td> element values</a>,
+I simply added the following snippet to <code>index.js</code>:</p>
+<pre class="prettyprint">
+$(document).ready(function() {
+  $("div#datatable_wrapper > table#datatable > tbody > tr > td")
+    .live('click', function() {
+      alert("You clicked my <td>: " + $(this).html()
+       + "... My TR is: " + $(this).parent("tr").html());
+    }
+  );
+});
+</pre>
+
+<p>This specifies a very strict path to the <code>td</code> element, including its entire list of parent elements, leaving none out, and not allowing any intermediate levels.</p>
+<p>A more lenient and equally valid way would be to just use the path <code>div#datatable_wrapper tbody td</code>.</p>
+<p>Here is the result of clicking a row now:</p>
+<p><center>
+<img src="img/comphound_datatable_row_alert.png" alt="CompHound datatable row selection alert"/>
+</center></p>
+<h4><a name="5"></a>CompHound Road Map</h4>
+<p>The next steps on the
+<a href="https://github.com/comphound">CompHound project</a> will
+include:</p>
+<ul>
+<li>Deploying the server live to Heroku</li>
+<li>Adding the <a href="https://developer.autodesk.com/">View and Data API</a> viewing component</li>
+<li>Rerouting the nice new <a href="http://comphound.net">comphound.net</a> domain to it</li>
+</ul>
+<p>The current versions discussed above are the
+<a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.12">CompHoundWeb 0.0.12</a> node.js mongodb web server,
+<a href="https://github.com/CompHound/CompHoundRvt/releases/tag/2016.0.0.2">CompHoundRvt 2016.0.0.2</a> C# REST API client populating it, and
+the (placeholder) landing page
+<a href="https://github.com/CompHound/CompHound.github.io/releases/tag/0.0.1">CompHound.github.io 0.0.1</a>.</p>
+<!---
+
+<center>
+<img src="img/.png" alt="" width="600"/>
+</center>
+
+-->

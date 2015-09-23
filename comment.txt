@@ -38,7 +38,7 @@ Cheers, Jeremy
 
 http://the3dwebcoder.typepad.com/blog/2015/07/put-post-delete-and-curl-testing-the-firerating-rest-api.html#comment-2120885272
 
-Theo
+Theo:
 
 Hi Jeremy. It looks like you are building all this locally on your computer. Would there be any way of doing this online so we could actually see a demo or just look at some output?
 
@@ -68,7 +68,7 @@ Cheers, Jeremy.
 
 http://the3dwebcoder.typepad.com/blog/2015/07/put-post-delete-and-curl-testing-the-firerating-rest-api.html#comment-2121005384
 
-Theo --> jeremy tammik
+Theo:
 
 Hi Jeremy
 
@@ -94,7 +94,7 @@ Cheers, Jeremy.
 
 http://the3dwebcoder.typepad.com/blog/2015/06/my-first-mongo-database.html#comment-2124861945
 
-David Mettler
+David Mettler:
 
 I see a very good idea using mongodb and revit! I've been playing with mongodb and revit trying to simplify the way revit segments data and package the data as a document packet. Good Stuff!!
 
@@ -116,7 +116,7 @@ Cheers, Jeremy.
 
 http://the3dwebcoder.typepad.com/blog/2015/08/hackergarten-chromium-and-markdown.html#comment-2221472800
 
-Theo
+Theo:
 
 Welcome to the world of Markdown - as used by GitHub, StackOverflow, Reddit and in many more sites.
 
@@ -138,7 +138,7 @@ Cheers, Jeremy.
 
 http://the3dwebcoder.typepad.com/blog/2015/08/hackergarten-chromium-and-markdown.html#comment-2226802960
 
-Theo
+Theo:
 
 Hi Jeremy
 
@@ -170,13 +170,13 @@ Cheers, Jeremy.
 
 http://the3dwebcoder.typepad.com/blog/2015/07/put-post-delete-and-curl-testing-the-firerating-rest-api.html#comment-2212051915
 
-yellowstone
+yellowstone:
 
 Hi Jeremy. What are the requirements to get all this working (database, .NET framework, etc.). How do I use it with SQL server ?
 
 2:24 p.m., Monday Aug. 24
 
-jeremy tammik Mod  yellowstone
+jeremy tammik --> yellowstone
 
 Dear Yellowstone,
 
@@ -190,3 +190,44 @@ https://github.com/jeremytammik/firerating
 
 Cheers, Jeremy.
 
+http://the3dwebcoder.typepad.com/blog/2015/07/fireratingcloud-round-trip-and-on-mongolab.html#comment-2259991375
+
+Arif HAnif:
+
+Jeremy just got done reading through these blogs amazing information, I have implemented the same type of concept using Python/Flask for MEP Spaces and Equipment Schedules. Instead of running commands, do you know of a way to have a non-modal window act as a web server inside revit so that commands could be invoked external to Revit?
+
+3:04 a.m., Friday Sept. 18
+
+jeremy tammik --> Arif HAnif
+
+Dear Arif,
+
+Very glad you like it.
+
+Thank you for the appreciation.
+
+Yes, it is exciting, isn't it?
+
+I just finished some significant cleanup of these two projects, making the code moch shorter and cleaner still:
+
+http://the3dwebcoder.typepad.com/blog/2015/09/c-doordata-and-nodejs-doorservice-classes.html
+
+The answer to your question is yes and no.
+
+No in the sense that the Revit API always requires a valid Revit API context to be used at all.
+
+Yes in the sense that such a context can be accessed quite easily, once you understand the system.
+
+This discussed in depth in The Building Coder topic group on 'Idling and External Events for modeless access and driving Revit from outside', which pretty exactly describes the situation you are in:
+
+http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28
+
+Cheers, Jeremy.
+
+http://the3dwebcoder.typepad.com/blog/2015/07/fireratingcloud-round-trip-and-on-mongolab.html#comment-2260560266
+
+Arif Hanif (Guest):
+
+Thanks Jeremy, I'll start reading.
+
+10:17 a.m., Friday Sept. 18 | Other comments by Arif Hanif
