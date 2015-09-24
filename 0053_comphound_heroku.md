@@ -114,6 +114,29 @@ The original repo to my slides is [github.com/shiya/atl-js](https://github.com/s
 
 That sounds easier than Kean's and my approach fiddling around with the Google domain settings.
 
+**Addendum by Cyrille:**<a name="3b"></a>
+I you would like to know what Shiya did for the cname redirection, read the GitHub documentation
+on [Setting up a custom domain with GitHub Pages](https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages).
+
+If you are interested in
+using [reveal.js](https://github.com/hakimel/reveal.js) for presentations,
+there is an editor [here](http://lab.hakim.se/reveal-js), or you
+can [deploy on heroku](http://www.sitepoint.com/creating-slick-html-presentations-using-reveal-js).
+You obviously need to make sure you have a reliable Internet connection when presenting, or configure your system for offline viewing.
+
+**[Q]** Many conferences require you to submit PDF or PPTX slide decks beforehand.
+Is it easy to transform a HTML slide deck to pptx and pdf?
+
+**[A]** Yes and no:
+
+- Easy if you export to images
+- Hard to extract as markup definition
+
+**Addendum by Jeremy:**
+I implemented
+the [PowerPoint slide deck text extractor](https://github.com/jeremytammik/Ppt2txt) command
+line tool for the inverse operation, to extract markup, or at least the pure text content, from a PPTX.
+
 
 #### <a name="4"></a>CompHound Deployment to Heroku
 
