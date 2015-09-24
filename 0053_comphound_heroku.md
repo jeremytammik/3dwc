@@ -52,7 +52,7 @@ That took a moment longer than expected due to one little hiccup.
 Here are my steps towards discovering and resolving it, and a few other topics that also arose in the meantime:
 
 - [Cloud9](#2)
-- [Easy github.io domain rerouting](#3)
+- [Online slide deck and easy github.io domain rerouting](#3)
 - [CompHound deployment to Heroku](#4)
 - [Heroku requires HTTPS](#5)
 - [Recent CompHound commits](#6)
@@ -88,7 +88,7 @@ So cool.
 Let alone the fact that Cloud9 sports one of the shortest URLs I know, [c9.io](https://c9.io).
 
 
-#### <a name="3"></a>Easy GitHub.io Domain Rerouting
+#### <a name="3"></a>Online Slide Deck and Easy GitHub.io Domain Rerouting
 
 Last week, I explored how to
 [set up a Google domain and reroute it to display a github.io web page](http://the3dwebcoder.typepad.com/blog/2015/09/c-doordata-and-nodejs-doorservice-classes.html#2).
@@ -99,8 +99,9 @@ This week,
 the
 [Monday night Atlanta JS meetup group](http://www.meetup.com/AtlantaJavaScript/events/225042453).
 
-She created a really nice slide deck for that, very much to the point, accessible from
-[shiyaluo.com/atl-js](http://www.shiyaluo.com/atl-js).
+She created a really nice online slide deck for that, very much to the point, accessible from
+[shiyaluo.com/atl-js](http://www.shiyaluo.com/atl-js), using
+[reveal.js](http://lab.hakim.se/reveal-js).
 
 I congratulated her on the super slides, cool hosting on her own domain, and enthusiastic feedback from participants on the
 [meetup site](http://www.meetup.com/AtlantaJavaScript/events/225042453).
