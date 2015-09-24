@@ -1,0 +1,201 @@
+<p><head>
+<title>The 3D Web Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+#adskdevnetwrk
+#expressjs
+#RestSharp #restapi
+#Autodesk #IoT #SeeControl #cloud
+#python #markdown #asciidoc
+#gcal #caldav #googleapi
+#milanojs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #jquery #handlebars
+#ViewAndDataAPI
+#JsFiddle #Reactjs
+#autodesku #rtceur
+akn_include
+
+CompHound #Heroku Deployment, Urban Farming #MongoDB #3dwebcoder #revitapi #javascript #nodejs #adsk #bim #aec #mongolab #mongoosejs
+
+Yesterday, I discussed the CompHound datatable implementation.
+Today, let's deploy to Heroku for you to try it out right away
+&ndash; Cloud9
+&ndash; Easy github.io domain rerouting
+&ndash; CompHound deployment to Heroku
+&ndash; Heroku requires HTTPS
+&ndash; Recent CompHound commits
+&ndash; Try it out live
+&ndash; CompHound road map
+&ndash; Self-sufficient urban farming on 1/10 of an acre...
+
+-->
+
+<h3>CompHound Heroku Deployment, Urban Farming</h3>
+<p>Yesterday, I discussed the
+<a href="http://the3dwebcoder.typepad.com/blog/2015/09/the-comphound-mongoose-datatable.html">CompHound datatable implementation</a> and
+thought I would be able to deploy to Heroku for you to try it out right away.</p>
+<p>That took a moment longer than expected due to one little hiccup.</p>
+<p>Here are my steps towards discovering and resolving it, and a few other topics that also arose in the meantime:</p>
+<ul>
+<li><a href="#2">Cloud9</a></li>
+<li><a href="#3">Easy github.io domain rerouting</a></li>
+<li><a href="#4">CompHound deployment to Heroku</a></li>
+<li><a href="#5">Heroku requires HTTPS</a></li>
+<li><a href="#6">Recent CompHound commits</a></li>
+<li><a href="#7">Try it out live</a></li>
+<li><a href="#8">CompHound road map</a></li>
+<li><a href="#9">Self-sufficient urban farming on 1/10 of an acre</a></li>
+</ul>
+<p><center>
+<img src="img/urbanhomestead.png" alt="Urban gardening"/>
+</center></p>
+<h4><a name="2"></a>Cloud9</h4>
+<p>Are you aware of <a href="https://c9.io">Cloud9</a>?</p>
+<p><a href="http://adndevblog.typepad.com/cloud_and_mobile/philippe-leefsma.html">Philippe Leefsma</a> created a boilerplate sample for using the
+<a href="https://developer.autodesk.com">View and Data API</a>.</p>
+<p>Based on that, you can have your viewer-based web application up and running within minutes.</p>
+<p>Philippe guides us through the required steps in full detail in his
+<a href="http://adndevblog.typepad.com/cloud_and_mobile/2015/09/first-try-at-cloud9-viewdata-api-boilerplate.html">first try at Cloud9, View &amp; Data API boilerplate</a>.</p>
+<p>If you are interested in more general information, the tutorial on
+<a href="http://charless.org/?p=283">Github, Cloud9, NodeJS &amp; Heroku: develop &amp; deploy a web(socket) application</a> and
+the Cloud9 document on
+<a href="https://docs.c9.io/docs/deploying-via-cli">deploying via the command line</a> might
+fit the bill.</p>
+<p>So cool.</p>
+<p>Let alone the fact that Cloud9 sports one of the shortest URLs I know, <a href="https://c9.io">c9.io</a>.</p>
+<h4><a name="3"></a>Easy GitHub.io Domain Rerouting</h4>
+<p>Last week, I explored how to
+<a href="http://the3dwebcoder.typepad.com/blog/2015/09/c-doordata-and-nodejs-doorservice-classes.html#2">set up a Google domain and reroute it to display a github.io web page</a>.</p>
+<p>This week,
+<a href="http://www.shiyaluo.com">Shiya Luo</a> gave a presentation on the
+<a href="https://developer.autodesk.com">View and Data API</a> to
+the
+<a href="http://www.meetup.com/AtlantaJavaScript/events/225042453">Monday night Atlanta JS meetup group</a>.</p>
+<p>She created a really nice slide deck for that, very much to the point, accessible from
+<a href="http://www.shiyaluo.com/atl-js">shiyaluo.com/atl-js</a>.</p>
+<p>I congratulated her on the super slides, cool hosting on her own domain, and enthusiastic feedback from participants on the
+<a href="http://www.meetup.com/AtlantaJavaScript/events/225042453">meetup site</a>.</p>
+<p>Here is her explanation how this rerouting was achieved:</p>
+<blockquote>
+<p>Thanks, what I did is I routed <code>shiya.github.io</code>’s <code>CNAME</code> to my own domain <code>shiyaluo.com</code>.
+Every page (a repo with a branch called <code>gh-pages</code> and an <code>index.html</code>) I create on Github automatically becomes <code>shiyaluo.com/reponame</code>.
+The original repo to my slides is <a href="https://github.com/shiya/atl-js">github.com/shiya/atl-js</a>.</p>
+</blockquote>
+<p>That sounds easier than Kean's and my approach fiddling around with the Google domain settings.</p>
+<h4><a name="4"></a>CompHound Deployment to Heroku</h4>
+<p>I am really getting the hang of this <a href="https://dashboard.heroku.com">Heroku</a> deployment thing.</p>
+<p>While I was writing yesterday's post, I thought it might be nice to show you what I am up to, live.</p>
+<p>In other words, I wanted to deploy the CompHoundWeb server in the wide wild web and not just locally for only me to enjoy.</p>
+<p>Since it already lives in its own cosy little
+<a href="https://github.com/CompHound/CompHoundWeb">CompHoundWeb GitHub repository</a>,
+nothing is easier than that.</p>
+<p>I created a new Heroku app for it, connected it to the GitHub repo, deployed, and had it up and running within minutes.</p>
+<p>But...</p>
+<p>There is a reason why I did not add this note right away to yesterday's post:</p>
+<h4><a name="5"></a>Heroku Requires HTTPS</h4>
+<p>I hit one little snag that took me a while to sort out:</p>
+<p>The datatable view only displayed the table header and footer. All the content was missing.</p>
+<p>Some exploration revealed the problem: the datatable CSS and JavaScript files were failing to load.</p>
+<p>On my local machine, running locally, using <code>localhost</code>, the app is accessed via HTTP.</p>
+<p>On Heroku, all access is HTTPS.</p>
+<p>On Heroku, it therefore refused to access the unsafe datatable CSS and JavaScript files.</p>
+<p>They were being pulled in like this by <code>views/index.jade</code>:</p>
+<pre class="prettyprint">
+link(rel='stylesheet', href='http://cdn.datatables.net/1.10.5/css/jquery.dataTables.min.css')
+script(type='text/javascript', src='http://cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js')
+</pre>
+
+<p>Once I discovered that and added the missing <code>s</code>, all was fine:</p>
+<pre class="prettyprint">
+link(rel='stylesheet', href='https://cdn.datatables.net/1.10.5/css/jquery.dataTables.min.css')
+script(type='text/javascript', src='https://cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js')
+</pre>
+
+<p>The web server is up and running now; see <a href="#7">below</a> for some links to test it.</p>
+<h4><a name="6"></a>Recent CompHound Commits</h4>
+<p>Just for my own reference, here is the list of commits I made during the exploration described above:</p>
+<ul>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.7">0.0.7</a> implemented config.json server configuration</li>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.8">0.0.8</a> improved config.json server configuration</li>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.9">0.0.9</a> check db connection before launching web server</li>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.10">0.0.10</a> mongoose datatable is up and running</li>
+<li><a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.11">0.0.11</a> cleanup and smaller datatable font size</li>
+</ul>
+<h4><a name="7"></a>Try it out Live</h4>
+<p>Now that the CompHound web server is happily deployed on Heroku, you can explore it up and running live.</p>
+<p>Here is the mongolab-hosted database that we are using:
+<a href="https://mongolab.com/databases/comphound">mongolab.com/databases/comphound</a>.</p>
+<p>It contains the collection of
+<a href="https://mongolab.com/databases/comphound/collections/instances">component instances</a>.
+The only occurrences that I exported so far are from the standard Revit sample file <code>rst_advanced_sample_project.rvt</code>.
+You can add more yourself by running the
+<a href="https://github.com/CompHound/CompHoundRvt">CompHoundRvt</a> add-in in any other Revit BIM of your choice.</p>
+<p>The node.js web server driving the database via mongoose is hosted on
+<a href="https://dashboard.heroku.com">Heroku</a>, and its URL is
+<a href="https://comphound.herokuapp.com">https://comphound.herokuapp.com</a>.</p>
+<p>Its REST API is accessible via the route <a href="https://comphound.herokuapp.com/api/v1">/api/v1</a>.</p>
+<p><a href="https://comphound.herokuapp.com/api/v1/instances">/api/v1/instances</a> should in theory returning all database entries, but it will fail with an application error due to too large data.</p>
+<p>However, you can use <a href="https://comphound.herokuapp.com/api/v1/instances/48891eaa-9041-405b-a10f-f06585de3cbb-0001de6d">/api/v1/instances/:id</a> to retrieve the JSON document for a single specific entry.</p>
+<p>Finally, it sports the beginnings of a user interface that currently provides the following access points:</p>
+<ul>
+<li><a href="https://comphound.herokuapp.com">/</a> &ndash; say hello.</li>
+<li><a href="https://comphound.herokuapp.com/hello/jeremy">/hello/:message</a> &ndash; reply with the message passed in.</li>
+<li><a href="https://comphound.herokuapp.com/html/count">/html/count</a> &ndash; return the number of database entries.</li>
+<li><a href="https://comphound.herokuapp.com/www/instances1">/www/instances1</a> &ndash;  list all the database entries in a table &ndash; this can take a long time.</li>
+<li><a href="https://comphound.herokuapp.com/www/datatable">/www/datatable</a> &ndash; display a datatable navigation interface through the instance records.</li>
+</ul>
+<p>In the long run, most of these access points can be shut down again.</p>
+<p>Instead, one single main <code>index</code> entry point will display the datatable listing the component occurrences as well as provide access to the still missing reporting, viewing and model navigation functionality.</p>
+<h4><a name="8"></a>CompHound Road Map</h4>
+<p>Here are some of the things to work on next:</p>
+<ul>
+<li>Add a <a href="https://developer.autodesk.com">View and Data API</a> viewing component.</li>
+<li>Implement the model translation for the viewer.</li>
+<li>Add a database column for the viewer URN.</li>
+<li>Add the rest of the database columns to the datatable view.</li>
+<li>Implement isolated viewing of an individual selected instance.</li>
+<li>Reroute the <a href="http://comphound.net">comphound.net</a> domain to it.</li>
+</ul>
+<p>The versions discussed above are
+the <a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.15">CompHoundWeb 0.0.15</a> node.js
+mongodb web server,
+the <a href="https://github.com/CompHound/CompHoundRvt/releases/tag/2016.0.0.2">CompHoundRvt 2016.0.0.2</a> C#
+REST API client populating it, and the (placeholder) landing
+page <a href="https://github.com/CompHound/CompHound.github.io/releases/tag/0.0.1">CompHound.github.io 0.0.1</a>.</p>
+<h4><a name="9"></a>Self-sufficient Urban Farming on 1/10 of an Acre</h4>
+<p>Would you like to change the world?</p>
+<p>Do you think you can make anyone else change anything at all?</p>
+<p>Do you think you can change anything just for yourself, all on your own?</p>
+<p>A one-woman or one-man revolution?</p>
+<p>Well, here is a pretty uplifting <a href="https://youtu.be/7IbODJiEM5A">15-minute documentary</a> about someone who has done just that successfully for over a decade:</p>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/7IbODJiEM5A" frameborder="0" allowfullscreen></iframe>
+</center></p>
+<p><em>Surrounded by urban sprawl and just a short distance from a freeway, the <a href="http://urbanhomestead.org">Urban Homestead</a> project is a family operated and highly productive city farm. It is also a successful, real-life working model for sustainable agriculture and eco living in urban areas...
+harvesting 3 tons of organic food annually from our 1/10 acre garden while incorporating many back-to-basics practices, solar energy and biodiesel in order to reduce our footprint on the earth’s resources...</em></p>
+<!---
+
+<center>
+<img src="img/.png" alt="" width="600"/>
+</center>
+
+<pre class="prettyprint">
+</pre>
+
+run mongod
+
+run /a/src/web/mongo/mongoose-datatable/test/app.js
+
+http://localhost:8042/
+
+/a/src/web/mongo/mongoose-datatable-demo/
+-->
