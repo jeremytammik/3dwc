@@ -1,0 +1,104 @@
+<p><head>
+<title>The 3D Web Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+#adskdevnetwrk
+#expressjs
+#RestSharp #restapi
+#Autodesk #IoT #SeeControl #cloud
+#python #markdown #asciidoc
+#gcal #caldav #googleapi
+#milanojs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #jquery #handlebars
+#ViewAndDataAPI
+#javascript
+#JsFiddle #Reactjs
+#autodesku #rtceur
+akn_include
+
+Tutorials, Hackergarten, CompHound #Reactjs #Heroku #MongoDB #3dwebcoder #revitapi #nodejs #adsk #mongolab
+
+
+-->
+
+<h3>Tutorials, Hackergarten, CompHound React.js</h3>
+<p>Yesterday I participated in
+the <a href="http://www.meetup.com/Hackergarten-Basel/events/225033736">Hackergarten Basel September 2015</a> meeting and worked with
+Lukas <a href="https://github.com/syzer">@syzer</a> Gintowt on integrating
+a <a href="http://facebook.github.io/react">Reactjs</a> component into
+the <a href="https://github.com/CompHound/CompHound.github.io">CompHound</a> node.js mongodb web
+server <a href="https://github.com/CompHound/CompHoundWeb">CompHoundWeb</a>.</p>
+<p><center>
+<img src="img/hackergarten_basel_2015-09-24_3.jpeg" alt="Hackergarten Basel"/>
+</center></p>
+<p>Besides that, let me mention <a href="http://www.tutorialspoint.com">tutorialspoint</a>:</p>
+<ul>
+<li><a href="#2">Tutorialspoint</a></li>
+<li><a href="#3">CompHound React.js widget</a></li>
+<li><a href="#4">CompHound road map</a></li>
+</ul>
+<h4><a name="2"></a>Tutorialspoint</h4>
+<p>If you are interested in learning any new technology, my colleague Cyrille suggests taking a look
+at <a href="http://www.tutorialspoint.com">tutorialspoint</a>.</p>
+<p>It enables you to learn the theory and practice in a real-time hands-on lab at the same time, right there, online.</p>
+<p>It boasts of having the largest tutorials library on the web, covering hundreds of topics, with a wide list of subjects ranging across all the following:</p>
+<ul>
+<li>Academic</li>
+<li>Big Data</li>
+<li>Databases</li>
+<li>Digital Marketing</li>
+<li>Java Technologies</li>
+<li>Multi Language Tutorials</li>
+<li>Mainframe</li>
+<li>Management</li>
+<li>Microsoft Technologies</li>
+<li>Questions and Answers</li>
+<li>Miscellaneous</li>
+<li>Mobile Development</li>
+<li>Programming</li>
+<li>Scripts</li>
+<li>Software Quality</li>
+<li>Telecom</li>
+<li>Web Development</li>
+<li>XML Technologies</li>
+</ul>
+<p>I'm sure some of those are of interest to you too!</p>
+<h4><a name="3"></a>CompHound React.js Widget</h4>
+<p>Until yesterday,
+the <a href="http://the3dwebcoder.typepad.com/blog/2015/09/the-comphound-mongoose-datatable.html">CompHoundWeb mongoose datatable</a> was
+driven by a <a href="http://jade-lang.com">Jade</a> template file <code>views/index.jade</code>.</p>
+<p>Since it is hard to combine that with a <a href="http://facebook.github.io/react">Reactjs</a> component, Lukas replaced
+it by a pure HTML file <code>public/index.html</code>.</p>
+<p>We created version <a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.16">0.0.16</a>,
+which I later cleaned up into <a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.17">0.0.17</a>.</p>
+<p>I moved <code>index.html</code> to <a href="https://github.com/CompHound/CompHoundWeb/blob/master/public/datatable2.html">datatable2.html</a> and
+implemented a new route <a href="https://comphound.herokuapp.com/datatable2">/datatable2</a> to it.</p>
+<p>It is all up and running on Heroku, so you
+can <a href="https://comphound.herokuapp.com/datatable2">see the results live</a> and the source in
+the <a href="https://github.com/CompHound/CompHoundWeb">CompHoundWeb GitHub repo</a>.
+The readme there provides more info and testing links.</p>
+<p>Many thanks to Lukas for his work and many other interesting suggestions!</p>
+<h4><a name="4"></a>CompHound Road Map</h4>
+<p>At this stage, the list of the things to work on next is still growing instead of shrinking:</p>
+<ul>
+<li>Add the rest of the database columns to the datatable view.</li>
+<li>Implement the react component to view and edit a component occurrence.</li>
+<li>Add a <a href="https://developer.autodesk.com">View and Data API</a> viewing component.</li>
+<li>Implement the model translation for the viewer.</li>
+<li>Add a database column for the viewer URN.</li>
+<li>Implement isolated viewing of an individual selected instance.</li>
+<li>Reroute the <a href="http://comphound.net">comphound.net</a> domain to it.</li>
+</ul>
+<p>Wish me luck on finishing this before my conference presentations
+at <a href="http://www.rtcevents.com/rtc2015eu">RTC Europe</a> in Budapest
+and <a href="http://au.autodesk.com">Autodesk University</a> in
+Las Vegas are due, end of October and beginning of December, respectively.</p>
