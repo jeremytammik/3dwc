@@ -235,6 +235,11 @@ In the long run, most of these access points can be shut down again.
 
 Instead, one single main `index` entry point will display the datatable listing the component occurrences as well as provide access to the still missing reporting, viewing and model navigation functionality.
 
+**Addendum:** We are still in a rapid developmewnt phase, so these testing links are currently frequently changing.
+
+From version 0.0.17 onwards, the datatable test link is [/datatable2](https://comphound.herokuapp.com/datatable2) and includes a test react.js widget.
+
+Please always refer to the [CompHoundWeb readme](https://github.com/CompHound/CompHoundWeb) file for the most up-to-date working links.
 
 #### <a name="8"></a>CompHound Road Map
 
