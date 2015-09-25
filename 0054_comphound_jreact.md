@@ -28,6 +28,7 @@ akn_include
 
 Tutorials, Hackergarten, CompHound #Reactjs #Heroku #MongoDB #3dwebcoder #revitapi #nodejs #adsk #mongolab
 
+Yesterday I participated in the Hackergarten Basel and worked with Lukas @syzer Gintowt on integrating a Reactjs component into the CompHound node.js mongodb web server. Besides that, let me mention tutorialspoint...
 
 -->
 
@@ -58,6 +59,7 @@ If you are interested in learning any new technology, my colleague Cyrille sugge
 at [tutorialspoint](http://www.tutorialspoint.com).
 
 It enables you to learn the theory and practice in a real-time hands-on lab at the same time, right there, online.
+No need for any local installation of anything at all.
 
 It boasts of having the largest tutorials library on the web, covering hundreds of topics, with a wide list of subjects ranging across all the following:
 
