@@ -28,7 +28,10 @@ akn_include
 
 Lunar Eclipse, CORS Workaround, CompHound Update #Reactjs #Heroku #MongoDB #3dwebcoder #revitapi #nodejs #adsk #mongolab
 
-Yesterday I participated in the Hackergarten Basel and worked with Lukas @syzer Gintowt on integrating a Reactjs component into the CompHound node.js mongodb web server. Besides that, let me mention tutorialspoint...
+This weekend, I wanted to add an additional field to the component occurrences in the CompHoundWeb database, which led me to discover and fix a trivial yet serious error in my C# client. Also, let me mention a CORS workaround pointed out by my colleague Cyrille Fauvel and my night out to watch the lunar eclipse:
+&ndash; Lunar eclipse
+&ndash; Fed up with CORS?
+&ndash; CompHound Updates...
 
 -->
 
