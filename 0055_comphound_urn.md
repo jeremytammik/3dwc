@@ -156,4 +156,6 @@ current [CompHound](https://github.com/CompHound) implementation,
 in [CompHoundWeb 0.0.19](https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.19)
 and [CompHoundRvt 2016.0.0.4](https://github.com/CompHound/CompHoundRvt/releases/tag/2016.0.0.4).
 
-All the links to [Try it out Live](https://github.com/CompHound/CompHoundWeb#try-it-out-live) have been appropriately updated to the new web server and mongolab database instances.
+All the links
+to [Try it out Live](https://github.com/CompHound/CompHound.github.io#try-it-out-live) have
+been appropriately updated to the new web server and mongolab database instances.

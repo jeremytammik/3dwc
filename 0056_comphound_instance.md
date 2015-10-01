@@ -94,7 +94,7 @@ server [CompHoundWeb 0.0.19](https://github.com/CompHound/CompHoundWeb/releases/
 the C# REST API
 client [CompHoundRvt 2016.0.0.4](https://github.com/CompHound/CompHoundRvt/releases/tag/2016.0.0.4).
 
-The other links to [Try it out Live](https://github.com/CompHound/CompHoundWeb#try-it-out-live) are also up and running, of course.
+The other links to [Try it out Live](https://github.com/CompHound/CompHound.github.io#try-it-out-live) are also up and running, of course.
 
 Now I am gradually approaching the exciting part, setting up
 the [View and Data API](https://developer.autodesk.com/) viewer.
@@ -111,4 +111,3 @@ Here is the current state of the to-do list:
 The deadline for handing in my material for the conference presentations at [RTC Europe](http://www.rtcevents.com/rtc2015eu) in Budapest at the end of October is looming, so I will probably have to present this as work in progress there.
 
 Hopefully I can get it more completely wrapped up by the time of [Autodesk University](http://au.autodesk.com/) in Las Vegas in the beginning of December.
-
