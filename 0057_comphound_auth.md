@@ -43,7 +43,7 @@ I continued working on my CompHound component tracker and now successfully integ
 
 ### CompHound Viewer and Authorisation Service
 
-I continued working on my [CompHound](https://github.com/CompHound) component tracker and now successfully integrated the viewer, just in time to wrap up before leaving for two weeks vacation next Monday.
+I continued working on my [CompHound](https://github.com/CompHound) component tracker and now successfully integrated the viewer, just in time to wrap up before leaving for two weeks vacation starting next Monday.
 
 - [CompHound updates and the LMV viewer](#2)
 - [Authorisation token server](#3)
