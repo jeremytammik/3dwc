@@ -30,7 +30,13 @@ akn_include
 
 Single Column CompHound Viewer on iPad #Heroku #3dwebcoder #revitapi #nodejs #adsk #ViewAndDataAPI #jquery #javascript
 
-&ndash; Wrap-up and next steps...
+I am leaving for two weeks vacation in Andalusia tomorrow.
+I continued working on the CompHound component tracker in the past hours to leave it in a moderately cleaned-up state for Cyrille
+&ndash; Single column layout
+&ndash; Enable pick on iPad
+&ndash; CompHound CSS
+&ndash; To do
+&ndash; Vacation...
 
 -->
 
