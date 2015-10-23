@@ -45,7 +45,8 @@ the [CompHound](https://github.com/CompHound) component tracker project, and Ada
 
 - [Use GuiViewer3D to display LMV user interface](#2)
 - [CompHound Inventor C# REST API add-in](#3)
-- [To do](#4)
+- [Download and to do](#4)
+- [Dotty Animated 3D Assembly Instructions](#5)
 
 
 #### <a name="2"></a>Use GuiViewer3D to Display LMV User Interface
@@ -94,7 +95,7 @@ an Inventor add-in to populate the CompHound database from a mechanical design, 
 So if you are interested in a super simple REST API C# client for an Inventor add-in, this should definitely be your first port of call.
 
 
-#### <a name="4"></a>To Do
+#### <a name="4"></a>Download and To Do
 
 All the source code is available from the [CompHound](https://github.com/CompHound) organisation GitHub repositories.
 The current versions discussed above are the web
@@ -119,3 +120,17 @@ the Revit Technology Conference [RTC Europe](http://www.rtcevents.com/rtc2015eu)
 Budapest next week.
 
 High time to get going with the next tasks, then, instead of just this endless documenting...
+
+
+#### <a name="5"></a>Dotty Animated 3D Assembly Instructions
+
+Check out this super cool sample showing how
+the [View and Data API](https://developer.autodesk.com) viewer
+can be used to
+display [animated 3D assembly instructions](http://trial.dotdotty.com/share?shareId=431c-bac8-eedb-e43d-fc79&iframe=true) in
+the browser:
+
+<center>
+<img src="img/dotty_assembly_instructions.png" alt="Dotty animated 3D assembly instructions" width="400"/>
+</center>
+
