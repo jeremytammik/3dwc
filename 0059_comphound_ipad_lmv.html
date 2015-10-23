@@ -1,0 +1,206 @@
+<p><head>
+<title>The 3D Web Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+#adskdevnetwrk
+#expressjs
+#RestSharp
+#Autodesk #IoT #SeeControl #cloud
+#python #markdown #asciidoc
+#gcal #caldav #googleapi
+#milanojs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #handlebars
+#JsFiddle #Reactjs
+#autodesku #rtceur
+#Reactjs
+#MongoDB
+#mongolab
+#restapi
+akn_include
+
+CompHound on iPad Chrome and Node Env #Heroku #3dwebcoder #revitapi #nodejs #adsk #ViewAndDataAPI #jquery #javascript
+
+I returned from my vacation in Andalusia.
+So far, I spent much too much time this week working on Revit API issues and getting ready for the Revit Technology Conference.
+I managed to squeeze in a few enhancements to the CompHound component tracker project as well
+&ndash; Cyrille's error handling and handlebars fixes
+&ndash; Report the NODE_ENV setting
+&ndash; Heroku NODE_ENV defaults to production
+&ndash; Updating the LMV viewer version
+&ndash; Obsolete iPad hardware
+&ndash; CompHound running on iPad in Chrome
+&ndash; Regular ordinary Swedish meal time...
+
+-->
+
+<h3>CompHound on iPad Chrome and Node Env</h3>
+<p>I returned from
+my <a href="https://www.flickr.com/gp/jeremytammik/6D2J6x">vacation in Andalusia</a>:</p>
+<p><center>
+<a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157660051613645" title="Andalusia"><img src="https://farm6.staticflickr.com/5680/22315119061_3ca41c23d8_n.jpg" width="320" height="240" alt="Andalusia"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</center></p>
+<p>So far, I spent much too much time this week working on Revit API issues and getting ready for
+the Revit Technology Conference <a href="http://www.rtcevents.com/rtc2015eu">RTC Europe</a> in
+Budapest next week.</p>
+<p>I managed to squeeze in a few enhancements to
+the <a href="https://github.com/CompHound">CompHound</a> component tracker project as well, though, including some of
+the <a href="http://the3dwebcoder.typepad.com/blog/2015/10/single-column-comphound-viewer-on-ipad.html#5">to-do items</a> I listed before leaving:</p>
+<ul>
+<li><a href="#2">Cyrille's error handling and handlebars fixes</a></li>
+<li><a href="#3">Report the NODE_ENV setting</a></li>
+<li><a href="#4">Heroku NODE_ENV defaults to production</a></li>
+<li><a href="#5">Updating the LMV viewer version</a></li>
+<li><a href="#6">Obsolete iPad hardware</a></li>
+<li><a href="#7">CompHound running on iPad in Chrome</a></li>
+<li><a href="#8">Regular ordinary Swedish meal time</a></li>
+</ul>
+<h4><a name="2"></a>Cyrille's Error Handling and Handlebars Fixes</h4>
+<p>Cyrille very kindly improved the node web server error handling and handlebars fixes.</p>
+<p>More of the views are now handled by <code>handlebars</code> and defined in the <a href="https://github.com/CompHound/CompHoundWeb/tree/master/view">view</a> subfolder:</p>
+<ul>
+<li><code>count.handlebars</code></li>
+<li><code>error.handlebars</code></li>
+<li><code>instances1.handlebars</code></li>
+</ul>
+<p>The error handling enhancements mainly
+affect the lines around 152-185 in <a href="https://github.com/CompHound/CompHoundWeb/blob/master/server.js#L152-L185">server.js</a> and are captured
+in <a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.34">CompHoundWeb release 0.0.34</a>:</p>
+<pre class="prettyprint">
+  // Catch 404 and forward to error handler.
+
+  app.use (function (req, res, next) {
+    var err =new Error ('Error 404 - Resource Not Found') ;
+    err.status =404 ;
+    next (err) ;
+  }) ;
+
+  // Error handlers
+
+  var node_env = app.get ('env');
+
+  // Development error handler, prints stack trace.
+
+  if ( node_env === 'development') {
+    app.use (function (err, req, res, next) {
+      res.status (err.status || 500) ;
+      res.render ('error', {
+        message: err.message,
+        error: err
+      }) ;
+    }) ;
+  }
+
+  // Production error handler;
+  // no stack traces leaked to user.
+
+  app.use (function (err, req, res, next) {
+    res.status (err.status || 500) ;
+    res.render ('error', {
+      message: err.message,
+      error: {}
+    }) ;
+  }) ;
+</pre>
+
+<p>Many thanks to Cyrille for taking a look at this!</p>
+<h4><a name="3"></a>Check and Report the NODE_ENV Setting</h4>
+<p>Before leaving for vacation, I wondered about the code</p>
+<pre class="prettyprint">
+  if ( app.get ('env') === 'development') {
+</pre>
+
+<p>The node <code>env</code> setting is controlled by the environment variable NODE_ENV.</p>
+<p>You can set it to <code>production</code> to run the node server in production mode.</p>
+<p>Then, no debugging is possible.</p>
+<p>As you can see above, I now store that setting in the variable <code>node_env</code> and report the setting after completing the server startup like this:</p>
+<pre class="prettyprint">
+  var server = app.listen(
+    app.get( 'port' ),
+    function() {
+      var h = db.host;
+      if( -1 < h.indexOf('localhost') ) { h = 'locally '; }
+      else if( -1 < h.indexOf('mongolab') ) { h = 'mongolab-'; }
+
+      console.log( 'CompHound ' + node_env
+        + ' server ' + pkg.version
+        + ' listening at port ' + server.address().port
+        + ' with ' + h + 'hosted mongo db.');
+    }
+  );
+</pre>
+
+<p>This enhancement is captured
+in <a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.36">CompHoundWeb release 0.0.36</a>.</p>
+<p>If nothing is specified in the OS system environment, the node env setting defaults to <code>development</code>:</p>
+<pre>
+$ node server.js
+Connection to comphound database at ds051543.mongolab.com established.
+CompHound development server 0.0.38 listening at port 8042 with mongolab-hosted mongo db.
+</pre>
+
+<h4><a name="4"></a>Heroku NODE_ENV Defaults to Production</h4>
+<p>One of the many nice aspect about the semi-automatic <a href="http://www.herokuapp.com">Heroku</a> deployment
+is that the node environment there automatically defaults to <code>production</code> instead:</p>
+<p><center>
+<img src="img/heroku_node_env.png" alt="Default Heroku NODE_ENV set to production" width="498"/>
+</center></p>
+<h4><a name="5"></a>Updating the LMV Viewer Version</h4>
+<p>Before my vacation,
+I enabled <a href="http://the3dwebcoder.typepad.com/blog/2015/10/single-column-comphound-viewer-on-ipad.html#3">picking a datatable record on iPad</a>.</p>
+<p>However, the LMV viewer failed to load, producing the infamous <code>load error: 4</code> error message.</p>
+<p>Cyrille debugged on a iPad simulator and suggested using a newer version of
+the <a href="https://developer.autodesk.com/">View and Data API</a> viewer, so I raised the LMV version number from 1.2.16 to 1.2.21
+in <a href="https://github.com/CompHound/CompHoundWeb/blob/master/public/datatable2.html">datatable2.html</a>:</p>
+<pre class="prettyprint">
+&lt;link rel="stylesheet" href="https://developer.api.autodesk.com/viewingservice/v1/viewers/style.css?v=v1.2.21" type="text/css"/&gt;
+. . .
+&lt;script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.min.js?v=v1.2.21"&gt;&lt;/script&gt;
+</pre>
+
+<h4><a name="6"></a>Obsolete iPad Hardware</h4>
+<p>Unfortunately, that did not help me get the viewer running on my iPad hardware.</p>
+<p>It still worked for Cyrille on the simulator and not for me on the real device.</p>
+<p><a href="http://www.shiyaluo.com">Shiya Luo</a> asked for the exact iPad version details, listed under Settings &gt; General &gt; About:</p>
+<ul>
+<li>Version: 9.0.1 (13A404)</li>
+<li>Model: MD368FD/A</li>
+</ul>
+<p>This model number seems to be a 3rd generation iPad  marketed in 2012, as you will see by searching
+for <a href="https://duckduckgo.com/?q=iPad+model+number+MD368FD%2FA">iPad model number MD368FD/A</a>.</p>
+<p>Apple did not guarantee support for WebGL until iOS 8, which came out in 2014 with iPhone 6.</p>
+<p>In 2014 iPad Air 2 and iPad mini with Retina display were released as well.</p>
+<p>From then on, WebGL is fully supported.</p>
+<p>All previous devices have only limited support, even after updating to the latest iOS.</p>
+<p>It is a safe bet that this is a device issue.</p>
+<p>Time to get the latest shiniest gadget &ndash; :P</p>
+<p>If we see Apple devices after 2015 not showing the viewer, that should be reported to the viewer team.</p>
+<h4><a name="7"></a>CompHound running on iPad in Chrome</h4>
+<p>Luckily, I found a fix for my old piece of hardware as well.</p>
+<p>Even though I cannot use the LMV on the iPad in Safari, it comes up fine in Google Chrome.</p>
+<p>Problem solved.</p>
+<p>More coming soon.</p>
+<p>To wrap up, let me share one last item, something completely different, on modern traditional cookery.</p>
+<h4><a name="8"></a>Regular Ordinary Swedish Meal Time</h4>
+<p>I grew up in Sweden and am strongly influenced by that culture.</p>
+<p>My German friend Michaela has also grown to appreciate it very much, enjoy the beautiful nature on frequent holiday trips, and even learned the language fluently.</p>
+<p>She pointed out a nice series of YouTube video clips highlighting many traditional Swedish dishes, cooked with a lot of enthusiasm, energy and free-flowing emotions:
+<a href="https://www.youtube.com/user/SwedishMealTime">Regular Ordinary Swedish Meal Time</a>.</p>
+<p>She particularly pointed out the following dishes to me:</p>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=fYMiQ04ISss">Toxic cheesecake</a></li>
+<li><a href="https://www.youtube.com/watch?v=c4uTMHQtYrw">Killer kalops</a></li>
+<li><a href="https://www.youtube.com/watch?v=17dmabeA79U">Power pea soup and patriotic pankakes</a></li>
+</ul>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/fYMiQ04ISss?rel=0" frameborder="0" allowfullscreen></iframe>
+</center></p>
+<p>Enjoy!</p>
