@@ -24,22 +24,26 @@
 #Reactjs
 #MongoDB
 #mongolab
-#restapi
+#Heroku
 akn_include
 
- #Heroku #3dwebcoder #revitapi #nodejs #adsk #ViewAndDataAPI #jquery #javascript
+CompHound LMV User Interface and Inventor #3dwebcoder #revitapi #restapi #nodejs #adsk #ViewAndDataAPI #javascript
 
-&ndash; Vacation...
+I completed another little enhancement to the CompHound component tracker project, and Adam Nagy added something as well
+&ndash; Use GuiViewer3D to display LMV user interface
+&ndash; CompHound Inventor add-in
+&ndash; To do...
 
 -->
 
-<h3>CompHound LMV User Interface and Inventor Parts</h3>
+<h3>CompHound LMV User Interface and Inventor</h3>
 <p>I completed another little enhancement to
 the <a href="https://github.com/CompHound">CompHound</a> component tracker project, and Adam Nagy added something as well:</p>
 <ul>
 <li><a href="#2">Use GuiViewer3D to display LMV user interface</a></li>
-<li><a href="#3">CompHound Inventor add-in</a></li>
-<li><a href="#4">To do</a></li>
+<li><a href="#3">CompHound Inventor C# REST API add-in</a></li>
+<li><a href="#4">Download and to do</a></li>
+<li><a href="#5">Dotty Animated 3D Assembly Instructions</a></li>
 </ul>
 <h4><a name="2"></a>Use GuiViewer3D to Display LMV User Interface</h4>
 <p>Until yesterday, CompHound displayed the naked LMV viewer with no additional controls:</p>
@@ -68,12 +72,12 @@ from <a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.37">rel
 <img src="img/lmv_with_ui.png" alt="View and Data API viewer with default user interface" width="400"/>
 </center></p>
 <p>As you can see in the code snippet above, I also added a global Boolean module variable <code>display_user_interface</code> to easily switch the UI on and off.</p>
-<h4><a name="3"></a>CompHound Inventor Add-in</h4>
+<h4><a name="3"></a>CompHound Inventor C# REST API Add-in</h4>
 <p><a href="https://github.com/adamenagy">Adam Nagy</a> very kindly
 implemented <a href="https://github.com/CompHound/CompHoundInv">CompHoundInv</a>,
 an Inventor add-in to populate the CompHound database from a mechanical design, to show that it can be used to manage generic recurring component occurrences regardless of the type of CAD system used.</p>
 <p>So if you are interested in a super simple REST API C# client for an Inventor add-in, this should definitely be your first port of call.</p>
-<h4><a name="4"></a>To Do</h4>
+<h4><a name="4"></a>Download and To Do</h4>
 <p>All the source code is available from the <a href="https://github.com/CompHound">CompHound</a> organisation GitHub repositories.
 The current versions discussed above are the web
 server <a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.33">CompHoundWeb 0.0.33</a> and
@@ -94,3 +98,12 @@ up and running, so feel free to play around with it.</p>
 the Revit Technology Conference <a href="http://www.rtcevents.com/rtc2015eu">RTC Europe</a> in
 Budapest next week.</p>
 <p>High time to get going with the next tasks, then, instead of just this endless documenting...</p>
+<h4><a name="5"></a>Dotty Animated 3D Assembly Instructions</h4>
+<p>Check out this super cool sample showing how
+the <a href="https://developer.autodesk.com">View and Data API</a> viewer
+can be used to
+display <a href="http://trial.dotdotty.com/share?shareId=431c-bac8-eedb-e43d-fc79&amp;iframe=true">animated 3D assembly instructions</a> in
+the browser:</p>
+<p><center>
+<img src="img/dotty_assembly_instructions.png" alt="Dotty animated 3D assembly instructions" width="400"/>
+</center></p>
