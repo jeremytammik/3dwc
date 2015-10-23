@@ -25,23 +25,26 @@
 #Reactjs
 #MongoDB
 #mongolab
-#restapi
+#Heroku
 akn_include
 
- #Heroku #3dwebcoder #revitapi #nodejs #adsk #ViewAndDataAPI #jquery #javascript
+CompHound LMV User Interface and Inventor #3dwebcoder #revitapi #restapi #nodejs #adsk #ViewAndDataAPI #javascript
 
-&ndash; Vacation...
+I completed another little enhancement to the CompHound component tracker project, and Adam Nagy added something as well
+&ndash; Use GuiViewer3D to display LMV user interface
+&ndash; CompHound Inventor add-in
+&ndash; To do...
 
 -->
 
 
-### CompHound LMV User Interface and Inventor Parts
+### CompHound LMV User Interface and Inventor
 
 I completed another little enhancement to
 the [CompHound](https://github.com/CompHound) component tracker project, and Adam Nagy added something as well:
 
 - [Use GuiViewer3D to display LMV user interface](#2)
-- [CompHound Inventor add-in](#3)
+- [CompHound Inventor C# REST API add-in](#3)
 - [To do](#4)
 
 
@@ -82,7 +85,7 @@ from [release 0.0.37](https://github.com/CompHound/CompHoundWeb/releases/tag/0.0
 As you can see in the code snippet above, I also added a global Boolean module variable `display_user_interface` to easily switch the UI on and off.
 
 
-#### <a name="3"></a>CompHound Inventor Add-in
+#### <a name="3"></a>CompHound Inventor C# REST API Add-in
 
 [Adam Nagy](https://github.com/adamenagy) very kindly
 implemented [CompHoundInv](https://github.com/CompHound/CompHoundInv),
