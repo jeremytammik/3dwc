@@ -33,7 +33,8 @@ RTC Report LMV Model Upload and Translation #3dwebcoder #revitapi #restapi #node
 I presented the CompHound component tracker project as work in progress at the Revit Technology Conference RTC Europe in Budapest last week
 &ndash; RTC Conference and Connecting Desktop to Cloud
 &ndash; Driving the View and Data API Upload and Translation from a C# Add-In
-&ndash; Current CompHound Versions and To Do...
+&ndash; Current CompHound Versions and To Do
+&ndash; Meanwhile, autumn is well advanced here in Switzerland...
 
 -->
 
