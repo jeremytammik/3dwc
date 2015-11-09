@@ -1,0 +1,101 @@
+<p><head>
+<title>The 3D Web Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+#adskdevnetwrk
+#expressjs
+#RestSharp
+#Autodesk #IoT #SeeControl #cloud
+#python #markdown #asciidoc
+#gcal #caldav #googleapi
+#milanojs
+#3dwebaccel #prague #webgl #3dweb #a360
+#au2015 #autocad #inventor #ah8 #cubeathens #developers
+#aws #handlebars
+#JsFiddle #Reactjs
+#autodesku #rtceur
+#Reactjs
+#MongoDB
+#mongolab
+#Heroku
+akn_include
+
+RTC Report LMV Model Upload and Translation #3dwebcoder #revitapi #restapi #nodejs #adsk #ViewAndDataAPI #javascript #rtceur #au2015
+
+I completed another little enhancement to the CompHound component tracker project, and Adam Nagy added something as well
+&ndash; Use GuiViewer3D to display LMV user interface
+&ndash; CompHound Inventor add-in
+&ndash; To do...
+
+-->
+
+<h3>RTC Report LMV Model Upload and Translation</h3>
+<p>I presented
+the <a href="https://github.com/CompHound">CompHound</a> component tracker project as work in progress at
+the Revit Technology Conference <a href="http://www.rtcevents.com/rtc2015eu">RTC Europe</a> in
+Budapest last week.</p>
+<ul>
+<li><a href="#2">RTC Conference and Connecting Desktop to Cloud</a></li>
+<li><a href="#3">Driving the View and Data API Upload and Translation from a C# Add-In</a></li>
+<li><a href="#4">Current CompHound Versions and To Do</a></li>
+</ul>
+<p>Meanwhile, autumn is well advanced:</p>
+<p><center>
+<img src="/p/2015/2015-11-09_st_ursen_guggisberg/761_sunset_over_jura_cropped.jpg" alt="Sunset over Jura from Guggisberg" width="400"/>
+</center></p>
+<h4><a name="2"></a>RTC Conference and Connecting Desktop to Cloud</h4>
+<p>Here is an overview of the RTC conference and the three sessions I gave there:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/10/rtc-classes-and-getting-started-with-revit-macros.html">RTC Classes and Getting Started with Revit Macros</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/11/rtc-budapest-and-the-revit-api-panel.html">RTC, Budapest and the Revit API Panel</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/11/connecting-desktop-and-cloud-room-editor-update.html">Connecting Desktop and Cloud, Room Editor Update</a></li>
+</ul>
+<p>The really interesting one for us here is the last, on connecting the desktop with the cloud.</p>
+<h4><a name="3"></a>Driving the View and Data API Upload and Translation from a C# Add-In</h4>
+<p>In the meantime, my
+colleague <a href="http://adndevblog.typepad.com/autocad/adam-nagy.html">Adam Nagy</a> implemented
+automatic LMV model upload and translation functionality for
+the <a href="https://github.com/CompHound/CompHoundInv">CompHoundInv</a> Inventor
+C# add-in to populate the CompHound web database.</p>
+<p>I integrated Adam's uploaded into the Revit
+add-in <a href="https://github.com/CompHound/CompHoundRvt">CompHoundRvt</a> as well,
+in <a href="https://github.com/CompHound/CompHoundRvt/releases/tag/2016.0.0.6">release 2016.0.0.6</a>.</p>
+<p>Now, whenever the component occurrence data of a Revit or Inventor model is uploaded to the web database, the model itself is automatically uploaded and translated for viewing in
+the <a href="https://developer.autodesk.com">View and Data API</a> viewer at the same time.</p>
+<p>We are talking about improving the upload and translation source code, since it is currently asynchronous.</p>
+<p><a href="http://adndevblog.typepad.com/cloud_and_mobile/philippe-leefsma.html">Philippe Leefsma</a> implemented
+an asynchronous uploader in
+his <a href="https://github.com/Developer-Autodesk/library-dotnet-view.and.data.api">Rest API wrapper library for .NET applications</a>,
+but that does not yet handle complex models with different component files referencing each other, as is common in Revit and Inventor.</p>
+<p>We plan to merge these two streams in future.</p>
+<p>Meanwhile, the uploading works and the translated model URN is added to each component instance data:</p>
+<p><center>
+<img src="img/lmv_urn.png" alt="LMV URN" width="400"/>
+</center></p>
+<p>The next step I want to look at is to isolate each component occurrence in the LMV model view when it is selected in the web database.</p>
+<h4><a name="4"></a>Current CompHound Versions and To Do</h4>
+<p>All the project source code is available from
+the <a href="https://github.com/CompHound">CompHound</a> organisation GitHub repositories.
+The current versions discussed above are the web
+server <a href="https://github.com/CompHound/CompHoundWeb/releases/tag/0.0.39">CompHoundWeb 0.0.39</a> and
+the C# REST API
+clients <a href="https://github.com/CompHound/CompHoundRvt/releases/tag/2016.0.0.6">CompHoundRvt 2016.0.0.6</a> for Revit
+and <a href="https://github.com/CompHound/CompHoundInv/releases/tag/2016.0.0.1">CompHoundInv 2016.0.0.1</a> for Inventor.</p>
+<p>The web server is freshly redeployed to Heroku, driving the mongo database hosted on mongolab.
+As always, the links
+to <a href="https://github.com/CompHound/CompHound.github.io#try-it-out-live">try it out Live</a> are
+up and running, so feel free to play around with it to your heart's content.</p>
+<p>Here is the updated to-do list:</p>
+<ul>
+<li>Use the asynchronous C# upload and translation library.</li>
+<li>Implement isolated viewing of an individual selected instance.</li>
+<li>Enable editing of some component occurrence properties.</li>
+</ul>
+<p>I plan to complete some of these before submitting my Autodesk University handout material due this Friday, and before presenting the project at AU in Las Vegas in December.</p>
