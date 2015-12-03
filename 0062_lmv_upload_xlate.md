@@ -31,7 +31,7 @@ akn_include
 RTC Report LMV Model Upload and Translation #3dwebcoder #revitapi #restapi #nodejs #adsk #ViewAndDataAPI #javascript #rtceur #au2015
 
 I presented the CompHound component tracker project as work in progress at the Revit Technology Conference RTC Europe in Budapest last week
-&ndash; RTC Conference and Connecting Desktop to Cloud
+&ndash; RTC Conference and Connecting Desktop and Cloud
 &ndash; Driving the View and Data API Upload and Translation from a C# Add-In
 &ndash; Current CompHound Versions and To Do
 &ndash; Meanwhile, autumn is well advanced here in Switzerland...
@@ -46,7 +46,7 @@ the [CompHound](https://github.com/CompHound) component tracker project as work 
 the Revit Technology Conference [RTC Europe](http://www.rtcevents.com/rtc2015eu) in
 Budapest last week.
 
-- [RTC Conference and Connecting Desktop to Cloud](#2)
+- [RTC Conference and Connecting Desktop and Cloud](#2)
 - [Driving the View and Data API Upload and Translation from a C# Add-In](#3)
 - [Current CompHound Versions and To Do](#4)
 
@@ -58,7 +58,7 @@ Meanwhile, autumn is well advanced here in Switzerland:
 
 
 
-#### <a name="2"></a>RTC Conference and Connecting Desktop to Cloud
+#### <a name="2"></a>RTC Conference and Connecting Desktop and Cloud
 
 Here is an overview of the RTC conference, the three sessions I gave, and a bunch of photo albums I published during my stay:
 
