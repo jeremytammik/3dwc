@@ -165,3 +165,8 @@ We will stop now, but please continue asking questions in the forums and elsewhe
 
 Many thanks to everybody, participants and panellists, for your enthusiasm and interest!
 
+#### <a name="8"></a>Download
+
+For the sake of completeness, here is the AU session SD9731 &ndash; *Autodesk Cloud and Mobile API and Technologies: Meet the Experts*
+[handout](/a/doc/au/2015/doc2/sd9731_cloud_mobile_expert_panel_handout.pdf) and
+[slide deck](/a/doc/au/2015/doc2/sd9731_cloud_mobile_expert_panel_slides.pdf).
