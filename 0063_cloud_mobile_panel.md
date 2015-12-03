@@ -33,11 +33,13 @@ akn_include
 
 Autodesk Uni Cloud and Mobile Expert Panel #au2015 #3dwebcoder #revitapi #ViewAndDataAPI
 
-Here are the notes I took at the Autodesk University 2015 panel discussion SD9731 &ndash; <i>Autodesk Cloud and Mobile API and Technologies: Meet the Experts</i>, led by Cyrille Fauvel, Senior Manager, ADN M&E, Autodesk Inc. &ndash; Learning Objectives
-
-
-
-Here are the notes I took at the Autodesk University 2015 panel discussion SD9731 &ndash; *Autodesk Cloud and Mobile API and Technologies: Meet the Experts*, led by Cyrille Fauvel...
+Here are the notes I took at the Autodesk University 2015 panel discussion SD9731 &ndash; <i>Autodesk Cloud and Mobile API and Technologies: Meet the Experts</i>, led by Cyrille Fauvel, Senior Manager, ADN M&E, Autodesk Inc.
+&ndash; Learning Objectives
+&ndash; Description
+&ndash; Your AU Expert
+&ndash; Overview
+&ndash; Panellists
+&ndash; Questions and Answers...
 
 -->
 
@@ -46,7 +48,7 @@ Here are the notes I took at the Autodesk University 2015 panel discussion SD973
 
 Here are the notes I took at the Autodesk University 2015 panel discussion SD9731 &ndash; *Autodesk Cloud and Mobile API and Technologies: Meet the Experts*, led by Cyrille Fauvel, Senior Manager, ADN M&amp;E, Autodesk Inc.
 
-#### <a name="2"></a>Learning Objectives
+&ndash; Learning Objectives
 
 - Get to know your fellow cloud and mobile programmers and members of the Cloud and Mobile Engineering Team
 - Learn how to integrate Autodesk software’s cloud and mobile technology into your own product (desktop or cloud and mobile)
