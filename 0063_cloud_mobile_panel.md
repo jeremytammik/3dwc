@@ -69,6 +69,10 @@ That’s about it for this handout. It’s very short, but then the value of the
 
 #### <a name="6"></a>Panellists
 
+<center>
+<img src="img/cloud_mobile_panel.jpg" alt="Cloud and Mobile Expert Panel" width="512">
+</center>
+
 - Kean Walmsley &ndash; Autodesk Software Architect, AutoCAD Platform Architect
 - Stephen Preston &ndash; Autodesk ADN DevTech Manager
 - Cyrille Fauvel &ndash; Autodesk Game Programmer, ADN DevTech
