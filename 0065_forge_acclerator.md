@@ -17,7 +17,7 @@
 #python #markdown #asciidoc
 #gcal #caldav #googleapi
 #milanojs
-#3dwebaccel #prague #webgl #3dweb #a360
+#prague
 #au2015 #autocad #inventor #ah8 #cubeathens #developers
 #aws #handlebars
 #JsFiddle #Reactjs
@@ -28,17 +28,18 @@
 #Heroku
 #restapi #nodejs #adsk
 #javascript
+#au2015 #autodesku #rtceur #SVG #javascript
 
 akn_include
 
-Roomedit @CouchDB Database Definition #au2015 #3dwebcoder #revitapi #autodesku #rtceur #SVG #javascript
+Autodesk Forge Accelerator #3dwebcoder #revitapi #3dweb #a360 #3dwebaccel #webgl @adskForge
 
-You may be aware of the roomedit CouchDB app that I implemented for my 2D real-time round-trip cloud-based RoomEditorApp. Originally implemented in 2013, I migrated it to Revit 2016 for my class on connecting desktop and cloud at the Revit Technology Conference RTC Europe, and created a recording of it preparing to set up the AEC booth for Autodesk University. We were unable to find an easy way to upload the roomedit database definition files to CouchDB...
+Happy New Year! I had a really good break, although I spent the last ten days being ill and coming to grips with a serious sinusitis. I am getting better again now, though. I also learned the nice card game Tichu :-)  Meanwhile, Autodesk announced the Forge platform at Autodesk University in the beginning of December to power a connected ecosystem for product development, inviting developers and innovators to join in to integrate design, engineering, and manufacturing and build the future of making things together...
 
 -->
 
 
-### Autodesk Forge Accelerator
+### Happy New Autodesk Forge Accelerator!
 
 <p style="font-size: 150%; font-weight: bold">Happy New Year!</p>
 
