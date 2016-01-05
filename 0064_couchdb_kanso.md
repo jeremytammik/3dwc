@@ -31,20 +31,14 @@
 
 akn_include
 
-Autodesk Uni Cloud and Mobile Expert Panel #au2015 #3dwebcoder #revitapi #ViewAndDataAPI
+Roomedit @CouchDB Database Definition #au2015 #3dwebcoder #revitapi #autodesku #rtceur #SVG #javascript
 
-Here are the notes I took at the Autodesk University 2015 panel discussion SD9731 &ndash; <i>Autodesk Cloud and Mobile API and Technologies: Meet the Experts</i>, led by Cyrille Fauvel, Senior Manager, ADN M&E, Autodesk Inc.
-&ndash; Learning Objectives
-&ndash; Description
-&ndash; Your AU Expert
-&ndash; Overview
-&ndash; Panellists
-&ndash; Questions and Answers...
+You may be aware of the roomedit CouchDB app that I implemented for my 2D real-time round-trip cloud-based RoomEditorApp. Originally implemented in 2013, I migrated it to Revit 2016 for my class on connecting desktop and cloud at the Revit Technology Conference RTC Europe, and created a recording of it preparing to set up the AEC booth for Autodesk University. We were unable to find an easy way to upload the roomedit database definition files to CouchDB...
 
 -->
 
 
-### Roomedit CouchDB Update
+### Roomedit CouchDB Database Definition
 
 You may be aware of
 the [roomedit CouchDB app](https://github.com/jeremytammik/roomedit) that I implemented for
@@ -56,8 +50,8 @@ the Revit Technology Conference RTC Europe, and created a recording of
 it [preparing to set up the AEC booth](http://thebuildingcoder.typepad.com/blog/2015/11/connecting-desktop-and-cloud-at-au-and-devdays.html) at
 Autodesk University.
 
-My colleague [Jaime Rosales Duque](http://adndevblog.typepad.com/aec/jaime-rosales.html) had some issues setting up roomedit on his machine, I struggled with the same, and
-finally [@DanTartaglia66](https://twitter.com/DanTartaglia66) joined the club, as you can see from our discussion in
+My colleague [Jaime Rosales Duque](http://adndevblog.typepad.com/aec/jaime-rosales.html) had some issues setting up roomedit on his machine, I struggled with the same,
+and finally [@DanTartaglia66](https://twitter.com/DanTartaglia66) joined the club, as you can see from our discussion in
 a [series of blog post comments](http://thebuildingcoder.typepad.com/blog/2015/11/connecting-desktop-and-cloud-at-au-and-devdays.html#comment-2389427045).
 
 The gist of all our discussions is that we were unable to find an easy way to upload the roomedit database definition files to CouchDB.
