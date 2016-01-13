@@ -34,6 +34,13 @@ akn_include
 
 How to View a Space and Exciting Times Ahead #3dwebcoder #revitapi #3dweb #a360 #3dwebaccel #webgl @adskForge
 
+Today, let's recapitulate a discussion on viewing architectural spaces in the View and Data API, plus take a look at all the exciting things happening both for myself in the next weeks and for Autodesk as a company as a whole, reinventing itself for the modern cloud-based collaborative sharing technoculture
+&ndash; The first annual Autodesk X summit
+&ndash; Jeremy's January
+&ndash; DevDay in Munich
+&ndash; Accelerator Workshop
+&ndash; BIM Workshop in Madrid
+&ndash; Viewing IFC spaces and models...
 
 -->
 
@@ -186,8 +193,3 @@ They are displayed graphically by several IFC viewer applications and i.m.o shou
 2. This is great news! Combining models is quite crucial for the use cases that I’m investigating currently.
 3. If I understood correctly this would be the responsibility of the View and Data server’s 'registration' process. I did not manage to get access to the Storey, Space or System objects. Perhaps the registration/translation functionality will be enhanced in the future?
 4. Yes, I will publish my next questions to the discussion forum and you can of course publish our current discussion there, also.
-
-
-
-
-
