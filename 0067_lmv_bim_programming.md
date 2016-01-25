@@ -82,11 +82,10 @@ akn_include
 
 View and Data API Intro for BIM Programming #3dwebcoder #revitapi #3dweb #a360 #3dwebaccel #webgl @adskForge
 
-&ndash; DevDay in Munich
-&ndash; Accelerator Workshop
-&ndash; BIM Workshop in Madrid
-&ndash;
-...
+We successfully completed the European Munich DevDay conference and the subsequent four-day abbreviated Autodesk Cloud Accelerator. Here is the last snapshot of the frosted trees and blue sky from the train station platform in Harras. The most exciting project there for me personally was the implementation of the Revit BIM database and element modification tracker. Next on my rather busy January agenda is the BIM Programming Workshop in Madrid
+&ndash; Jaime's presentations and samples
+&ndash; View and Data API demo sites
+&ndash; Slack team collaborations...
 
 -->
 
@@ -170,6 +169,9 @@ Here are some other [View and Data API](https://developer.autodesk.com) samples 
 - Direct link to the [AEC application example](http://examples.developer.autodesk.com/lmv-navigation) &ndash;
 - [View and Data programming sample repos](http://developer-autodesk.github.io) on GitHub.
 
+If these sample have whetted your appetite for more, check out the
+step-by-step [hands-on tutorial](https://github.com/Developer-Autodesk/tutorial-getting.started-view.and.data) showing
+how to quickly and easily create your own node.js-based View and Data API web site!
 
 #### <a name="4"></a>Slack for Hackathon and Other Team Collaborations
 
