@@ -144,7 +144,7 @@ and [slide show](http://jaimerosales.github.io/london-prehack)
 meetup [repo](https://github.com/jaimerosales/colombia-jsconf-workshop)
 and [slide show](http://jaimerosales.github.io/colombia-jsconf-workshop)
 
-In addition, here are links to a couple of particularly impressive pure WebGL samples:
+<a name="2b"></a>Jaime also pointed out a couple of particularly impressive pure WebGL samples:
 
 - [Water simulation](http://madebyevan.com/webgl-water)
 - [Pearl boy rows and dives](http://labs.gooengine.com/pearl-boy/index.html)
