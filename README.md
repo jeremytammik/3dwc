@@ -1,4 +1,4 @@
-# 3dwc &ndash; The 3D Web Coder
+# 3dwc &ndash; The 3D Web Coder blog source
 
 Source code, full text and chronological index
 for [The 3D Web Coder](http://the3dwebcoder.typepad.com) blog.
