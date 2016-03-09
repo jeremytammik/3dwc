@@ -34,7 +34,12 @@ akn_include
 
 Team Meeting and Deploy to Heroku Button #3dwebcoder #revitapi #3dweb #a360 #3dwebaccel @adskForge #Heroku
 
-&ndash; ...
+
+I am at in London for an internal meeting with my European ADN DevTech colleagues today.
+As you might guess from the pictures, we are in Broad Court, right next to Bow Street and beside the nice bronze statue Young Dancer by Enzo Plazotta.
+During the meeting, Cyrille mentioned the possibility to add a 'deploy to Heroku' button to a GitHub repository readme to automate the installation and testing a cloud-based app.
+I use Heroku to run all my cloud-based apps, so I decided to test that right away...
+
 
 -->
 
@@ -48,6 +53,10 @@ I am at in London for an internal meeting with my European ADN DevTech colleague
 </center>
 
 As you might guess from the pictures, we are in Broad Court, right next to [Bow Street](https://en.wikipedia.org/wiki/Bow_Street) and beside the nice bronze statue *Young Dancer* by Enzo Plazotta.
+
+By a happy chance, we are also celebrating Adam's birthday today.
+
+Congratulations, Adam!
 
 During the meeting, Cyrille mentioned the possibility to add a 'deploy to Heroku' button to a GitHub repository readme to automate the installation and testing a cloud-based app.
 
