@@ -29,7 +29,10 @@ I am still in London for our internal European ADN DevTech meeting, returning ba
 
 Just before we arrived, I received an interesting and somewhat different question from Cyrille that I am happy to dive into, research and share with you:
 
-**Question:** I need to reformat production release notes in a consistent way to our customers and am researching an optimal and future-proof documentation and communication workflow to generate and share API documentation for the View and Data API and other web services. Any suggestions?
+**Question:** I need to reformat production release notes in a consistent way to our customers and am researching an optimal and future-proof documentation and communication workflow to generate and share API documentation for
+the [View and Data API](https://developer.autodesk.com/api/view-and-data-api) and
+other [Forge web services](https://developer.autodesk.com).
+Any suggestions?
 
 **Answer:** One toolset that I used for something similar in the past included the Microsoft [Sandcastle documentation compiler](https://sandcastle.codeplex.com), described in the thread on
 an [optimal solution for documentation of .NET](https://social.msdn.microsoft.com/Forums/en-US/132104fc-c875-4a75-9862-19d7d53a5e87/optimal-solution-for-documentation).
