@@ -11,15 +11,6 @@
 <!---
 
 Live Web Site Editing Rendering #Markdown via #Showdown #atx #setext #3dwebcoder #python #adskdevnetwrk #adsk #jacascript #html #github
-#asciidoc
-#gcal #caldav #cloud #googleapi #restapi
-#nodejs #revitapi #mongodb #mongolab #heroku
-#mongoosejs #expressjs
-#milanojs
-#3dwebaccel #prague #webgl #3dweb #a360
-#au2015 #autocad #inventor #ah8 #cubeathens #developers
-#aws #revitapi #jquery #handlebars #heroku
-akn_include
 
 Theo Armour uses Showdown to convert Markdown to HTML in all his JavaScript apps.
 Each page generates its own HTML from the embedded MD and there is no need more for any external intermediate conversion steps.

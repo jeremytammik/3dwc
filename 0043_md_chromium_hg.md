@@ -14,16 +14,6 @@
 
 - asciidoc easy web site framework
 
-#3dwebcoder #python #adskdevnetwrk #adsk #markdown #asciidoc
-#gcal #caldav #cloud #googleapi #restapi
-#nodejs #revitapi #mongodb #mongolab #heroku
-#mongoosejs #expressjs
-#milanojs
-#3dwebaccel #prague #webgl #3dweb #a360
-#au2015 #autocad #inventor #ah8 #cubeathens #developers
-#aws #revitapi #jquery #handlebars #heroku
-akn_include
-
 -->
 
 
