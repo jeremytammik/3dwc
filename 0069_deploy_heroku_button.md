@@ -34,19 +34,17 @@ akn_include
 
 Team Meeting and Deploy to Heroku Button #3dwebcoder #revitapi #3dweb #a360 #3dwebaccel @adskForge #Heroku
 
-
-I am at in London for an internal meeting with my European ADN DevTech colleagues today.
+I am in London for an internal meeting with my European ADN DevTech colleagues today.
 As you might guess from the pictures, we are in Broad Court, right next to Bow Street and beside the nice bronze statue Young Dancer by Enzo Plazotta.
 During the meeting, Cyrille mentioned the possibility to add a 'deploy to Heroku' button to a GitHub repository readme to automate the installation and testing a cloud-based app.
 I use Heroku to run all my cloud-based apps, so I decided to test that right away...
-
 
 -->
 
 
 ### Team Meeting and Deploy to Heroku Button
 
-I am at in London for an internal meeting with my European ADN DevTech colleagues today:
+I am in London for an internal meeting with my European ADN DevTech colleagues today:
 
 <center>
 <a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157663346443223" title="European ADN Team Meeting"><img src="https://farm2.staticflickr.com/1544/25349932560_c97148600b_n.jpg" width="320" height="240" alt="European ADN Team Meeting"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
@@ -80,7 +78,7 @@ Here is a button to immediately and fully automatically deploy and run this app 
 I added, committed and pushed the updated readme to the GitHub repository, and the new button appears like this:
 
 <center>
-<img src="img/deploy_to_heroku_button.png" alt="Deploy to Heroku' button" width="224">
+<img src="img/deploy_to_heroku_button.png" alt="'Deploy to Heroku' button" width="224">
 </center>
 
 This takes you through all the steps fully automatically with no manual intervention required, except possibly to enter your account details and credentials.
