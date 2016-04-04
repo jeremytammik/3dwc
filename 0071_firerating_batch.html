@@ -1,0 +1,52 @@
+<p><head>
+<title>The 3D Web Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+#3dwebcoder #revitapi #3dweb @adskForge #markdown #asciidoc #DocBook #adsk
+
+&ndash; ...
+
+-->
+
+<h3>FireRatingCloud REST API Batch Upload</h3>
+<p>Before getting technical, let me mention that I had a great time with Markus and Wolfgang on <a href="https://flic.kr/s/aHskwMCnYo">ski tours climbing a couple of mountains around the Gemmipass</a> last weekend:</p>
+<p><center>
+<a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157666107801002" title="Ski tours round Gemmipass"><img src="https://farm2.staticflickr.com/1619/25975834236_86ceacb927_n.jpg" width="320" height="240" alt="Ski tours round Gemmipass"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</center></p>
+<p>Back to the technical stuff.</p>
+<p>I implemented a batch upload functionality for
+the <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud C# .NET Revit API add-in REST API MongoDB client</a> over
+a month ago, in Madrid, during
+the <a href="http://thebuildingcoder.typepad.com/blog/2016/01/bim-programming-madrid-and-spanish-connectivity.html">BIM Programming workshop</a>,
+together with Jose Ignacio Montes of <a href="http://avatarbim.com">Avatar BIM</a>, who shared his solution
+for <a href="http://thebuildingcoder.typepad.com/blog/2016/02/modelling-small-details.html">modelling small details</a> in Revit.</p>
+<p>Jose had noted that uploading the data for all doors in a large building model to the cloud database consumed a significant amount of time, whereas downloading the modified data for the same doors is almost instantaneous.</p>
+<p>This is completely obvious, once you come to think of it, since the original upload functionality uses an individual EST API call for each door element, whereas the download uses one single batch call for the entire set.</p>
+<p>There is a god reason for the individual calls to upload the data: I wished to create new database records for doors not yet represented in the database, and update the existing records for all others.</p>
+<p>I spent quite a
+while <a href="http://the3dwebcoder.typepad.com/blog/2015/09/mongodb-upsert.html">implementing and optimising my <code>upsert</code> method</a> to
+achieve just that.</p>
+<p>Unfortunately, I do not see any possibility to implement a batch upsert functionality to MongoDB.</p>
+<p>On the other hand, making thousands of individual REST API calls for a large Revit model is a completely ridiculous thought.</p>
+<p>Here is the list of enhancement made since I last discussed this project, with the corresponding GitHub project releases:</p>
+<ul>
+<li><a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2016.0.0.15">2016.0.0.15</a> &ndash; beginning to set up for <a href="http://www.bimprogramming.com">madrid bim programmingconference</a></li>
+<li><a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2016.0.0.16">2016.0.0.16</a> &ndash; split Commands.cs into three separate modules</li>
+<li><a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2016.0.0.17">2016.0.0.17</a> &ndash; added error message in case of node.js web server not running</li>
+<li><a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2016.0.0.18">2016.0.0.18</a> &ndash; implemented import of tag aka mark and added GET and PUT benchmarking timer</li>
+<li><a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2016.0.0.19">2016.0.0.19</a> &ndash; split all Revit independent utils into separate module</li>
+<li><a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2016.0.0.20">2016.0.0.20</a> &ndash; integrated FireRatingClient</li>
+<li><a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2016.0.0.21">2016.0.0.21</a> &ndash; implemented batch upload using C# Delete + PostBatch calling fireratingdb deleteAllForProject + insertBatch</li>
+<li><a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2016.0.0.22">2016.0.0.22</a> &ndash; batch upload worked fine locally but not on web server so switched back to one by one upload</li>
+<li><a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2016.0.0.23">2016.0.0.23</a> &ndash; batch upload works fine on mongolab too, implemented separate upload commands for batch versus one by one</li>
+</ul>
+<p>In case you are wondering about the new <code>FireRatingClient</code> module, suffice to say it is a very cool simple little Windows forms executable to demonstrate ubiquitous BIM data access and editing with immediate upload back to the cloud and back to the original BIM model.</p>
+<p>More on that anon.</p>
+<p>I am off to my <a href="http://thebuildingcoder.typepad.com/blog/2016/03/vipassana-meditation-and-idling-versus-external-events.html">Vipassana meditation retreat</a> now, so more on all this when I return.</p>

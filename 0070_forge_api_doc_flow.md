@@ -49,6 +49,10 @@ on [documentation of a REST API with Swagger and AsciiDoc](http://www.robwin.eu/
 
 AsciiDoc is preferable to Markdown as it has more features. AsciiDoc is a text document format for writing documentation, articles, books, ebooks, slideshows, web pages and blogs. AsciiDoc files can be converted to HTML, PDF and EPUB. AsciiDoc and Markdown are well suited for describing public APIs.
 
+If it has to do with REST, a really cool option is to combine your documentation workflow with [YAML](https://en.wikipedia.org/wiki/YAML),
+a human-readable data serialization language,
+and [Swagger](http://swagger.io), a simple yet powerful representation of any RESTful API.
+
 I actually already looked at [AsciiDoc and Markdown](http://the3dwebcoder.typepad.com/blog/2015/08/hackergarten-chromium-and-markdown.html#4) when
 initially starting to use the latter to write all my blog posts for both [The Building Coder](http://thebuildingcoder.typepad.com) and [The 3d Web coder](http://the3dwebcoder.typepad.com). I am writing this sentence for you at this very moment using a pure text editor and Markdown.
 
