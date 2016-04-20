@@ -33,10 +33,25 @@ Here are the steps to achieve that:
 - [C# REST API client accessing the new route](#3)
 - [Download and diff](#4)
 
+
+#### <a name="1"></a>Modern JavaScript Bundling Tools
+
 Before getting to that, here is a quick pointer to a thorough and interesting article on consolidating modern JavaScript tooling from [Philippe Leefsma](http://adndevblog.typepad.com/cloud_and_mobile/philippe-leefsma.html), who says:
 
 > Here is a worthy read to
 help [understanding JavaScript modules, bundling and  transpiling](http://www.sitepoint.com/javascript-modules-bundling-transpiling).
+
+The gist of the article is providing an overview of and a solution for the current complex situation:
+
+> Personally, I don’t care for building asset pipelines any longer, what I’m looking for is minimal config tools that allow me to use modern tooling as needed: Things like Sass, Autoprefixer, Babel and Coffeescript, a proper module system and loader without having to worry about the implementation, configuration and ongoing maintenance. In essence, every developer has been investing time into creating asset pipelines over the last few years, that’s a lot of wheel re-invention going on and a lot of wasted hours.
+
+It wraps up saying:
+
+> If you just want to use modules, then Browserify, jspm or Webpack with the default options will do the job.
+
+> Keep the tooling simple and the configuration light. Happy Bundling.
+
+
 
 
 #### <a name="2"></a>A MongoDB Query and Express Route Using $gt

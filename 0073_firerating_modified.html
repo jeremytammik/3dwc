@@ -28,10 +28,20 @@ my FireRatingCloud mongodb documents with the intention of retrieving only docum
 <li><a href="#3">C# REST API client accessing the new route</a></li>
 <li><a href="#4">Download and diff</a></li>
 </ul>
+<h4><a name="1"></a>Modern JavaScript Bundling Tools</h4>
 <p>Before getting to that, here is a quick pointer to a thorough and interesting article on consolidating modern JavaScript tooling from <a href="http://adndevblog.typepad.com/cloud_and_mobile/philippe-leefsma.html">Philippe Leefsma</a>, who says:</p>
 <blockquote>
 <p>Here is a worthy read to
 help <a href="http://www.sitepoint.com/javascript-modules-bundling-transpiling">understanding JavaScript modules, bundling and  transpiling</a>.</p>
+</blockquote>
+<p>The gist of the article is providing an overview of and a solution for the current complex situation:</p>
+<blockquote>
+<p>Personally, I don’t care for building asset pipelines any longer, what I’m looking for is minimal config tools that allow me to use modern tooling as needed: Things like Sass, Autoprefixer, Babel and Coffeescript, a proper module system and loader without having to worry about the implementation, configuration and ongoing maintenance. In essence, every developer has been investing time into creating asset pipelines over the last few years, that’s a lot of wheel re-invention going on and a lot of wasted hours.</p>
+</blockquote>
+<p>It wraps up saying:</p>
+<blockquote>
+<p>If you just want to use modules, then Browserify, jspm or Webpack with the default options will do the job.</p>
+<p>Keep the tooling simple and the configuration light. Happy Bundling.</p>
 </blockquote>
 <h4><a name="2"></a>A MongoDB Query and Express Route Using $gt</h4>
 <p>I can very easily retrieve all documents from a mongo db for a specific BIM project with a <code>modified</code> timestamp greater than the one specified in the REST API query like this:</p>
