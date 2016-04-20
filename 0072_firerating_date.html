@@ -9,7 +9,7 @@
 </head></p>
 <!---
 
-FireRatingCloud Document Modification Timestamp #3dwebcoder #revitapi #3dweb @adskForge #adsk #RestSharp #nodejs
+FireRatingCloud Document Modification Timestamp #3dwebcoder #revitapi #3dweb @AutodeskForge #adsk #RestSharp #nodejs
 
 The last task I discussed here was the FireRatingCloud batch upload functionality.
 FireRatingCloud is a C# .NET Revit API add-in REST API MongoDB client of the fireratingdb node.js MongoDB web server.
@@ -120,7 +120,7 @@ var doorSchema = new Schema(
 <p>This seems to be one of those typical web development scenarios where everything you need has already been implemented somewhere, but it is next to impossible &ndash; or seems rather hard to me, at least &ndash; to determine exactly where and how to use it fully.</p>
 <p>In this case, some operations perform as expected, others do not, and the documentation is meagre and confusing.</p>
 <p>I therefore opted to define my own timestamp in the C# code, to ensure complete control &ndash; mainly due to my incomplete understanding of MongoDB and Mongoose, of course.</p>
-<h4><a name="5"></a>Implementing My Own Timestamp in C</h4>
+<h4><a name="5"></a>Implementing My Own Timestamp in C&#35;</h4>
 <p>In order to avoid any time and date confusion issues, I am opting to store my own Unix timestamp, i.e., the number of seconds since 1970-01-01.</p>
 <p>I am storing it as an integer value, and not letting anyone know that it is in fact a timestamp, to hopefully ensure that all parties involved leave it alone and don't try to meddle with it in any way.</p>
 <p>I added it to the base DoorData class like this:</p>
