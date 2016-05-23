@@ -1,0 +1,386 @@
+<p><head>
+<title>The 3D Web Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true&amp;skin=sunburst&amp;lang=css" defer="defer"></script>
+</head></p>
+<!---
+
+Roomedit3d Viewer Extension, POST and Socket #3dwebcoder #revitapi #3dweb @AutodeskForge #nodejs #socketio
+
+I returned from the Barcelona Forge Accelerator, where I started an exciting new project connecting BIM and the cloud demonstrating two cool possibilities to enhance interaction with the View and Data API, a viewer extension enabling interactive model modification, i.e., translation of selected elements, and a real-time communication of the modification back to the source CAD system
+&ndash; It's Read-Only! How can it be Read-Write?
+&ndash; Genealogy or Where to Start?
+&ndash; Capturing the TransformTool Selection
+&ndash; Determining the TransformTool Translation Vector
+&ndash; POST From Viewer to Server
+&ndash; Broadcast via Socket.io
+&ndash; Desktop Notification Connection and Subscription
+&ndash; Demo Recording
+&ndash; Download and Diff
+&ndash; To Do...
+
+-->
+
+<h3>Roomedit3d Viewer Extension, POST and Socket</h3>
+<p>I returned from the Barcelona <a href="http://forge.autodesk.com">Forge</a> <a href="http://autodeskcloudaccelerator.com">Accelerator</a>,
+where I started an exciting new project connecting BIM and the cloud demonstrating two cool possibilities to enhance interaction with
+the <a href="https://developer.autodesk.com/api/view-and-data-api">View and Data API</a>:</p>
+<ul>
+<li>A viewer extension enabling interactive model modification, i.e., translation of selected elements</li>
+<li>Real-time communication of the modification back to the source CAD system using:<ul>
+<li>A REST API POST call from the viewer extension to the node.js web server</li>
+<li>A direct <a href="http://socket.io">socket.io</a> connections to broadcast from the web server to any number of desktop clients</li>
+</ul>
+</li>
+</ul>
+<p>Let's look at these topics in more detail:</p>
+<ul>
+<li><a href="#2">Barcelona Forge Accelerator</a></li>
+<li><a href="#3">Roomedit3d</a></li>
+<li><a href="#4">It's Read-Only! How can it be Read-Write?</a></li>
+<li><a href="#5">Genealogy or Where to Start?</a></li>
+<li><a href="#6">Capturing the TransformTool Selection</a></li>
+<li><a href="#7">Determining the TransformTool Translation Vector</a></li>
+<li><a href="#8">POST From Viewer to Server</a></li>
+<li><a href="#9">Broadcast via Socket.io</a></li>
+<li><a href="#10">Desktop Notification Connection and Subscription</a></li>
+<li><a href="#11">Demo Recording</a></li>
+<li><a href="#12">Download and Diff</a></li>
+<li><a href="#13">To Do</a></li>
+</ul>
+<h4><a name="2"></a>Barcelona Forge Accelerator</h4>
+<p>Here are some pictures from the accelerator.</p>
+<p>Arrival in Barcelona and the Autodesk office in Poble Nou:</p>
+<p><center>
+<a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157666044807243" title="Forge Accelerator"><img src="https://farm8.staticflickr.com/7099/26462287804_38d1bbb582_n.jpg" width="320" height="240" alt="Forge Accelerator"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</center></p>
+<p>Relaxing from intensive cloud programming on a two-hour sailboat cruise:</p>
+<p><center>
+<a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157668599840235" title="Forge Accelerator Ahoy"><img src="https://farm8.staticflickr.com/7594/27014775142_d30eb90c39_n.jpg" width="320" height="240" alt="Forge Accelerator Ahoy"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</center></p>
+<p>On Thursday night I found a very nice and friendly restaurant in Poble Nou, <a href="http://www.aguaribay-bcn.com">Aguaribay</a>.
+I asked what the word 'aguaribay' means and discovered it is an indigenous South American word for the 'pepper tree' growing aromatic red pepper corn berries.
+Very tasty.</p>
+<p>The accelerator itself went very well.</p>
+<p>Here are some notes from the demos on the last day:</p>
+<ul>
+<li><a href="http://autoplot.es">Autoplot</a> Barcelona implemented an AutoCAD I/O REST API app to extract and modify DWG block attributes.
+After the demo, Philippe suggested making use of the <a href="https://chrome.google.com/webstore/detail/jsonview/chklaanhfefbnpoihckbnefhakgolnmc">JSONview Chrome extension</a> to pretty-print an intermediate JSON result.</li>
+<li><a href="http://www.edgeforrevit.com">PTAC EDGE^Revit</a> delivers concrete construction functionality for Revit, information for the job site and production floor.
+Currently, they ship drawings. Can we deliver this content via an iPAD or tablet and skip the paper? A prototype is up and running now listing content in the cloud.</li>
+<li><a href="http://www.mum-europe.com">Mensch und Maschine</a> worked on two projects: for several FM tasks and for Vault linking with MongoDB. They implemented apps using the <a href="https://developer.autodesk.com/api/view-and-data-api">View and Data API</a> and AutoCAD I/O. <!--- Among other things, they upload documents, list buckets, create a new bucket... --></li>
+<li><a href="https://www.opendesk.cc">Opendesk</a> offers a different approach to designing furniture and making it locally, sustainably and on demand. Currently using Inventor, they explored moving to Fusion and driving CNC machines directly from there.</li>
+<li>Finally, I presented my new roomedit3d sample described below, demonstrating a <a href="http://socket.io">socket.io</a> broadcast from a web server to any number of connected clients, on the desktop or elsewhere.</li>
+</ul>
+<p>All very exciting and promising stuff!</p>
+<h4><a name="3"></a>Roomedit3d</h4>
+<p>Roomedit3d is yet another addition to my collection of samples demonstrating connecting the desktop and the cloud using a Revit BIM model communicating round-trip and real-time with a web-hosted data collection.</p>
+<p>This one is based on the same idea as my venerable old <a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp</a>, with two significant and interesting enhancements:</p>
+<ul>
+<li>Use the View and Data API to present and interact with a full 3D view of the BIM instead of a limited 2D one.</li>
+<li>Use a <a href="http://socket.io">socket.io</a> connection to communicate changes back to the BIM instead of inefficient REST-based polling.</li>
+</ul>
+<p>The RoomEditorApp creates a vastly simplified 2D <a href="https://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a> model
+of selected rooms, displays it any browser, including on any mobile device, enables you to interactively move and rotate furniture family instances, and updates the BIM model accordingly in real time.</p>
+<p>The other important sample connecting the desktop and the cloud
+is <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud</a>.</p>
+<p>Just like RoomEditorApp and FireRatingCloud, Roomedit3d consists of two parts:</p>
+<ul>
+<li><a href="https://github.com/jeremytammik/roomedit3d">roomedit3d</a>, implementing the web server, MongoDB cloud-hosted database and <a href="https://developer.autodesk.com/api/view-and-data-api">View and Data API</a> interactive 3D model viewer.</li>
+<li><a href="https://github.com/jeremytammik/Roomedit3dApp">Roomedit3dApp</a>, the C# .NET Revit API add-in client.</li>
+</ul>
+<p>Here are the main steps required to implement the <a href="https://github.com/jeremytammik/roomedit3d">roomedit3d</a> node.js web server handling the viewer side of things:</p>
+<ul>
+<li>Set up the View and Data API viewer and display a model, including the REST API to handle the authorisation token.</li>
+<li>Implement an extension to drag a selected element to a new location in the viewer.</li>
+<li>REST API <code>POST</code> call to send the element selection and translation data back from the JavaScript viewer browser client to the node.js web server.</li>
+<li>Implement a <a href="http://socket.io">socket.io</a> broadcast to make the modification data available to other subscribing clients.</li>
+<li>Deploy in Heroku.</li>
+</ul>
+<p>The C# .NET Revit add-in <a href="https://github.com/jeremytammik/Roomedit3dApp">Roomedit3dApp</a> is still in its early stages, and includes the following:</p>
+<ul>
+<li>A <a href="http://socket.io">socket.io</a> connection subscribing to the broadcast messages.</li>
+<li>An external event to modify the BIM when updates become available.</li>
+<li>An external app to handle the external event.</li>
+<li>An external command to toggle on and off the broadcast subscription.</li>
+</ul>
+<h4><a name="4"></a>It's Read-Only! How can it be Read-Write?</h4>
+<p>Arif Hanif asked a very valid question in
+a <a href="http://thebuildingcoder.typepad.com/blog/2016/05/idea-station-and-textnote-bounding-box.html#comment-2687266921">comment</a> on
+my <a href="http://thebuildingcoder.typepad.com/blog/2016/05/idea-station-and-textnote-bounding-box.html">initial description of this project</a>:</p>
+<p><strong>Question:</strong> The roomeditor with View and Data API seems interesting.</p>
+<p>I did not know you could make edits in the View and Data API?</p>
+<p><strong>Answer:</strong> Thank you for your pertinent question.</p>
+<p>The View and Data API consists of two parts:</p>
+<ol>
+<li>Translation service from CAD model or other sources to the viewer JSON stream.</li>
+<li>The viewer.</li>
+</ol>
+<p>The viewer displays the translated JSON data stream using <a href="https://en.wikipedia.org/wiki/Three.js">three.js</a>.</p>
+<p>That is completely open source and JavaScript based.</p>
+<p>Three.js can also be used to edit the scene.</p>
+<p>The system is read-only in the sense that you cannot save back any changes directly back to the original CAD source model.</p>
+<p>You can however modify the scene, retrieve and store those modifications in your own format, and implement your own functionality to update the original CAD model accordingly, if you so please.</p>
+<p>That is what all my samples connecting BIM and the cloud demonstrate.</p>
+<p>I hope this clarifies.</p>
+<h4><a name="5"></a>Genealogy or Where to Start?</h4>
+<p>The first step listed above, setting up the View and Data API viewer and displaying a model, including the REST API to handle the authorisation token, is completely based on Philippe Leefsma's <a href="https://github.com/leefsmp/view.and.data-boilerplate">View and Data API boilerplate</a>.</p>
+<p>It implements the complete node.js web server, viewer, authorisation token handling and a REST API for the browser client to query the web server for it.</p>
+<p>Once that was up and running with the sample model of my choice, I added
+the <a href="http://viewer.autodesk.io/node/gallery/embed?id=546bf4493a5629a0158bc3a4&amp;extIds=Autodesk.ADN.Viewing.Extension.TransformTool">TransformTool extension</a> from
+Philippe's <a href="https://github.com/Developer-Autodesk/library-javascript-viewer-extensions">collection of View and Data API JavaScript extensions</a> for
+the viewer, showing what is doable with the client-side JavaScript API.</p>
+<p>Those two steps were really quick and easy.</p>
+<p>Many thanks to Philippe for his help with them!</p>
+<h4><a name="6"></a>Capturing the TransformTool Selection</h4>
+<p>The TransformTool enables a user to interactively select an element in the viewer and manipulate its location.</p>
+<p>We need to communicate the selected element external id and the resulting translation vector back to the desktop CAD model.</p>
+<p>I renamed the extension module to <code>Roomedit3dTranslationTool.js</code> and implemented two variables to capture this data, <code>_externalId</code> and <code>_initialHitPoint</code>.</p>
+<p>Thee external id is determined from the viewer <code>dbId</code> in the selection changed event handler like this:</p>
+<pre class="prettyprint">
+  function onSelectionChanged(event) {
+    var dbId = event.dbIdArray[0];
+
+    if(dbId) {
+      viewer.getProperties(dbId, function(result){
+        //console.log(result);
+        _externalId = result.externalId;
+      });
+    }
+    handleSelectionChanged(event.fragIdsArray);
+  }
+</pre>
+
+<h4><a name="7"></a>Determining the TransformTool Translation Vector</h4>
+<p>The interesting stuff happens in the <code>handleButtonUp</code> event handler.</p>
+<p>It:</p>
+<ul>
+<li>Queries the current tool location</li>
+<li>Calculates the translation vector <code>offset</code></li>
+<li>Logs the data to the console</li>
+<li>Packages the data</li>
+<li>Sends it from the JavaScript viewer client in the browser to the node.js web server</li>
+</ul>
+<pre class="prettyprint">
+this.handleButtonUp = function(event, button) {
+
+  if( _isDirty && _externalId && _initialHitPoint ) {
+    var offset = subtract_point(
+      _transformControlTx.position,
+      _initialHitPoint );
+
+    _initialHitPoint = new THREE.Vector3(
+      _transformControlTx.position.x,
+      _transformControlTx.position.y,
+      _transformControlTx.position.z );
+
+    console.log( 'button up: external id '
+      + _externalId + ' offset by '
+      + pointString( offset ) );
+
+    var data = {
+      externalId : _externalId,
+      offset : offset
+    }
+
+    options.roomedit3dApi.postTransform(data);
+
+    _isDirty = false;
+  }
+
+  _isDragging = false;
+
+  if (_transformControlTx.onPointerUp(event))
+    return true;
+
+  return false;
+};
+</pre>
+
+<h4><a name="8"></a>POST From Viewer to Server</h4>
+<p>The <code>postTransform</code> function invoked above to POST the translation from the viewer to the web server is implemented by the <code>Roomedit3dApiClient</code> using
+the [JavaScript <code>fetch</code> method(https://fetch.spec.whatwg.org/#dom-global-fetch) defined by]
+the <a href="https://fetch.spec.whatwg.org">Fetch standard</a> and provided by
+the <a href="https://www.npmjs.com/package/whatwg-fetch">whatwg-fetch npm package</a> like this:</p>
+<pre class="prettyprint">
+var Roomedit3dApiClient = function(args) {
+
+  var _apiUrl = args.baseUrl;
+
+  this.postTransform = function(data) {
+    return fetch(_apiUrl + '/transform', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+  }
+}
+</pre>
+
+<h4><a name="9"></a>Broadcast via Socket.io</h4>
+<p>Now we come to the exciting part.</p>
+<p>Once the node.js web server has received the translation information from the viewer client in the browser, it broadcasts it to any number of clients using <a href="http://socket.io">socket.io</a>.</p>
+<p>In case you are interested, here is a nice <a href="http://socket.io/get-started/chat">socket.io getting started</a> sample implementing a bidirectional chat.</p>
+<p>The node.js server mainline sets up the socket like this:</p>
+<pre class="prettyprint">
+var io = require('socket.io');
+var roomedit3d = require('./routes/api/roomedit3d');
+
+// . . .
+
+app.set('port', process.env.PORT || 3000);
+
+var server = app.listen(
+  app.get( 'port' ),
+  function() {
+    var a = server.address().port;
+
+    console.log(
+      'Roomedit3d server ' + pkg.version
+      + ' listening at port ' + a + '.'
+    );
+
+    var io2 = io(server);
+
+    io2.on('connection', function(client){
+      console.log('a client connected to the roomedit3d socket');
+    });
+
+    app.use('/api/roomedit3d', roomedit3d(io2));
+  }
+);
+</pre>
+
+<p>The socket is passed in to the <code>roomedit3d</code> module, which implements the <code>api/roomedit3d/transform</code> POST route and immediately passes the data on to the socket to broadcast like this:</p>
+<pre class="prettyprint">
+var express = require('express');
+
+module.exports = function(io) {
+
+  var router = express.Router();
+
+  router.post('/transform', function (req, res) {
+    console.log(req.body);
+
+    //req.body.externalId; // external id == Revit UniqueId
+    //req.body.offset; // THREE.Vector3 offset x y z
+
+    io.sockets.emit('transform', req.body);
+
+    return res.send();
+  });
+
+  return router;
+}
+</pre>
+
+<p>Pretty easy, isn't it?</p>
+<p>Subscribing to the broadcast from the desktop in C# is easier still!</p>
+<h4><a name="10"></a>Desktop Notification Connection and Subscription</h4>
+<p>I started implementing the <a href="https://github.com/jeremytammik/Roomedit3dApp">Roomedit3dApp</a> C# .NET Revit API add-in client.</p>
+<p>To test the connection and receive the socket broadcast notifications, however, we have no need for all the Revit API overhead.</p>
+<p>I implemented the simple stand-alone console test
+executable <a href="https://github.com/jeremytammik/Roomedit3dApp/tree/master/Roomedit3dSocketTest">Roomedit3dSocketTest</a> to do so.</p>
+<p>It makes use of the <a href="https://github.com/Quobject/SocketIoClientDotNet">SocketIoClientDotNet</a> Socket.IO client library for .NET, which is also available as a NuGet package.</p>
+<p>Here is the resulting packages.config:</p>
+<pre class="code">
+<span style="color:blue;">&lt;?</span><span style="color:#a31515;">xml</span><span style="color:blue;">&nbsp;</span><span style="color:red;">version</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">1.0</span>&quot;<span style="color:blue;">&nbsp;</span><span style="color:red;">encoding</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">utf-8</span>&quot;<span style="color:blue;">?&gt;</span>
+<span style="color:blue;">&lt;</span><span style="color:#a31515;">packages</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">package</span><span style="color:blue;">&nbsp;</span><span style="color:red;">id</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">EngineIoClientDotNet</span>&quot;<span style="color:blue;">&nbsp;</span><span style="color:red;">version</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">0.9.22</span>&quot;<span style="color:blue;">&nbsp;</span><span style="color:red;">targetFramework</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">net452</span>&quot;<span style="color:blue;">&nbsp;/&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">package</span><span style="color:blue;">&nbsp;</span><span style="color:red;">id</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">Newtonsoft.Json</span>&quot;<span style="color:blue;">&nbsp;</span><span style="color:red;">version</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">8.0.1</span>&quot;<span style="color:blue;">&nbsp;</span><span style="color:red;">targetFramework</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">net452</span>&quot;<span style="color:blue;">&nbsp;/&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">package</span><span style="color:blue;">&nbsp;</span><span style="color:red;">id</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">SocketIoClientDotNet</span>&quot;<span style="color:blue;">&nbsp;</span><span style="color:red;">version</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">0.9.13</span>&quot;<span style="color:blue;">&nbsp;</span><span style="color:red;">targetFramework</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">net452</span>&quot;<span style="color:blue;">&nbsp;/&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">package</span><span style="color:blue;">&nbsp;</span><span style="color:red;">id</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">WebSocket4Net</span>&quot;<span style="color:blue;">&nbsp;</span><span style="color:red;">version</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">0.14.1</span>&quot;<span style="color:blue;">&nbsp;</span><span style="color:red;">targetFramework</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">net452</span>&quot;<span style="color:blue;">&nbsp;/&gt;</span>
+<span style="color:blue;">&lt;/</span><span style="color:#a31515;">packages</span><span style="color:blue;">&gt;</span>
+</pre>
+
+<p>With the help of that, the console application mainline implements the following steps:</p>
+<ul>
+<li>Set up the socket.io connection</li>
+<li>Post a message when connected</li>
+<li>On receiving a <code>transform</code> message, format and log the info</li>
+<li>Loop forever, waiting for messages</li>
+</ul>
+<p>That is achieved with the following few lines of code:</p>
+<pre class="code">
+<span style="color:blue;">using</span>&nbsp;System.Threading;
+<span style="color:blue;">using</span>&nbsp;Newtonsoft.Json.Linq;
+<span style="color:blue;">using</span>&nbsp;Quobject.SocketIoClientDotNet.Client;
+<span style="color:blue;">using</span>&nbsp;System;
+
+<span style="color:blue;">namespace</span>&nbsp;Roomedit3dSocketTest
+{
+&nbsp;&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">Program</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">const</span>&nbsp;<span style="color:blue;">string</span>&nbsp;_url&nbsp;=&nbsp;<span style="color:#a31515;">&quot;https://roomedit3d.herokuapp.com:443&quot;</span>;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">void</span>&nbsp;Main(&nbsp;<span style="color:blue;">string</span>[]&nbsp;args&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;options&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">IO</span>.<span style="color:#2b91af;">Options</span>()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IgnoreServerCertificateValidation&nbsp;=&nbsp;<span style="color:blue;">true</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AutoConnect&nbsp;=&nbsp;<span style="color:blue;">true</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ForceNew&nbsp;=&nbsp;<span style="color:blue;">true</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;};
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Socket</span>&nbsp;socket&nbsp;=&nbsp;<span style="color:#2b91af;">IO</span>.Socket(&nbsp;_url,&nbsp;options&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;socket.On(&nbsp;<span style="color:#2b91af;">Socket</span>.EVENT_CONNECT,&nbsp;()&nbsp;=&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Console</span>.WriteLine(&nbsp;<span style="color:#a31515;">&quot;Connected&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;socket.On(&nbsp;<span style="color:#a31515;">&quot;transform&quot;</span>,&nbsp;(data)&nbsp;=&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">JObject</span>&nbsp;data2&nbsp;=&nbsp;<span style="color:#2b91af;">JObject</span>.FromObject(&nbsp;data&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Console</span>.WriteLine(&nbsp;<span style="color:blue;">string</span>.Format(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;transform:&nbsp;externalId={0}&nbsp;({1:0.00},{2:0.00},{3:0.00})&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data2[<span style="color:#a31515;">&quot;externalId&quot;</span>],&nbsp;data2[<span style="color:#a31515;">&quot;offset&quot;</span>][<span style="color:#a31515;">&quot;x&quot;</span>],&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data2[<span style="color:#a31515;">&quot;offset&quot;</span>][<span style="color:#a31515;">&quot;y&quot;</span>],&nbsp;data2[<span style="color:#a31515;">&quot;offset&quot;</span>][<span style="color:#a31515;">&quot;z&quot;</span>]&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">while</span>&nbsp;(&nbsp;<span style="color:blue;">true</span>&nbsp;)&nbsp;{&nbsp;<span style="color:#2b91af;">Thread</span>.Sleep(&nbsp;100&nbsp;);&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}
+</pre>
+
+<h4><a name="11"></a>Demo Recording</h4>
+<p>Here is a <a href="https://youtu.be/5IBd-L3cD3Y">six-minute demo recording</a> showing:</p>
+<ul>
+<li>View and Data API viewer running locally</li>
+<li>The viewer extension</li>
+<li>The viewer echoing the translation data in the JavaScript debugger console</li>
+<li>The node server logging the POST data received from the viewer when running locally, and forwarding it to the socket.io broadcast</li>
+<li>The same steps running Heroku-hosted in the cloud</li>
+<li>The console app connecting to the cloud and logging the translation messages as they are sent and received</li>
+</ul>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/5IBd-L3cD3Y" frameborder="0" allowfullscreen></iframe>
+</center></p>
+<h4><a name="12"></a>Download and Diff</h4>
+<p>The current versions
+of <a href="https://github.com/jeremytammik/roomedit3d">roomedit3d</a>
+and <a href="https://github.com/jeremytammik/Roomedit3dApp">Roomedit3dApp</a> discussed above
+are <a href="https://github.com/jeremytammik/roomedit3d/releases/tag/0.0.4">release 0.0.4</a>
+and <a href="https://github.com/jeremytammik/Roomedit3dApp/releases/tag/2017.0.0.2">release 2017.0.0.2</a>,
+respectively.</p>
+<h4><a name="13"></a>To Do</h4>
+<p>The Roomedit3dSocketTest console application is just a proof of concept.</p>
+<p>Obviously, I now want to implement the real thing:</p>
+<ul>
+<li>Complete the <a href="https://github.com/jeremytammik/Roomedit3dApp">Roomedit3dApp</a> C# .NET Revit API add-in client with its external event, transform message handling, BIM update, etc.</li>
+<li>Besides translation, I would also like the View and Data extension to handle rotation in the XY plane.</li>
+<li>Since this runs so well here, I would like to update
+the <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud</a> sample
+to use the same technology and implement a socket.io connection between the FireRatingCloud C# .NET Revit add-in and
+its <a href="https://github.com/jeremytammik/firerating">fireratingdb</a> node.js web and MongoDB server.</li>
+</ul>
+<p>Not to mention much more urgent other things, such as preparing for the upcoming <a href="http://forge.autodesk.com/conference">Forge DevCon</a>!</p>
