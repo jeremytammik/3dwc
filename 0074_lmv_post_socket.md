@@ -6,6 +6,8 @@
 <script src="run_prettify.js" type="text/javascript"></script>
 -->
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true&amp;skin=sunburst&amp;lang=css" defer="defer"></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true&amp;skin=sunburst" defer="defer"></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 </head>
 
 <!---
@@ -189,7 +191,6 @@ Thee external id is determined from the viewer `dbId` in the selection changed e
 
     if(dbId) {
       viewer.getProperties(dbId, function(result){
-        //console.log(result);
         _externalId = result.externalId;
       });
     }
