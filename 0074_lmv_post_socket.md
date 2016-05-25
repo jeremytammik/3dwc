@@ -52,7 +52,7 @@ Let's look at these topics in more detail:
 - [Broadcast via Socket.io](#9)
 - [Desktop Notification Connection and Subscription](#10)
 - [Demo Recording](#11)
-- [Download and Diff](#12)
+- [Download](#12)
 - [To Do](#13)
 
 #### <a name="2"></a>Barcelona Forge Accelerator
@@ -436,7 +436,7 @@ Here is a [six-minute demo recording](https://youtu.be/5IBd-L3cD3Y) showing:
 </center>
 
 
-#### <a name="12"></a>Download and Diff
+#### <a name="12"></a>Download
 
 The current versions
 of [roomedit3d](https://github.com/jeremytammik/roomedit3d)
