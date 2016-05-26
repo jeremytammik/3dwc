@@ -38,7 +38,7 @@ the [View and Data API](https://developer.autodesk.com/api/view-and-data-api):
 - A viewer extension enabling interactive model modification, i.e., translation of selected elements
 - Real-time communication of the modification back to the source CAD system using:
     - A REST API POST call from the viewer extension to the node.js web server
-    - A direct [socket.io](http://socket.io) connections to broadcast from the web server to any number of desktop clients
+    - A direct [socket.io](http://socket.io) connection to broadcast from the web server to any number of desktop clients
 
 Let's look at these topics in more detail:
 
