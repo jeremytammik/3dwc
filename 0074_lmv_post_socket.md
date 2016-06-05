@@ -35,7 +35,7 @@ I returned from the Barcelona [Forge](http://forge.autodesk.com) [Accelerator](h
 where I started an exciting new project connecting BIM and the cloud demonstrating two cool possibilities to enhance interaction with
 the [View and Data API](https://developer.autodesk.com/api/view-and-data-api):
 
-- A viewer extension enabling interactive model modification, i.e., translation of selected elements
+- A viewer extension enabling interactive model modification, i.e., translation of selected elements, based on Philippe Leefsma's [TransformTool](http://adndevblog.typepad.com/cloud_and_mobile/2015/08/moving-visually-your-components-in-the-viewer-using-the-transformtool.html)
 - Real-time communication of the modification back to the source CAD system using:
     - A REST API POST call from the viewer extension to the node.js web server
     - A direct [socket.io](http://socket.io) connection to broadcast from the web server to any number of desktop clients
@@ -168,7 +168,8 @@ It implements the complete node.js web server, viewer, authorisation token handl
 Once that was up and running with the sample model of my choice, I added
 the [TransformTool extension](http://viewer.autodesk.io/node/gallery/embed?id=546bf4493a5629a0158bc3a4&extIds=Autodesk.ADN.Viewing.Extension.TransformTool) from
 Philippe's [collection of View and Data API JavaScript extensions](https://github.com/Developer-Autodesk/library-javascript-viewer-extensions) for
-the viewer, showing what is doable with the client-side JavaScript API.
+the viewer, showing what is doable with the client-side JavaScript API, documented in the discussion on [visually moving your components in the viewer](http://adndevblog.typepad.com/cloud_and_mobile/2015/08/moving-visually-your-components-in-the-viewer-using-the-transformtool.html).
+
 
 Those two steps were really quick and easy.
 

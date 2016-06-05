@@ -32,7 +32,7 @@ I returned from the Barcelona Forge Accelerator, where I started an exciting new
 where I started an exciting new project connecting BIM and the cloud demonstrating two cool possibilities to enhance interaction with
 the <a href="https://developer.autodesk.com/api/view-and-data-api">View and Data API</a>:</p>
 <ul>
-<li>A viewer extension enabling interactive model modification, i.e., translation of selected elements</li>
+<li>A viewer extension enabling interactive model modification, i.e., translation of selected elements, based on Philippe Leefsma's <a href="http://adndevblog.typepad.com/cloud_and_mobile/2015/08/moving-visually-your-components-in-the-viewer-using-the-transformtool.html">TransformTool</a></li>
 <li>Real-time communication of the modification back to the source CAD system using:<ul>
 <li>A REST API POST call from the viewer extension to the node.js web server</li>
 <li>A direct <a href="http://socket.io">socket.io</a> connection to broadcast from the web server to any number of desktop clients</li>
@@ -135,7 +135,7 @@ my <a href="http://thebuildingcoder.typepad.com/blog/2016/05/idea-station-and-te
 <p>Once that was up and running with the sample model of my choice, I added
 the <a href="http://viewer.autodesk.io/node/gallery/embed?id=546bf4493a5629a0158bc3a4&amp;extIds=Autodesk.ADN.Viewing.Extension.TransformTool">TransformTool extension</a> from
 Philippe's <a href="https://github.com/Developer-Autodesk/library-javascript-viewer-extensions">collection of View and Data API JavaScript extensions</a> for
-the viewer, showing what is doable with the client-side JavaScript API.</p>
+the viewer, showing what is doable with the client-side JavaScript API, documented in the discussion on <a href="http://adndevblog.typepad.com/cloud_and_mobile/2015/08/moving-visually-your-components-in-the-viewer-using-the-transformtool.html">visually moving your components in the viewer</a>.</p>
 <p>Those two steps were really quick and easy.</p>
 <p>Many thanks to Philippe for his help with them!</p>
 <h4><a name="6"></a>Capturing the TransformTool Selection</h4>
