@@ -145,9 +145,9 @@ at [roomedit3dv2.herokuapp.com](http://roomedit3dv2.herokuapp.com).
 Alternatively, you can fork it and launch your own instance on Heroku, your own server, locally or on the web, or anywhere else you please.
 
 The current versions
-of [roomedit3dv2](https://github.com/jeremytammik/roomedit3d)
+of [roomedit3dv2](https://github.com/jeremytammik/model.derivative.api-nodejs-sample-roomedit3d)
 and [Roomedit3dApp](https://github.com/jeremytammik/Roomedit3dApp) discussed above
-are [release 0.0.2](https://github.com/jeremytammik/roomedit3d/releases/tag/0.0.4)
-and [release 2017.0.0.5](https://github.com/jeremytammik/Roomedit3dApp/releases/tag/2017.0.0.5),
+are [release 0.0.2](https://github.com/jeremytammik/model.derivative.api-nodejs-sample-roomedit3d/releases/tag/0.0.2)
+and [2017.0.0.5](https://github.com/jeremytammik/Roomedit3dApp/releases/tag/2017.0.0.5),
 respectively.
 
