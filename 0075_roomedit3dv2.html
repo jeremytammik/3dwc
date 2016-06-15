@@ -1,0 +1,122 @@
+<p><head>
+<title>The 3D Web Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true" defer="defer"></script>
+</head></p>
+<!---
+
+Roomedit3d Thee-legged OAuth Access to Forge #3dwebcoder #revitapi @AutodeskForge #nodejs #ForgeDevCon
+
+The Forge DevCon launches today. I am putting the final touches to my presentation. One of them was the migration of the roomedit3d viewer extension and web app to the new Forge structure
+&ndash; Forge platform components
+&ndash; Setting up a specific Roomedit3d model
+&ndash; Roomedit3dV2 using OAuth2 to edit any model
+&ndash; Download and installation...
+
+-->
+
+<h3>Forge Platform and Roomedit3d with Thee-legged OAuth</h3>
+<p>The <a href="http://forge.autodesk.com/conference">Forge DevCon</a> launches today.</p>
+<p>I am putting the final touches to my presentation.</p>
+<p>One of them was the migration of
+the <a href="https://github.com/jeremytammik/roomedit3d">roomedit3d viewer extension and web app</a> to the new Forge structure:</p>
+<ul>
+<li><a href="#2">Forge platform components</a></li>
+<li><a href="#3">Setting up a specific Roomedit3d model</a></li>
+<li><a href="#4">Roomedit3dV2 using OAuth2 to edit any model</a></li>
+<li><a href="#5">Download and installation</a></li>
+</ul>
+<p>First, here are some snapshots from my walk through San Francisco to and from the One Market Autodesk office yesterday:</p>
+<p><center>
+<a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157669686966406" title="Telegraph Hill, Haight, Steiner"><img src="https://c4.staticflickr.com/8/7661/27071269003_04abbd4bff_n.jpg" width="320" height="240" alt="Telegraph Hill, Haight, Steiner"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</center></p>
+<h4><a name="2"></a>Forge platform components</h4>
+<p>As you may know by now, the View and Data API no longer exists.</p>
+<p>It morphed into several separate more specific, general, well-defined Forge APIs.</p>
+<p>Currently, these are the main Forge components:</p>
+<ul>
+<li>General Availability<ul>
+<li>Authentication</li>
+<li>Data Management API</li>
+<li>Model Derivative API</li>
+<li>Design Doc</li>
+<li>Fusion Client API</li>
+</ul>
+</li>
+<li>Public Beta<ul>
+<li>3D Printing</li>
+<li>BIM Product API</li>
+</ul>
+</li>
+</ul>
+<p>The authentication can be both two- and three-legged.</p>
+<p>What does that mean?</p>
+<ul>
+<li>Two-legged &ndash; my web app knows my credentials and uses them to access my Forge data.</li>
+<li>Three-legged &ndash; my web app prompts a third party end user to log in to the system in order to access her Forge data.</li>
+</ul>
+<h4><a name="3"></a>Setting up a Specific Roomedit3d Model</h4>
+<p>In a <a href="http://thebuildingcoder.typepad.com/blog/2016/05/roomedit3d-live-real-time-bim-update-recording.html#comment-2714887080">comment</a>
+on The Building Coder discussion of
+the <a href="http://thebuildingcoder.typepad.com/blog/2016/05/roomedit3d-live-real-time-bim-update-recording.html">roomedit3d live real-time socket.io BIM update</a>,
+Danny Bentley asked:</p>
+<blockquote>
+<p>This is very cool.
+I got everything downloaded and started going through the SocketTest and it worked great.
+I want to try the Roomedit3dApp, but in my zip file I don't seem to have the .rvt file of the room.
+Where could I find this file?</p>
+</blockquote>
+<p>Answer: You can use any Revit BIM RVT project file you like.</p>
+<p>It does not have to have anything to do with rooms at all, really, since any element will be accepted, moved, and the translation communicated back via the socket to the Revit add-in running in the same model.</p>
+<p>Translate your RVT for the Forge viewer using your own credentials.</p>
+<p>Adapt the roomedit3d viewer server to load it by specifying your own credentials and your translated model URN.</p>
+<p>With that done, you should be ready to go.</p>
+<p>That is an example of using the two-legged authorisation.</p>
+<p>Since I provided that answer, however, things have got easier still with the three-legged OAuth:</p>
+<h4><a name="4"></a>Roomedit3dV2 Using OAuth2 to Edit any Model</h4>
+<p>The Forge platform has now been redesigned and the View and Data API renamed.</p>
+<p>To be more precise, what we so far considered the View and Data API has been restructured more cleanly into separate REST API endpoint collections:</p>
+<ul>
+<li><a href="https://developer.autodesk.com/en/docs/oauth/v2/overview">Authentication</a></li>
+<li><a href="https://developer.autodesk.com/en/docs/data/v2/overview">Data Management API</a></li>
+<li><a href="https://developer.autodesk.com/en/docs/model-derivative/v2/overview">Model Derivative API</a></li>
+<li><a href="https://developer.autodesk.com/en/docs/viewer/v2/overview">Viewer</a></li>
+</ul>
+<p>I implemented a new version of Roomedit3d adapted to fit into that structure:
+<a href="https://github.com/jeremytammik/model.derivative.api-nodejs-sample-roomedit3d">Roomedit3dV2</a>.</p>
+<p>You can test it live
+at <a href="http://roomedit3dv2.herokuapp.com">roomedit3dv2.herokuapp.com</a>.</p>
+<p>In that version, you can log into
+your <a href="https://myhub.autodesk360.com">own A360 account</a>, obviously exercising
+the <a href="https://developer.autodesk.com/en/docs/oauth/v2/overview">Authentication API</a>.</p>
+<p>The sample uses
+the <a href="https://developer.autodesk.com/en/docs/data/v2/overview">Data Management API</a> to
+list all hubs you have access to and the hierarchy of projects, folders, items and versions within them.</p>
+<p>When you select a specific version,
+the <a href="https://developer.autodesk.com/en/docs/model-derivative/v2/overview">Model Derivative API</a> provides
+access to the internal CAD seed file structure, translates it for the viewer, and enables geometry export of selected elements.</p>
+<p>Within the viewer, the <code>Roomedit3dTranslationTool</code> can be turned on and behaves just as before:</p>
+<ul>
+<li>Select an element</li>
+<li>Transform its location</li>
+<li>Report the data back from the viewer to the web server via a REST API call</li>
+<li>Broadcast the data from the web server to the C# .NET clients to update the BIM</li>
+</ul>
+<p>If you have installed and launched
+the <a href="https://github.com/jeremytammik/Roomedit3dApp">Roomedit3dApp Revit add-in</a> in
+the same model and run its external command to subscribe to the broadcast events, you will see your own BIM being updated live by the element translations defined in the Forge viewer.</p>
+<p>You don't even have to touch the roomedit3dv2 web server.</p>
+<h4><a name="5"></a>Download and Installation</h4>
+<p>As long as my free Heroku account is not overloaded by excessive usage, you can access, share and use my instance
+at <a href="http://roomedit3dv2.herokuapp.com">roomedit3dv2.herokuapp.com</a>.</p>
+<p>Alternatively, you can fork it and launch your own instance on Heroku, your own server, locally or on the web, or anywhere else you please.</p>
+<p>The current versions
+of <a href="https://github.com/jeremytammik/roomedit3d">roomedit3dv2</a>
+and <a href="https://github.com/jeremytammik/Roomedit3dApp">Roomedit3dApp</a> discussed above
+are <a href="https://github.com/jeremytammik/roomedit3d/releases/tag/0.0.4">release 0.0.2</a>
+and <a href="https://github.com/jeremytammik/Roomedit3dApp/releases/tag/2017.0.0.5">release 2017.0.0.5</a>,
+respectively.</p>
