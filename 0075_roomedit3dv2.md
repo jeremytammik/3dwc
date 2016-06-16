@@ -49,15 +49,19 @@ It morphed into several separate more specific, general, well-defined Forge APIs
 
 Currently, these are the main Forge components:
 
-- General Availability
+- Launched
     - Authentication
     - Data Management API
     - Model Derivative API
-    - Design Doc
-    - Fusion Client API
-- Public Beta
-    - 3D Printing
-    - BIM Product API
+    - Viewer
+    - Design Automation API
+- Review Queue
+    - 3D Print API
+    - BIM 360 API
+    - Issues API
+    - Reality Capture API
+    - Fusion Connect API
+    - A360 API
 
 The authentication can be both two- and three-legged.
 
@@ -150,4 +154,3 @@ and [Roomedit3dApp](https://github.com/jeremytammik/Roomedit3dApp) discussed abo
 are [release 0.0.2](https://github.com/jeremytammik/model.derivative.api-nodejs-sample-roomedit3d/releases/tag/0.0.2)
 and [2017.0.0.5](https://github.com/jeremytammik/Roomedit3dApp/releases/tag/2017.0.0.5),
 respectively.
-
