@@ -10,7 +10,7 @@
 
 <!---
 
-Flipping OBJ Axes with Texture for Forge Viewer #3dwebcoder #revitapi @AutodeskForge #ForgeDevCon
+Flipping OBJ Axes and OBJ Texture for Forge #3dwebcoder #revitapi @AutodeskForge #ForgeDevCon
 
 The Forge DevCon finished.
 I had a full body 3D scan created in the Shapify Booth there.
@@ -21,7 +21,7 @@ Unfortunately, the initial model is lying down, not standing up:
 
 -->
 
-### Flipping OBJ Axes with Texture for Forge Viewer
+### Flipping OBJ Axes and OBJ Texture for Forge
 
 The [Forge DevCon](http://forge.autodesk.com/conference) finished, and I spent a nice weekend walking around San Francisco.
 
@@ -80,6 +80,12 @@ To flip the figure from lying to standing, we need to modify two of the three ca
 - `X` &ndash; leave unchanged
 - `Y` &ndash; replace by the `Z` value
 - `Z` &ndash; replace by the `-Y` value
+
+By the way, the negation is required to conserve the 'handedness' of the surface triangles.
+
+The rendering system assumes them to be oriented in a specified direction, based on a right-handed coordinate system.
+
+Not flipping the sign would convert the right-handed system to a left-handed one, invert the triangle orientation, and corrupt the rendering.
 
 In the OBJ file, each vertex is defined in a line of text like these:
 

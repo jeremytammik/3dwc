@@ -9,7 +9,7 @@
 </head></p>
 <!---
 
-Flipping OBJ Axes with Texture for Forge Viewer #3dwebcoder #revitapi @AutodeskForge #ForgeDevCon
+Flipping OBJ Axes and OBJ Texture for Forge #3dwebcoder #revitapi @AutodeskForge #ForgeDevCon
 
 The Forge DevCon finished.
 I had a full body 3D scan created in the Shapify Booth there.
@@ -20,7 +20,7 @@ Unfortunately, the initial model is lying down, not standing up:
 
 -->
 
-<h3>Flipping OBJ Axes with Texture for Forge Viewer</h3>
+<h3>Flipping OBJ Axes and OBJ Texture for Forge</h3>
 <p>The <a href="http://forge.autodesk.com/conference">Forge DevCon</a> finished, and I spent a nice weekend walking around San Francisco.</p>
 <p>Saturday, I crossed the Golden Gate bridge and the Marin headlands to Sausalito:</p>
 <p><center>
@@ -60,6 +60,9 @@ for you to test the rotation behaviour in that orientation.</p>
 <li><code>Y</code> &ndash; replace by the <code>Z</code> value</li>
 <li><code>Z</code> &ndash; replace by the <code>-Y</code> value</li>
 </ul>
+<p>By the way, the negation is required to conserve the 'handedness' of the surface triangles.</p>
+<p>The rendering system assumes them to be oriented in a specified direction, based on a right-handed coordinate system.</p>
+<p>Not flipping the sign would convert the right-handed system to a left-handed one, invert the triangle orientation, and corrupt the rendering.</p>
 <p>In the OBJ file, each vertex is defined in a line of text like these:</p>
 <pre>
 v -87.852317810058594 -89.117828369140625 25.285612106323242
